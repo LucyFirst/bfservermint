@@ -1,0 +1,10 @@
+{
+  "host": "192.168.1.71",
+  "port": 443,
+  "mstv": "21900",
+  "cdn_dir": "cdn",
+  "save_dir": "saves",
+  "replay_stick_last": true,
+  "fetch_missing_content": true,
+  "content_source": "https://cdn.bfrevive.net"
+}

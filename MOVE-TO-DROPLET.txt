@@ -1,0 +1,54 @@
+MOVING THE SERVER TO THE DROPLET (1.0)
+======================================
+
+How it fits together
+  - Code (this folder minus the big stuff) lives on GitHub: LucyFirst/bfservermint (private).
+    Claude pushes changes there; the Droplet picks them up with one command: bf-update
+  - Art/sound (cdn), accounts and progress (saves), settings and the secret key are copied to the
+    Droplet ONCE (step 2) and never go to GitHub.
+
+You need: this PC, the DigitalOcean website, and the Droplet's root password.
+(No root password? DigitalOcean > your Droplet > Access > "Reset root password" - it is emailed.)
+
+1. STOP THE SERVER ON THIS PC
+   Close the START-SERVER window, so nobody's progress changes while it moves.
+
+2. PACK AND SEND EVERYTHING (on this PC)
+   Open PowerShell (Start menu > type PowerShell) and paste these two lines, one at a time:
+
+     tar -czf "$env:USERPROFILE\Desktop\bfserver.tgz" -C "D:\User\downloads\for claude" bfserver
+     scp "$env:USERPROFILE\Desktop\bfserver.tgz" root@bravefmint.com:/opt/
+
+   The first makes bfserver.tgz on your Desktop (a few minutes - the art is big). The second sends it.
+   The first time it asks "Are you sure you want to continue connecting?" - type yes. Then type the
+   root password (nothing shows while you type - that's normal) and press Enter.
+
+3. SET IT UP ON THE DROPLET
+   DigitalOcean > your Droplet > "Console" (top right). In the black window paste:
+
+     cd /opt && tar -xzf bfserver.tgz && bash /opt/bfserver/setup-droplet.sh
+
+   Halfway it stops and shows a key (one line starting with ssh-ed25519). Copy that whole line, then
+   on GitHub: LucyFirst/bfservermint > Settings > Deploy keys > Add deploy key
+     Title: Droplet    Key: paste the line    leave "Allow write access" OFF    > Add key
+   Go back to the console and press Enter. At the end it says
+   "Done. The server is running on https://bravefmint.com".
+
+4. PLAYERS
+   Install BF-Private-1.0.apk (it installs over the old app).
+   Everyone logs in with the same username and password as before - all accounts moved over.
+
+5. ADMIN PAGE
+   https://bravefmint.com/admin - same password as before, from any wifi or mobile data.
+   The browser warns that the connection is not private (the server uses its own certificate, the same
+   kind the app trusts). Click Advanced > Proceed. It stays encrypted.
+
+DAY TO DAY (in the Droplet console)
+   Get Claude's latest changes:    bf-update
+   See what the server is doing:   journalctl -u bfserver -f        (Ctrl+C to stop watching)
+   Restart the server:             systemctl restart bfserver
+   Daily save backups:             /opt/bf-backups  (one file per day at 04:00, never deleted automatically)
+
+THE PC COPY
+   This folder stays as it was - a full backup. The old app (v15 and earlier) still works with it on
+   your home network if you ever start it again, but players' progress then only changes here.

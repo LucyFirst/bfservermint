@@ -1,0 +1,237 @@
+{
+ "_how": "First-clear rewards for each trial (on top of its exp and zel). gems = number; units / items = lists of {\"id\": \"...\", \"count\": 1}. Find unit / item ids with ADMIN.bat: find <name>. Restart the server after editing.",
+ "2000000": {
+  "name": "Trial No. 001",
+  "gems": 1,
+  "units": [
+   {
+    "id": "20233",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "2000001": {
+  "name": "Trial No. 002",
+  "gems": 1,
+  "units": [
+   {
+    "id": "60324",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "2000002": {
+  "name": "Trial No. 003",
+  "gems": 1,
+  "units": [
+   {
+    "id": "50525",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "2000003": {
+  "name": "Trial No. 004",
+  "gems": 1,
+  "units": [
+   {
+    "id": "60425",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "2000004": {
+  "name": "The Green Menace",
+  "gems": 1,
+  "units": [],
+  "items": [
+   {
+    "id": "44700",
+    "count": 1
+   }
+  ]
+ },
+ "2000005": {
+  "name": "Trial No. 005",
+  "gems": 1,
+  "units": [
+   {
+    "id": "60435",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "2000006": {
+  "name": "The Crimson Terror",
+  "gems": 1,
+  "units": [],
+  "items": [
+   {
+    "id": "44701",
+    "count": 1
+   }
+  ]
+ },
+ "2000007": {
+  "name": "Trial No. 006",
+  "gems": 1,
+  "units": [
+   {
+    "id": "60445",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "2000008": {
+  "name": "The Cobalt Impact",
+  "gems": 1,
+  "units": [],
+  "items": [
+   {
+    "id": "44702",
+    "count": 1
+   }
+  ]
+ },
+ "2000009": {
+  "name": "Trial No. 007",
+  "gems": 1,
+  "units": [
+   {
+    "id": "50285",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "2000010": {
+  "name": "Imperial Ambition",
+  "gems": 1,
+  "units": [],
+  "items": [
+   {
+    "id": "44703",
+    "count": 1
+   }
+  ]
+ },
+ "2000011": {
+  "name": "Trial No. 008",
+  "gems": 1,
+  "units": [
+   {
+    "id": "50786",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "2000012": {
+  "name": "黄の閃光",
+  "gems": 1,
+  "units": [],
+  "items": [
+   {
+    "id": "44704",
+    "count": 1
+   }
+  ]
+ },
+ "2000013": {
+  "name": "超えるべき壁",
+  "gems": 1,
+  "units": [],
+  "items": [
+   {
+    "id": "49940",
+    "count": 1
+   },
+   {
+    "id": "110051",
+    "count": 1
+   },
+   {
+    "id": "110060",
+    "count": 1
+   }
+  ]
+ },
+ "2000014": {
+  "name": "虹の女神",
+  "gems": 1,
+  "units": [],
+  "items": [
+   {
+    "id": "110041",
+    "count": 1
+   }
+  ]
+ },
+ "2000015": {
+  "name": "天才からの挑戦",
+  "gems": 1,
+  "units": [],
+  "items": [
+   {
+    "id": "44705",
+    "count": 1
+   }
+  ]
+ },
+ "8300031": {
+  "name": "Trial No. X2",
+  "gems": 1,
+  "units": [],
+  "items": [
+   {
+    "id": "818911",
+    "count": 1
+   }
+  ]
+ },
+ "8360021": {
+  "name": "Trial No. X1",
+  "gems": 1,
+  "units": [
+   {
+    "id": "20302",
+    "count": 1
+   }
+  ],
+  "items": [
+   {
+    "id": "818910",
+    "count": 1
+   }
+  ]
+ },
+ "8360041": {
+  "name": "Trial No. X3",
+  "gems": 1,
+  "units": [
+   {
+    "id": "860156",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "8360051": {
+  "name": "Trial No. X4",
+  "gems": 1,
+  "units": [
+   {
+    "id": "850346",
+    "count": 1
+   }
+  ],
+  "items": []
+ },
+ "_source": "Brave Frontier wiki trial pages (Rewards sections), October 2026"
+}

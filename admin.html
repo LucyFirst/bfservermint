@@ -1,0 +1,1292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Server Admin</title>
+<style>
+:root{
+  --bg:#13151b; --panel:#1c1f27; --panel2:#242833; --line:#323745; --text:#e8e9ee; --muted:#9aa0b0;
+  --gold:#e0b65a; --gold2:#f3d48a; --good:#5ec58a; --bad:#e76a6a; --accent:#6aa7ff; --r:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(#1b1e26,#171a21);border-bottom:1px solid var(--line)}
+.bar{max-width:980px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-weight:700;letter-spacing:.3px;color:var(--gold2)}
+.brand small{color:var(--muted);font-weight:500;margin-left:6px}
+.spacer{flex:1}
+nav{max-width:980px;margin:0 auto;padding:0 8px;display:flex;gap:4px;overflow-x:auto}
+nav button{background:none;border:0;color:var(--muted);padding:10px 12px;font:inherit;font-weight:600;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--gold2);border-bottom-color:var(--gold)}
+main{max-width:980px;margin:0 auto;padding:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 4px;font-size:17px}
+.card p.hint{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px 11px;font:inherit}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1 1 160px}
+.btn{background:var(--gold);color:#1a1406;border:0;border-radius:9px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid #5a2f35}
+.btn.sm{padding:6px 11px;font-size:13px}
+.msg{margin-top:10px;font-size:14px}
+.msg.ok{color:var(--good)} .msg.err{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.4px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.pick{cursor:pointer} tr.pick:hover td{background:#232733}
+tr.sel td{background:#2a2f3c}
+.tablewrap{overflow-x:auto}
+.pill{display:inline-block;white-space:nowrap;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.on{background:#1d3a2a;color:var(--good)} .pill.off{background:#3d2226;color:var(--bad)} .pill.exp{background:#3a3220;color:var(--gold)}
+.results{margin-top:6px;max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:9px;display:none}
+.results div{padding:8px 11px;cursor:pointer;border-bottom:1px solid var(--line)}
+.results div:hover{background:var(--panel2)}
+.chosen{margin-top:6px;font-size:14px;color:var(--gold2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;max-height:340px;overflow:auto;padding:2px}
+.tog{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;cursor:pointer;font-size:14px}
+.tog input{width:auto;accent-color:var(--bad)}
+.tog.closed{border-color:#6a3138;background:#2b1d21}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 2px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px}
+.stat b{display:block;font-size:15px;color:var(--text);font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted)}
+.center{min-height:80vh;display:grid;place-items:center;padding:16px}
+.login{width:100%;max-width:360px}
+.seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:3px;gap:3px;margin-bottom:6px}
+.seg button{background:none;border:0;color:var(--muted);padding:7px 12px;border-radius:7px;font:inherit;font-weight:600;cursor:pointer}
+.seg button.on{background:var(--gold);color:#1a1406}
+.hide{display:none!important}
+.mults{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+@media (max-width:560px){ td.hide-sm,th.hide-sm{display:none} }
+main.wide{max-width:1180px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.toolbar>input,.toolbar>select{width:auto;flex:1 1 150px}
+.toolbar label.chk{display:flex;align-items:center;gap:6px;margin:0;font-size:14px;color:var(--text)}
+.toolbar label.chk input{width:auto}
+.ugrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.ut{position:relative;background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:6px 4px 5px;text-align:center;cursor:pointer;user-select:none}
+.ut img{width:64px;height:64px;display:block;margin:0 auto 4px;image-rendering:auto}
+.ut .nm{font-size:11.5px;line-height:1.2;height:2.4em;overflow:hidden}
+.ut .rr{font-size:11px;color:var(--gold)}
+.ut.sel{border-color:var(--accent);background:#1f2a3d}
+.ut.closed::after{content:'CLOSED';position:absolute;top:4px;left:4px;background:var(--bad);color:#fff;font-size:9.5px;font-weight:800;padding:1px 5px;border-radius:5px}
+.ut.closed img{filter:grayscale(1) brightness(.6)}
+.sticky{position:sticky;top:96px;z-index:3}
+@media (max-width:700px){.sticky{position:static}}
+.tabhead{display:flex;align-items:center;gap:10px;cursor:pointer}
+.subtab{border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:12px;margin-top:12px;background:#191c23}
+.subtab .tabhead h3{font-size:15px}
+.tabhead h3{margin:0;font-size:16px;flex:1}
+.banners{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:12px}
+.bn{background:var(--panel2);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.bn.closed{border-color:#6a3138}
+.bn .pic{aspect-ratio:640/224;background:#0d0f14 center/cover no-repeat;display:grid;place-items:center;color:var(--muted);font-size:12px}
+.bn.closed .pic{filter:grayscale(1) brightness(.55)}
+.bn .bd{padding:10px}
+.bn .t{font-weight:700;font-size:14.5px}
+.bn .sub{color:var(--muted);font-size:12px;margin:2px 0 8px}
+.bn .acts{display:flex;flex-wrap:wrap;gap:6px}
+.qs{margin:8px 0 0;padding:0;list-style:none;font-size:13px;max-height:200px;overflow:auto;border-top:1px solid var(--line)}
+.qs li{padding:5px 0;border-bottom:1px solid var(--line);display:flex;gap:8px}
+.qs li span{color:var(--muted);margin-left:auto;white-space:nowrap}
+.tag{font-size:11px;font-weight:700;padding:1px 6px;border-radius:5px;margin-left:6px;vertical-align:middle}
+.tag.d{background:#1d3a2a;color:var(--good)}.tag.d.no{background:#2a2d36;color:var(--muted)}
+.days{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.days button{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 0;width:52px;font:inherit;font-weight:700;cursor:pointer}
+.days button.on{background:var(--gold);color:#1a1406;border-color:var(--gold)}
+.days button.today{box-shadow:0 0 0 2px var(--accent) inset}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.sm-card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.sm-card.off{border-color:#6a3138}
+.sm-card .pic{aspect-ratio:640/632;background:#0d0f14 center/contain no-repeat;display:grid;place-items:center;color:var(--muted);font-size:12px}
+.sm-card.off .pic{filter:grayscale(1) brightness(.55)}
+.sm-card .bd{padding:10px}
+.sm-card .t{font-weight:700;font-size:14.5px}
+.sm-card .sub{color:var(--muted);font-size:12px;margin:2px 0 6px}
+.rates{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.rates span{font-size:11.5px;background:#2a2d36;border-radius:5px;padding:1px 6px}
+.rrow{display:flex;align-items:center;gap:8px;margin:4px 0}
+.rrow b{width:44px;color:var(--gold)} .rrow input{width:110px} .rrow span{color:var(--muted);font-size:13px}
+.minigrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px;max-height:300px;overflow:auto;padding:2px;margin-top:6px}
+.minigrid .ut{padding:4px 2px} .minigrid .ut img{width:48px;height:48px}
+.minigrid .ut .nm{font-size:10.5px}
+dialog.big{width:min(900px,96vw)}
+.colbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 6px;font-size:13px;color:var(--muted)}
+.colbar button{width:26px;height:26px;border-radius:6px;border:2px solid var(--line);cursor:pointer;padding:0}
+.colbar button.plain{width:auto;height:auto;background:var(--panel2);color:var(--text);padding:4px 9px;font:inherit;font-size:12.5px}
+.colbar .pick{display:flex;align-items:center;gap:4px;margin:0;color:var(--text);cursor:pointer}
+.colbar .pick input{width:30px;height:26px;padding:0;border:0;background:none}
+.gamebox{margin-top:6px;background:#0b0905;border:2px solid #8a6a2a;border-radius:10px;padding:10px 12px;text-align:center;color:#fff;font-weight:700;font-size:14px;line-height:1.35;min-height:2em;white-space:normal}
+.tag.b{background:#3b2a12;color:#ffc966}
+.bolist{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:9px;margin-top:8px;padding:4px 0}
+.bolist label{display:flex;gap:8px;align-items:center;padding:5px 10px;margin:0;font-weight:500;color:var(--text);cursor:pointer}
+.bolist label:hover{background:var(--panel2)}
+.bolist .grp{padding:8px 10px 2px;font-size:12px;font-weight:700;color:var(--muted)}
+.bolist input{width:auto;margin:0}
+.tag.c{background:#1f3350;color:#9cc4ff}.tag.e{background:#3a3220;color:var(--gold)}.tag.x{background:#3d2226;color:var(--bad)}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:18px;width:min(560px,94vw)}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+canvas.prev{width:100%;border-radius:8px;background:#0d0f14;display:block;margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-size:13px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13.5px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+.kv span{color:var(--muted)}
+.pe-h{font-size:14.5px;margin:18px 0 2px;color:var(--gold2)}
+.pe-note{margin:4px 0 8px!important}
+.petabs{flex-wrap:wrap}
+label.chk-line{display:flex;gap:8px;align-items:center;color:var(--text);font-size:13.5px;margin-top:10px}
+label.chk-line input{width:auto}
+.flag{border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-top:6px;background:var(--panel2)}
+.flag .fk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13.5px}
+.flag .fk b{font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.flag .fk span{color:var(--muted)}
+.flag .fv{display:flex;gap:6px;margin-top:6px}
+.flag .fv textarea,.flag .fv input{font:12.5px/1.4 ui-monospace,Consolas,monospace}
+.flag .fv textarea{height:90px}
+details.qa{border:1px solid var(--line);border-radius:9px;margin-top:6px;background:var(--panel2)}
+details.qa>summary{cursor:pointer;padding:9px 12px;font-weight:600;display:flex;gap:8px;align-items:center}
+details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;margin-left:auto}
+.qd{padding:4px 12px 10px}
+.qd .dh{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13.5px;font-weight:600}
+.qd .dh span{color:var(--muted);font-weight:500}
+.qd .dh button[data-c="1"]{margin-left:auto}
+.ql{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:3px 12px;margin-top:4px}
+.ql label{display:flex;gap:7px;align-items:center;margin:0;color:var(--text);font-size:13px;cursor:pointer}
+.ql label input{width:auto;accent-color:var(--good)}
+.ql label i{color:var(--muted);font-style:normal;font-size:11.5px}
+.uimg{width:40px;height:40px;display:block}
+.chip button{background:none;border:0;color:var(--bad);cursor:pointer;font-weight:800;margin-left:4px}
+</style>
+</head>
+<body>
+
+<div id="gate" class="center hide">
+  <div class="card login">
+    <h2 id="gateTitle">Server admin</h2>
+    <p class="hint" id="gateHint">Sign in with the admin password.</p>
+    <form id="gateForm">
+      <label for="pw">Password</label>
+      <input id="pw" type="password" autocomplete="current-password" required>
+      <div id="pw2wrap" class="hide"><label for="pw2">Type it again</label><input id="pw2" type="password" autocomplete="new-password"></div>
+      <div style="margin-top:14px"><button class="btn" id="gateBtn">Sign in</button></div>
+      <div class="msg err" id="gateMsg"></div>
+    </form>
+  </div>
+</div>
+
+<div id="app" class="hide">
+<header>
+  <div class="bar"><div class="brand">Brave Frontier<small>server admin</small></div><div class="spacer"></div>
+    <button class="btn ghost sm" id="logout">Sign out</button></div>
+  <nav id="tabs">
+    <button data-t="players" class="on">Players</button>
+    <button data-t="gifts">Server gifts</button>
+    <button data-t="story">Story areas</button>
+    <button data-t="vortex">Vortex</button>
+    <button data-t="trials">Trials</button>
+    <button data-t="summons">Summons</button>
+    <button data-t="honor">Honor Summon</button>
+    <button data-t="units">Units</button>
+    <button data-t="features">Game areas</button>
+    <button data-t="rates">Rates</button>
+    <button data-t="news">News</button>
+  </nav>
+</header>
+<main>
+
+<section id="t-players">
+  <div class="card">
+    <h2>Players</h2>
+    <p class="hint">Tap a player to see and change their account: give things, profile, quests cleared, units, items, flags and backups.</p>
+    <div class="tablewrap"><table id="ptable"><thead><tr><th>Name</th><th>Last active</th><th class="num">Lv</th><th class="num">Gems</th><th class="num hide-sm">Zel</th><th class="num hide-sm">Karma</th><th class="num hide-sm">Gifts waiting</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="card hide" id="pcard">
+    <h2 id="pname"></h2>
+    <div class="stats" id="pstats"></div>
+    <div class="seg petabs" id="peTabs" style="margin-top:12px"><button data-pt="give" class="on">Give</button><button data-pt="profile">Profile</button><button data-pt="quests">Quests</button><button data-pt="units">Units</button><button data-pt="items">Items</button><button data-pt="flags">Flags</button><button data-pt="backups">Backups</button><button data-pt="raw">Raw save</button></div>
+    <p class="hint pe-note" id="peNote"></p>
+    <div id="pt-give">
+    <div style="margin-top:4px" class="seg" id="giveMode"><button data-m="box" class="on">Send to gift box</button><button data-m="balance">Change balance</button></div>
+    <div id="boxForm">
+      <div class="row">
+        <div><label>What</label><select id="gKind"><option value="gems">Gems</option><option value="zel">Zel</option><option value="karma">Karma</option><option value="unit">Unit</option><option value="item">Item / sphere</option></select></div>
+        <div><label>How many</label><input id="gCount" type="number" min="1" value="1"></div>
+      </div>
+      <div id="gPickWrap" class="hide"><label id="gPickLabel">Search</label><input id="gPick" placeholder="Type at least 2 letters"><div class="results" id="gResults"></div><div class="chosen" id="gChosen"></div></div>
+      <label>Message in the gift box</label><input id="gMsg" maxlength="80" placeholder="A gift from the server">
+      <div style="margin-top:12px"><button class="btn" id="gSend">Send</button></div>
+    </div>
+    <div id="balForm" class="hide">
+      <div class="row">
+        <div><label>Balance</label><select id="bKind"><option value="gems">Gems</option><option value="zel">Zel</option><option value="karma">Karma</option><option value="honor">Honor points</option><option value="tickets">Summon tickets</option></select></div>
+        <div><label>Add (use a minus number to take away)</label><input id="bCount" type="number" value="0"></div>
+      </div>
+      <div style="margin-top:12px"><button class="btn" id="bSend">Apply</button></div>
+    </div>
+    </div>
+
+    <div id="pt-profile" class="hide">
+      <div class="kv" id="peInfo"></div>
+      <label>Player name</label><input id="peName" maxlength="12">
+      <label class="chk-line"><input type="checkbox" id="peGold"> Gold name (admin account) - other players see this name in gold in friend lists, helpers and the arena</label>
+      <h3 class="pe-h">Account</h3>
+      <div class="mults" id="peTeam"></div>
+      <label class="chk-line"><input type="checkbox" id="peLvStats" checked> When the level changes, also set that level's max energy, squad cost and friend slots</label>
+      <h3 class="pe-h">Balances</h3>
+      <div class="mults" id="peWallet"></div>
+      <div id="peOverrides"></div>
+      <div style="margin-top:14px"><button class="btn" id="peSaveProfile">Save profile</button></div>
+    </div>
+
+    <div id="pt-quests" class="hide">
+      <div class="toolbar">
+        <input id="pqSearch" placeholder="Search quest, dungeon or area">
+        <select id="pqCat"><option value="">All kinds</option><option>Story</option><option>Vortex</option><option>Trials</option><option>Other</option></select>
+        <select id="pqShow"><option value="">Cleared and not</option><option value="1">Cleared only</option><option value="0">Not cleared only</option></select>
+      </div>
+      <p class="hint" id="pqCount"></p>
+      <div id="pqList"></div>
+    </div>
+
+    <div id="pt-units" class="hide">
+      <div class="toolbar"><input id="puSearch" placeholder="Search units"><span class="hint" id="puCount" style="margin:0"></span></div>
+      <div class="tablewrap"><table id="puTable"><thead><tr><th></th><th>Unit</th><th class="num">Level</th><th class="num">BB / SBB lv</th><th class="num">SP</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <div id="pt-items" class="hide">
+      <div class="tablewrap"><table id="piTable"><thead><tr><th>Item</th><th class="num">Amount</th><th></th></tr></thead><tbody></tbody></table></div>
+      <h3 class="pe-h">Add an item</h3>
+      <div class="row"><div><input id="piPick" placeholder="Type at least 2 letters"><div class="results" id="piResults"></div><div class="chosen" id="piChosen"></div></div>
+        <div style="flex:0 0 120px"><input id="piCount" type="number" min="1" value="1"></div>
+        <div style="flex:0 0 auto"><button class="btn" id="piAdd">Set amount</button></div></div>
+    </div>
+
+    <div id="pt-flags" class="hide">
+      <p class="hint">Values are JSON: numbers as they are, text in "quotes", lists in [ ] and groups in { }. Clearing a flag (for example welcome_gifts or login_gift_day) makes the server act as if it never happened.</p>
+      <h3 class="pe-h">Server flags</h3>
+      <div id="pfServer"></div>
+      <div class="row" style="margin-top:8px"><div><input id="pfNewKey" placeholder="New flag name"></div><div><input id="pfNewVal" placeholder="Value, e.g. 1"></div><div style="flex:0 0 auto"><button class="btn ghost" id="pfAdd">Add flag</button></div></div>
+      <h3 class="pe-h">Game account flags</h3>
+      <p class="hint">The account row the game reads at login: tutorial, story cutscenes seen, unlocked menu features and so on.</p>
+      <div id="pfGame"></div>
+    </div>
+
+    <div id="pt-backups" class="hide">
+      <p class="hint">The server copies this player's save to saves/backups before changes made here (at most every 10 minutes, and always before a raw edit or a restore). The newest 20 are listed here; older ones are moved to saves/backups/old, never deleted. Clear that folder yourself when you want.</p>
+      <div style="margin-bottom:10px"><button class="btn ghost" id="pbMake">Make a backup now</button></div>
+      <div class="tablewrap"><table id="pbTable"><thead><tr><th>Backup</th><th>Made</th><th class="num">Size</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <div id="pt-raw" class="hide">
+      <p class="hint">The whole save file. Only for things the other tabs can't do: a wrong edit can break the account (a backup is made before saving, so it can be restored on the Backups tab).</p>
+      <div style="margin-bottom:8px"><button class="btn ghost" id="prLoad">Load the save</button></div>
+      <textarea id="prText" spellcheck="false" style="height:420px;font:12.5px/1.4 ui-monospace,Consolas,monospace;white-space:pre"></textarea>
+      <div style="margin-top:10px"><button class="btn danger" id="prSave">Write the save</button></div>
+    </div>
+    <div class="msg" id="pmsg"></div>
+  </div>
+</section>
+
+<section id="t-gifts" class="hide">
+  <div class="card">
+    <h2>New gift for every player</h2>
+    <p class="hint">Every player finds it in their gift box (players who join later too, while it lasts). It can be claimed for 30 days, then shows as expired for 2 days, then disappears.</p>
+    <div class="row">
+      <div><label>What</label><select id="sKind"><option value="gems">Gems</option><option value="zel">Zel</option><option value="karma">Karma</option><option value="unit">Unit</option><option value="item">Item / sphere</option></select></div>
+      <div><label>How many</label><input id="sCount" type="number" min="1" value="1"></div>
+    </div>
+    <div id="sPickWrap" class="hide"><label id="sPickLabel">Search</label><input id="sPick" placeholder="Type at least 2 letters"><div class="results" id="sResults"></div><div class="chosen" id="sChosen"></div></div>
+    <label>Message players see</label><input id="sMsg" maxlength="80" placeholder="e.g. Thanks for playing!">
+    <div style="margin-top:12px"><button class="btn" id="sSend">Send to everyone</button></div>
+    <div class="msg" id="smsg"></div>
+  </div>
+  <div class="card">
+    <h2>Current gifts</h2>
+    <div class="tablewrap"><table id="gtable"><thead><tr><th>Message</th><th>Reward</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div>
+    <p class="hint hide" id="gEmpty" style="margin-top:10px">No server gifts right now.</p>
+  </div>
+</section>
+
+<section id="t-story" class="hide">
+  <div class="card">
+    <h2>Story areas</h2>
+    <p class="hint">Ticked areas are closed: they disappear from the quest map and their quests can't be started.</p>
+    <div class="grid" id="storyGrid" style="max-height:none"></div>
+    <div style="margin-top:12px"><button class="btn" id="storySave">Save</button></div>
+    <div class="msg" id="storymsg"></div>
+  </div>
+</section>
+
+<section id="t-vortex" class="hide">
+  <div class="card">
+    <h2>Vortex banners</h2>
+    <p class="hint">Each banner and the quests behind it, grouped by Vortex tab. Close banners, change their picture, move them to another tab, or make your own banner from copies of existing quests. Picture and banner changes reach players the next time they open the game.</p>
+    <div class="toolbar">
+      <input id="vSearch" placeholder="Search banners or quests">
+      <label class="chk"><input type="checkbox" id="vListed" checked> Only banners the game lists</label>
+      <label class="chk"><input type="checkbox" id="vOpenOnly"> Open only</label>
+      <label class="chk"><input type="checkbox" id="vClosedOnly"> Closed only</label>
+      <label class="chk"><input type="checkbox" id="vSchedOnly"> Day banners only</label>
+      <button class="btn ghost" id="vBoost">Reward boosts</button>
+      <button class="btn" id="vNew">New banner</button>
+    </div>
+    <div class="msg" id="vmsg"></div>
+  </div>
+  <div id="vTabs"></div>
+</section>
+
+<section id="t-features" class="hide">
+  <div class="card">
+    <h2>Game areas</h2>
+    <p class="hint">Switch parts of the game off for every player. These are the game's own switches, so a switched-off area cannot be opened - players do not get sent back to the home screen. Players see changes after fully closing and reopening the game.</p>
+    <div id="featList"></div>
+    <div class="msg" id="featmsg"></div>
+  </div>
+</section>
+
+<section id="t-trials" class="hide">
+  <div class="card">
+    <h2>Trials</h2>
+    <p class="hint">The Summoners' Research Lab trials, in the order they came out. A trial that is switched off is not in the game's trial list at all, and cannot be started. When a trial is off, the next one unlocks with whatever opened the switched-off one. Every trial gives its rewards once per account, on the first clear only. Fighting it again gives no exp, zel, drops, tasks or gifts. Players see on/off changes after logging in again and fully restarting the game.</p>
+    <div class="toolbar"><select id="trShow"><option value="">All trials</option><option value="on">On</option><option value="off">Off</option></select></div>
+    <div id="trList"></div>
+    <div class="msg" id="trmsg"></div>
+  </div>
+</section>
+
+<section id="t-summons" class="hide">
+  <div class="card">
+    <h2>Summons</h2>
+    <p class="hint">Every summon the game knows. The game's Summon screen is one list you swipe through, in this order. Change what each summon costs, which units it gives and how often, and its picture. Players see changes the next time they open the Summon screen.</p>
+    <div class="toolbar">
+      <input id="smSearch" placeholder="Search summons">
+      <select id="smShow"><option value="">Shown and hidden</option><option value="shown">Shown in the game</option><option value="hidden">Hidden</option></select>
+      <select id="smKind"><option value="">All kinds</option><option value="summon">Summons</option><option value="selector">Selectors</option></select>
+    </div>
+    <div class="msg" id="smmsg"></div>
+  </div>
+  <div class="sgrid" id="smGrid"></div>
+</section>
+
+<section id="t-honor" class="hide">
+  <div class="card">
+    <h2>Honor Summon</h2>
+    <p class="hint">The summon paid for with honor points from helpers and friends.</p>
+    <div class="msg" id="hnmsg"></div>
+  </div>
+  <div class="sgrid" id="hnGrid"></div>
+</section>
+
+<section id="t-units" class="hide">
+  <div class="card sticky" style="margin-bottom:10px">
+    <div class="toolbar" style="margin-bottom:6px">
+      <input id="uSearch" placeholder="Search name or number">
+      <select id="uRarity"><option value="">All rarities</option></select>
+      <select id="uElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option></select>
+      <select id="uShow"><option value="">Open and closed</option><option value="closed">Closed only</option><option value="open">Open only</option></select>
+    </div>
+    <div class="toolbar" style="margin:0">
+      <button class="btn ghost sm" id="uAll">Select all shown</button>
+      <button class="btn ghost sm" id="uNone">Clear selection</button>
+      <span id="uCount" style="color:var(--muted);font-size:13px"></span><span class="spacer"></span>
+      <button class="btn danger sm" id="uClose">Close selected</button>
+      <button class="btn sm" id="uOpen">Open selected</button>
+    </div>
+    <div class="msg" id="umsg" style="margin-top:6px"></div>
+  </div>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0 0 10px">Closed units no longer come from summons or quest drops, and no unit can evolve into them (the game shows the unit before as fully evolved). Units players already own stay. Tap units to select them.</p>
+  <div class="ugrid" id="uGrid"></div>
+  <div style="text-align:center;margin:14px 0"><button class="btn ghost" id="uMore">Show more</button></div>
+</section>
+
+<dialog id="picDlg">
+  <h2 style="margin:0 0 4px;font-size:17px" id="picTitle">Banner picture</h2>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0">Pick an image - it is fitted to the game's banner size (640 x 224).</p>
+  <input type="file" accept="image/*" id="picFile" style="margin-top:10px">
+  <canvas class="prev" id="picCanvas" width="640" height="224"></canvas>
+  <div class="row" style="margin-top:12px;gap:8px"><button class="btn" id="picSave" style="flex:0 0 auto">Save picture</button><button class="btn ghost" id="picCancel" style="flex:0 0 auto">Cancel</button></div>
+  <div class="msg" id="picmsg"></div>
+</dialog>
+
+<dialog id="boDlg" class="big">
+  <h2 style="margin:0 0 4px;font-size:17px">Reward boosts</h2>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0">Multiply the EXP, Zel or Karma a Vortex banner's quests give. The game shows it on the banner (for example "XP Received x2"), and zel / karma dropped in battle are multiplied too. The game shows one boost per banner, so a banner holds one boost at a time. This is on top of the overall rates. Whole numbers only (2-99): the game's banner number has no decimal point.</p>
+  <label>Boost</label>
+  <div class="seg" id="boType"><button data-v="exp">EXP</button><button data-v="zel">Zel</button><button data-v="karma">Karma</button></div>
+  <label>Multiplier</label>
+  <div class="row" style="gap:8px;align-items:center">
+    <div class="seg" id="boRate" style="margin:0"><button data-v="2">x2</button><button data-v="3">x3</button><button data-v="4">x4</button><button data-v="5">x5</button></div>
+    <input type="number" id="boRateC" min="2" max="99" step="1" placeholder="or type one (2-99)" style="flex:0 1 190px">
+  </div>
+  <label>Ends (optional - the game shows the time left)</label>
+  <div class="row" style="gap:8px;align-items:center"><input type="date" id="boUntil" style="flex:1 1 160px"><button class="btn ghost sm" id="boUntilClear" style="flex:0 0 auto">No end date</button></div>
+  <label>Banners</label>
+  <div class="row" style="gap:8px;align-items:center">
+    <input id="boSearch" placeholder="Search banners" style="flex:1 1 200px">
+    <label class="chk" style="margin:0"><input type="checkbox" id="boOnly"> Ticked / boosted only</label>
+    <button class="btn ghost sm" id="boNone" style="flex:0 0 auto">Untick all</button>
+  </div>
+  <div class="bolist" id="boList"></div>
+  <div class="row" style="margin-top:14px;gap:8px"><button class="btn" id="boSave" style="flex:0 0 auto">Apply to ticked banners</button><button class="btn danger" id="boRemove" style="flex:0 0 auto">Remove boost from ticked</button><button class="btn ghost" id="boCancel" style="flex:0 0 auto">Cancel</button></div>
+  <div class="msg" id="bomsg"></div>
+</dialog>
+
+<dialog id="schDlg">
+  <h2 style="margin:0 0 4px;font-size:17px" id="schTitle">Banner days</h2>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0" id="schHint"></p>
+  <div class="seg" id="schMode" style="margin-top:12px"><button data-m="days">On these days</button><button data-m="always">Always on</button><button data-m="off">Off</button></div>
+  <div class="days" id="schDays"></div>
+  <label>Also open every day until (optional)</label>
+  <div class="row" style="gap:8px;align-items:center"><input type="date" id="schUntil" style="flex:1 1 160px"><button class="btn ghost sm" id="schUntilClear" style="flex:0 0 auto">No end date</button></div>
+  <div class="row" style="margin-top:14px;gap:8px"><button class="btn" id="schSave" style="flex:0 0 auto">Save</button><button class="btn ghost" id="schReset" style="flex:0 0 auto">Back to game's days</button><button class="btn ghost" id="schCancel" style="flex:0 0 auto">Cancel</button></div>
+  <div class="msg" id="schmsg"></div>
+</dialog>
+
+<dialog id="smDlg" class="big">
+  <h2 style="margin:0 0 4px;font-size:17px" id="smTitle">Summon</h2>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0" id="smHint"></p>
+  <div class="row" style="margin-top:6px">
+    <div><label>Gems per summon</label><input type="number" min="0" id="smGems"></div>
+    <div><label>Honor points per summon</label><input type="number" min="0" id="smHonor"></div>
+  </div>
+  <label>Text under the picture in the game</label>
+  <div class="colbar" id="smColors">
+    <span>Colour the selected words:</span>
+    <button data-c="#ffff00" style="background:#ffff00" title="Yellow"></button>
+    <button data-c="#ff0000" style="background:#ff0000" title="Red"></button>
+    <button data-c="#00ff00" style="background:#00ff00" title="Green"></button>
+    <button data-c="#00c8ff" style="background:#00c8ff" title="Blue"></button>
+    <button data-c="#ff9900" style="background:#ff9900" title="Orange"></button>
+    <button data-c="#ff66cc" style="background:#ff66cc" title="Pink"></button>
+    <button data-c="#b07cff" style="background:#b07cff" title="Purple"></button>
+    <button data-c="#ffffff" style="background:#ffffff" title="White"></button>
+    <label class="pick" title="Any colour"><input type="color" id="smPick" value="#ffd77a"><span>Other…</span></label>
+    <button class="plain" id="smUncolor" title="Remove colour from the selection">Clear colour</button>
+    <button class="plain" id="smFromAuto" title="Put the automatic text in the box to edit it">Start from automatic text</button>
+  </div>
+  <textarea id="smText" rows="4" maxlength="1200" placeholder=""></textarea>
+  <div style="font-size:12.5px;color:var(--muted);margin-top:4px">Select words, then pick a colour. Leave the box empty to use the automatic text (shown greyed in the box). Preview:</div>
+  <div class="gamebox" id="smPreview"></div>
+  <div id="smRatesWrap"><label>Rates - the chance of each rarity (units of a rarity are equally likely)</label><div id="smRates"></div><div id="smRateSum" style="font-size:13px;color:var(--muted);margin-top:4px"></div></div>
+  <label id="smUnitsLabel">Units</label>
+  <div class="toolbar" style="margin:0 0 6px"><span id="smUnitCount" style="font-size:13px;color:var(--muted)"></span><span class="spacer"></span><button class="btn ghost sm" id="smAddBtn">Add units</button><button class="btn danger sm" id="smClearSel">Remove selected</button></div>
+  <div class="toolbar" style="margin:0">
+    <input id="suSearch" placeholder="Find in this summon">
+    <select id="suRarity"><option value="">All rarities</option></select>
+    <select id="suElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option></select>
+    <button class="btn ghost sm" id="suAll">Select all shown</button>
+    <button class="btn ghost sm" id="suNone">Clear selection</button>
+  </div>
+  <div class="minigrid" id="smUnits"></div>
+  <div id="smPicker" class="hide" style="margin-top:10px;border-top:1px solid var(--line);padding-top:10px">
+    <p class="hint" style="color:var(--muted);font-size:13px;margin:0 0 6px">Only units switched on in the Units section can be added.</p>
+    <div class="toolbar" style="margin-bottom:4px">
+      <input id="spSearch" placeholder="Search units to add">
+      <select id="spRarity"><option value="">All rarities</option></select>
+      <select id="spElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option></select>
+      <button class="btn ghost sm" id="spAll">Select all shown</button>
+      <button class="btn sm" id="spAdd">Add selected</button>
+    </div>
+    <div class="minigrid" id="spGrid"></div>
+  </div>
+  <div class="row" style="margin-top:14px;gap:8px"><button class="btn" id="smSave" style="flex:0 0 auto">Save</button><button class="btn ghost" id="smCancel" style="flex:0 0 auto">Cancel</button></div>
+  <div class="msg" id="smDmsg"></div>
+</dialog>
+
+<dialog id="smPicDlg">
+  <h2 style="margin:0 0 4px;font-size:17px" id="smPicTitle">Summon picture</h2>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0">The big picture on this summon's page in the Summon screen. Pick an image - it is fitted to the game's size (640 x 632).</p>
+  <input type="file" accept="image/*" id="smPicFile" style="margin-top:10px">
+  <canvas class="prev" id="smPicCanvas" width="640" height="632" style="max-width:320px;margin:8px auto 0"></canvas>
+  <div class="row" style="margin-top:12px;gap:8px"><button class="btn" id="smPicSave" style="flex:0 0 auto">Save picture</button><button class="btn ghost" id="smPicCancel" style="flex:0 0 auto">Cancel</button></div>
+  <div class="msg" id="smPicMsg"></div>
+</dialog>
+
+<dialog id="newDlg">
+  <h2 style="margin:0 0 4px;font-size:17px">New Vortex banner</h2>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0">The quests are copies of existing ones (same battles and rewards); the originals stay where they are.</p>
+  <label>Name</label><input id="nName" maxlength="40">
+  <label>Vortex tab</label><select id="nTab"></select>
+  <label>Quests</label><input id="nQ" placeholder="Search quests (2+ letters)"><div class="results" id="nQRes"></div>
+  <div class="chips" id="nChips"></div>
+  <label>Picture (optional)</label><input type="file" accept="image/*" id="nFile">
+  <canvas class="prev hide" id="nCanvas" width="640" height="224"></canvas>
+  <div class="row" style="margin-top:12px;gap:8px"><button class="btn" id="nSave" style="flex:0 0 auto">Create banner</button><button class="btn ghost" id="nCancel" style="flex:0 0 auto">Cancel</button></div>
+  <div class="msg" id="nmsg"></div>
+</dialog>
+
+<section id="t-news" class="hide">
+  <div class="card">
+    <h2>News</h2>
+    <p class="hint">The page players see from Home &gt; Info, Menu &gt; News and News on the title screen. One banner picture at the top, then your posts (newest first - use the arrows to reorder). In the text: an empty line starts a new paragraph, lines starting with "- " become a list, and **word** is bold.</p>
+    <label>Banner picture (top of the page)</label>
+    <div class="row" style="gap:8px;align-items:center"><input type="file" accept="image/*" id="nwFile" style="flex:1 1 220px"><button class="btn ghost sm" id="nwNoBanner" style="flex:0 0 auto">Remove banner</button></div>
+    <img id="nwBanner" style="display:none;max-width:100%;margin-top:10px;border-radius:8px;border:1px solid var(--line)">
+    <div class="row" style="margin-top:16px;gap:8px"><button class="btn ghost" id="nwAdd" style="flex:0 0 auto">Add post</button><button class="btn" id="nwSave" style="flex:0 0 auto">Save news</button><a class="btn ghost" id="nwView" href="/bf/web/notice/indexCtrl.php" target="_blank" style="flex:0 0 auto;text-decoration:none">Preview page</a></div>
+    <div class="msg" id="nwmsg"></div>
+  </div>
+  <div id="nwPosts"></div>
+</section>
+
+<section id="t-rates" class="hide">
+  <div class="card">
+    <h2>Rates</h2>
+    <p class="hint">1 = normal. 2 = double, 0.5 = half. Exp, zel and karma are the quest clear rewards; drop and chest rates change how often units drop and chests appear.</p>
+    <div class="mults">
+      <div><label>Quest exp</label><input type="number" step="0.1" min="0" max="100" id="m-exp"></div>
+      <div><label>Quest zel</label><input type="number" step="0.1" min="0" max="100" id="m-zel"></div>
+      <div><label>Quest karma</label><input type="number" step="0.1" min="0" max="100" id="m-karma"></div>
+      <div><label>Unit drop chance</label><input type="number" step="0.1" min="0" max="100" id="m-drop"></div>
+      <div><label>Item chest chance</label><input type="number" step="0.1" min="0" max="100" id="m-item"></div>
+    </div>
+    <div style="margin-top:14px" class="row" style="gap:8px"><button class="btn" id="rSave" style="flex:0 0 auto">Save rates</button><button class="btn ghost" id="rReset" style="flex:0 0 auto">Back to normal</button></div>
+    <div class="msg" id="rmsg"></div>
+  </div>
+  <div class="card">
+    <h2>Fusion success</h2>
+    <p class="hint">Great and Super Success when fusing units. Tick a boost to use your own chance and exp multiplier for it; unticked it stays normal (Great 12% x1.5, Super 3% x2). The label under the Unit screen's Fusion button is your choice below ("Super Success Rate Up" needs app v12 or newer). The game shows the multiplier after a fusion ("Super Success! 2x XP!") - players see a new multiplier after fully closing and reopening the game.</p>
+    <div id="fuGrid"></div>
+    <div style="margin-top:14px" class="row"><button class="btn" id="fuSave" style="flex:0 0 auto">Save fusion success</button><button class="btn ghost" id="fuReset" style="flex:0 0 auto">Back to normal</button></div>
+    <div class="msg" id="fumsg"></div>
+  </div>
+  <div class="card">
+    <h2>Unit sell prices</h2>
+    <p class="hint">Zel a player gets for selling one of these units. The game shows the new price on the sell screen too. Players see changes after fully closing and reopening the game.</p>
+    <div class="mults" id="sellGrid"></div>
+    <div style="margin-top:14px" class="row"><button class="btn" id="sellSave" style="flex:0 0 auto">Save sell prices</button><button class="btn ghost" id="sellReset" style="flex:0 0 auto">Back to normal</button></div>
+    <div class="msg" id="sellmsg"></div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const fmt=n=>Number(n||0).toLocaleString();
+async function api(a,d){
+  const r=await fetch('/admin/api/'+a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d||{}),credentials:'same-origin'});
+  let j={}; try{j=await r.json()}catch(e){}
+  if(j.signed_out){showGate();throw new Error(j.error)}
+  if(!r.ok) throw new Error(j.error||('Error '+r.status));
+  return j;
+}
+function say(el,t,ok){const m=$(el);m.textContent=t;m.className='msg '+(ok?'ok':'err')}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ---------- sign in
+let setupMode=false;
+async function boot(){
+  const s=await api('status');
+  if(s.signed_in) return start();
+  showGate(s);
+}
+function showGate(s){
+  $('#app').classList.add('hide'); $('#gate').classList.remove('hide');
+  if(s && !s.has_password){
+    if(!s.can_setup){$('#gateTitle').textContent='No admin password yet';$('#gateHint').textContent='Open this page once on the PC the server runs on to set the password.';$('#gateForm').classList.add('hide');return}
+    setupMode=true;$('#gateTitle').textContent='Set the admin password';$('#gateHint').textContent='First time here: choose the password for this page (at least 8 characters).';
+    $('#pw2wrap').classList.remove('hide');$('#gateBtn').textContent='Set password';$('#pw').autocomplete='new-password';
+  }
+}
+$('#gateForm').onsubmit=async e=>{
+  e.preventDefault(); const pw=$('#pw').value;
+  try{
+    if(setupMode){ if(pw!==$('#pw2').value) return say('#gateMsg','The two passwords are different.'); await api('setup',{password:pw}); }
+    else await api('login',{password:pw});
+    $('#pw').value='';$('#pw2').value='';start();
+  }catch(err){say('#gateMsg',err.message)}
+};
+$('#logout').onclick=async()=>{await api('logout');location.reload()};
+
+// ---------- tabs
+$$('#tabs button').forEach(b=>b.onclick=()=>{
+  $$('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  $$('main>section').forEach(s=>s.classList.toggle('hide',s.id!=='t-'+b.dataset.t));
+  document.querySelector('main').classList.toggle('wide',b.dataset.t==='units'||b.dataset.t==='players'||b.dataset.t==='vortex'||b.dataset.t==='summons'||b.dataset.t==='honor');
+  ({trials:loadTrials,features:loadFeatures,summons:()=>loadSummons('summons'),honor:()=>loadSummons('honor'),players:loadPlayers,gifts:loadGifts,story:loadSettings,vortex:loadVortex,units:loadUnits,rates:loadSettings,news:loadNews})[b.dataset.t]();
+});
+function start(){$('#gate').classList.add('hide');$('#app').classList.remove('hide');loadPlayers()}
+
+// ---------- search pickers
+function picker(input,results,chosen,kindSel,onPick){
+  let t=null, sel=null;
+  const run=async()=>{
+    const q=$(input).value.trim(), kind=typeof kindSel==='function'?kindSel():$(kindSel).value;
+    if(q.length<2){$(results).style.display='none';return}
+    const r=await api('search',{q,kind});
+    $(results).innerHTML=r.results.map(x=>`<div data-id="${x.id}" data-name="${esc(x.name)}">${esc(x.name)} <span style="color:var(--muted)">${kind==='unit'?(x.rarity+'★ · #'+x.id):(x.type+' · #'+x.id)}</span></div>`).join('')||'<div style="color:var(--muted)">Nothing found</div>';
+    $(results).style.display='block';
+  };
+  $(input).oninput=()=>{clearTimeout(t);t=setTimeout(run,220)};
+  $(results).onclick=e=>{const d=e.target.closest('div[data-id]');if(!d)return;sel={id:d.dataset.id,name:d.dataset.name};$(results).style.display='none';$(input).value='';if(chosen)$(chosen).textContent='Chosen: '+sel.name;onPick&&onPick(sel)};
+  return {get:()=>sel,clear:()=>{sel=null;if(chosen)$(chosen).textContent=''}};
+}
+function kindToggle(sel,wrap,label,pk){
+  $(sel).onchange=()=>{const k=$(sel).value;$(wrap).classList.toggle('hide',!(k==='unit'||k==='item'));$(label).textContent=k==='unit'?'Which unit':'Which item';pk.clear()};
+}
+
+// ---------- players
+let cur=null;
+function ago(t){if(!t)return '-';const s=Date.now()/1000-t;if(s<90)return 'just now';if(s<3600)return Math.round(s/60)+' min ago';if(s<86400)return Math.round(s/3600)+' h ago';return Math.round(s/86400)+' days ago'}
+async function loadPlayers(){
+  const r=await api('players');
+  $('#ptable tbody').innerHTML=r.players.map(p=>`<tr class="pick${cur===p.id?' sel':''}" data-id="${p.id}"><td>${esc(p.name)}${p.account?` <span style="color:var(--muted);font-size:12px">(${esc(p.account)})</span>`:''}</td><td>${p.online?'<span class="pill on">Online</span>':`<span style="color:var(--muted);font-size:13px">${ago(p.seen)}</span>`}</td><td class="num">${p.level}</td><td class="num">${fmt(p.gems)}</td><td class="num hide-sm">${fmt(p.zel)}</td><td class="num hide-sm">${fmt(p.karma)}</td><td class="num hide-sm">${p.presents}</td></tr>`).join('');
+  $$('#ptable tr.pick').forEach(tr=>tr.onclick=()=>{const p=r.players.find(x=>x.id===tr.dataset.id);showPlayer(p);$$('#ptable tr').forEach(x=>x.classList.toggle('sel',x===tr))});
+  if(cur){const p=r.players.find(x=>x.id===cur);if(p)showPlayer(p,true)}
+}
+function showPlayer(p,keep){
+  if(cur!==p.id){PQ=null;PE=null;$('#prText').value='';$('#pqList').innerHTML='';if(peTab==='quests')setTimeout(loadQuests,0)}
+  cur=p.id;$('#pcard').classList.remove('hide');$('#pname').textContent=p.name;
+  $('#pstats').innerHTML=`<div class="stat"><span>Status</span><b>${p.online?'<span style="color:var(--good)">Online</span>':esc(ago(p.seen))}</b></div>`+[['Level',p.level],['Gems',p.gems],['Zel',p.zel],['Karma',p.karma],['Honor',p.honor],['Tickets',p.tickets],['Merit',p.merit],['Units',p.units],['Gifts waiting',p.presents]].map(([k,v])=>`<div class="stat"><span>${k}</span><b>${fmt(v)}</b></div>`).join('');
+  if(!keep){$('#pmsg').textContent='';$('#pcard').scrollIntoView({behavior:'smooth',block:'start'})}
+  peLoad();
+}
+$$('#giveMode button').forEach(b=>b.onclick=()=>{$$('#giveMode button').forEach(x=>x.classList.toggle('on',x===b));$('#boxForm').classList.toggle('hide',b.dataset.m!=='box');$('#balForm').classList.toggle('hide',b.dataset.m!=='balance')});
+const gPick=picker('#gPick','#gResults','#gChosen','#gKind');
+kindToggle('#gKind','#gPickWrap','#gPickLabel',gPick);
+$('#gSend').onclick=async()=>{
+  const kind=$('#gKind').value, sel=gPick.get();
+  if((kind==='unit'||kind==='item')&&!sel) return say('#pmsg','Search and pick the '+kind+' first.');
+  try{$('#gSend').disabled=true;const r=await api('give',{player:cur,to:'box',kind,target:sel&&sel.id,count:+$('#gCount').value,message:$('#gMsg').value});say('#pmsg',r.ok,true);loadPlayers()}
+  catch(e){say('#pmsg',e.message)}finally{$('#gSend').disabled=false}
+};
+$('#bSend').onclick=async()=>{
+  try{$('#bSend').disabled=true;const r=await api('give',{player:cur,to:'balance',kind:$('#bKind').value,count:+$('#bCount').value});say('#pmsg',r.ok,true);$('#bCount').value=0;loadPlayers()}
+  catch(e){say('#pmsg',e.message)}finally{$('#bSend').disabled=false}
+};
+
+// ---------- account editor
+let PE=null, peTab='give', PQ=null;
+const dayStr=t=>t?new Date(t*1000).toLocaleString(undefined,{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'-';
+$$('#peTabs button').forEach(b=>b.onclick=()=>peShowTab(b.dataset.pt));
+function peShowTab(t){
+  peTab=t;$$('#peTabs button').forEach(x=>x.classList.toggle('on',x.dataset.pt===t));
+  ['give','profile','quests','units','items','flags','backups','raw'].forEach(x=>$('#pt-'+x).classList.toggle('hide',x!==t));
+  $('#pmsg').textContent='';
+  if(t==='quests'&&!PQ) loadQuests();
+}
+async function peLoad(){
+  if(!cur)return;
+  try{PE=await api('pe_get',{player:cur});peDraw()}catch(e){say('#pmsg',e.message)}
+}
+function peSet(v){if(v){PE=v;peDraw()}}
+function peDraw(){
+  const v=PE; if(!v)return;
+  const sm=v.summary||{};
+  $('#peNote').innerHTML=(sm.online?'<b style="color:var(--gold)">This player is online right now (game activity in the last 5 minutes).</b> Saving is safe, and anything they do meanwhile still counts. ':`Last active ${esc(ago(sm.seen))}. `)+'The game reads the account at login, so the player sees changes after fully restarting the game.';
+  $('#peInfo').innerHTML=[['User id',v.id],['Friend id',v.friend_id],['Sign-in account',v.account||'-'],['Made',dayStr(v.created)],['Quests cleared',fmt(v.cleared)],['Units',fmt(v.units.length)]].map(([k,x])=>`<span>${k}</span><b>${esc(x)}</b>`).join('');
+  $('#peName').value=v.name||''; $('#peGold').checked=!!v.gold;
+  $('#peTeam').innerHTML=v.team.map(f=>`<div><label>${esc(f.label)}${f.key==='level'&&v.max_level?` (1-${v.max_level})`:''}</label><input type="number" min="0" data-team="${f.key}" value="${esc(f.value)}"></div>`).join('');
+  $('#peWallet').innerHTML=v.wallet.map(f=>`<div><label>${esc(f.label)}</label><input type="number" min="0" data-wallet="${f.key}" value="${esc(f.value)}"></div>`).join('');
+  const ov=Object.entries(v.overrides||{});
+  $('#peOverrides').innerHTML=ov.length?`<p class="hint" style="margin-top:10px;color:var(--gold)">Fixed by ADMIN.bat "set" (these win over the values above): ${ov.map(([k,x])=>esc(k+' = '+x)).join(', ')}. Remove the "overrides" flag on the Flags tab to undo.</p>`:'';
+  drawPeUnits(); drawPeItems(); drawPeFlags(); drawPeBackups();
+}
+$('#peSaveProfile').onclick=async()=>{
+  const team={},wallet={};
+  $$('#peTeam input').forEach(i=>team[i.dataset.team]=i.value);
+  $$('#peWallet input').forEach(i=>wallet[i.dataset.wallet]=i.value);
+  try{$('#peSaveProfile').disabled=true;const r=await api('pe_profile',{player:cur,name:$('#peName').value,gold:$('#peGold').checked,team,wallet,level_stats:$('#peLvStats').checked});peSet(r.view);say('#pmsg',r.ok,true);loadPlayers()}
+  catch(e){say('#pmsg',e.message)}finally{$('#peSaveProfile').disabled=false}
+};
+// quests
+async function loadQuests(){
+  $('#pqList').innerHTML='<p class="hint">Loading quests...</p>';
+  try{PQ=await api('pe_quests',{player:cur});drawQuests()}catch(e){say('#pmsg',e.message)}
+}
+function pqFilter(){
+  const q=$('#pqSearch').value.trim().toLowerCase(),cat=$('#pqCat').value,show=$('#pqShow').value;
+  const out=[];
+  for(const g of PQ.groups){ if(cat&&g.name!==cat)continue;
+    for(const a of g.areas){ const ds=[];
+      for(const d of a.dungeons){
+        const hit=!q||a.name.toLowerCase().includes(q)||d.name.toLowerCase().includes(q);
+        const qs=d.quests.filter(x=>(hit||x[1].toLowerCase().includes(q)||x[0]===q)&&(show===''||(show==='1')===(x[2]>0)));
+        if(qs.length)ds.push({...d,quests:qs});
+      }
+      if(ds.length)out.push({cat:g.name,id:a.id,name:a.name,dungeons:ds});
+    }
+  }
+  return out;
+}
+function drawQuests(){
+  if(!PQ)return;
+  const areas=pqFilter(), open=!!$('#pqSearch').value.trim();
+  const n=areas.reduce((s,a)=>s+a.dungeons.reduce((t,d)=>t+d.quests.length,0),0);
+  $('#pqCount').textContent=`${fmt(PQ.cleared)} quests cleared on this account. ${fmt(n)} shown. Tick or untick quests to change them; the quest map follows the cleared quests. Clearing here gives no rewards.`;
+  $('#pqList').innerHTML=areas.slice(0,400).map((a,i)=>{
+    const tot=a.dungeons.reduce((t,d)=>t+d.quests.length,0),done=a.dungeons.reduce((t,d)=>t+d.quests.filter(x=>x[2]>0).length,0);
+    return `<details class="qa" data-i="${i}"${open&&areas.length<=15?' open':''}><summary>${esc(a.name)} <span class="tag ${done===tot?'d':'d no'}">${a.cat}</span><span class="cnt">${done} / ${tot} cleared</span></summary><div class="qd"></div></details>`}).join('')||'<p class="hint">No quests match.</p>';
+  const fill=(el)=>{const a=areas[+el.dataset.i];el.querySelector('.qd').innerHTML=a.dungeons.map(d=>{
+      const done=d.quests.filter(x=>x[2]>0).length;
+      return `<div class="dh">${esc(d.name)} <span>${done}/${d.quests.length}</span><button class="btn ghost sm" data-all="${d.quests.map(x=>x[0]).join(',')}" data-c="1">Clear all</button><button class="btn ghost sm" data-all="${d.quests.map(x=>x[0]).join(',')}" data-c="0">Unclear all</button></div>
+      <div class="ql">${d.quests.map(x=>`<label><input type="checkbox" data-q="${x[0]}"${x[2]>0?' checked':''}>${esc(x[1])} <i>#${x[0]}${x[2]>1?' · '+x[2]+'x':''}</i></label>`).join('')}</div>`}).join('')};
+  $$('#pqList details').forEach(el=>{if(el.open)fill(el);el.addEventListener('toggle',()=>{if(el.open&&!el.querySelector('.qd').innerHTML)fill(el)})});
+}
+$('#pqList').addEventListener('change',e=>{const c=e.target.closest('input[data-q]');if(c)setQuests([c.dataset.q],c.checked)});
+$('#pqList').addEventListener('click',e=>{const b=e.target.closest('button[data-all]');if(b)setQuests(b.dataset.all.split(','),b.dataset.c==='1')});
+async function setQuests(ids,clear){
+  try{const r=await api('pe_quest_set',{player:cur,ids,clear});PQ={groups:r.groups,cleared:r.cleared};
+    const openAreas=$$('#pqList details[open]').map(d=>d.querySelector('summary').firstChild.textContent.trim());
+    drawQuests();$$('#pqList details').forEach(d=>{if(openAreas.includes(d.querySelector('summary').firstChild.textContent.trim())&&!d.open){d.open=true}});
+    say('#pmsg',r.ok,true);if(PE)PE.cleared=r.cleared}
+  catch(e){say('#pmsg',e.message)}
+}
+let pqT=null;$('#pqSearch').oninput=()=>{clearTimeout(pqT);pqT=setTimeout(drawQuests,250)};
+$('#pqCat').onchange=drawQuests;$('#pqShow').onchange=drawQuests;
+// units
+function drawPeUnits(){
+  const q=$('#puSearch').value.trim().toLowerCase(), l=PE.units.filter(u=>!q||u.name.toLowerCase().includes(q)||u.id===q||u.uuid===q);
+  $('#puCount').textContent=`${l.length} of ${PE.units.length} units`;
+  $('#puTable tbody').innerHTML=l.slice(0,300).map(u=>`<tr><td><img class="uimg" loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"></td><td>${esc(u.name)} <span style="color:var(--gold);font-size:12px">${u.rarity===8?'Omni':u.rarity+'★'}</span>${u.squad?' <span class="tag c">in squad</span>':''}<div style="color:var(--muted);font-size:12px">#${u.id} · unit ${u.uuid}</div></td>
+    <td class="num"><input type="number" min="1" max="${u.max}" value="${u.level}" data-lv="${u.uuid}" style="width:80px;padding:6px"> <span style="color:var(--muted);font-size:12px">/ ${u.max}</span></td>
+    <td class="num" style="white-space:nowrap">${u.has_bb?`<input type="number" min="1" max="10" value="${u.bb||1}" data-bb="${u.uuid}" style="width:58px;padding:6px" title="BB level">`:'<span style="color:var(--muted)">-</span>'}${u.has_sbb?` <input type="number" min="0" max="10" value="${u.sbb}" data-sbb="${u.uuid}" style="width:58px;padding:6px" title="SBB level">`:''}</td>
+    <td class="num" style="white-space:nowrap">${u.has_sp?`<input type="number" min="${u.sp_used}" max="${u.sp_max}" value="${u.sp}" data-sp="${u.uuid}" style="width:64px;padding:6px" title="SP owned (${u.sp_used} used)"> <span style="color:var(--muted);font-size:12px">${u.sp_used} used</span>`:'<span style="color:var(--muted)">-</span>'}</td>
+    <td style="white-space:nowrap"><button class="btn ghost sm" data-set="${u.uuid}">Set</button> <button class="btn ghost sm" data-max="${u.uuid}">Max</button> <button class="btn danger sm" data-rm="${u.uuid}"${u.squad?' disabled title="In a squad"':''}>Remove</button></td></tr>`).join('');
+}
+$('#puSearch').oninput=drawPeUnits;
+$('#puTable').onclick=async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  let d={player:cur};
+  if(b.dataset.set){const id=b.dataset.set,B=$(`input[data-bb="${id}"]`),SB=$(`input[data-sbb="${id}"]`);d.uuid=id;d.level=$(`input[data-lv="${id}"]`).value;if(B)d.bb=B.value;if(SB)d.sbb=SB.value;const SP=$(`input[data-sp="${id}"]`);if(SP)d.sp=SP.value}
+  else if(b.dataset.max){const u=PE.units.find(x=>x.uuid===b.dataset.max);d.uuid=b.dataset.max;d.level='max';if(u.has_bb)d.bb='max';if(u.has_sbb)d.sbb='max';if(u.has_sp)d.sp='max'}
+  else if(b.dataset.rm){const u=PE.units.find(x=>x.uuid===b.dataset.rm);if(!confirm(`Remove ${u.name} from this player's unit box?`))return;d.uuid=b.dataset.rm;d.remove=true}
+  try{b.disabled=true;const r=await api('pe_unit',d);peSet(r.view);say('#pmsg',r.ok,true);loadPlayers()}catch(err){say('#pmsg',err.message);b.disabled=false}
+};
+// items
+function drawPeItems(){
+  $('#piTable tbody').innerHTML=PE.items.map(i=>`<tr><td>${esc(i.name)} <span style="color:var(--muted);font-size:12px">#${i.id}</span></td><td class="num"><input type="number" min="0" value="${i.count}" data-ic="${i.id}" style="width:90px;padding:6px"></td><td style="white-space:nowrap"><button class="btn ghost sm" data-iset="${i.id}">Set</button> <button class="btn danger sm" data-irm="${i.id}">Remove</button></td></tr>`).join('')||'<tr><td colspan="3" style="color:var(--muted)">No items.</td></tr>';
+}
+const piPick=picker('#piPick','#piResults','#piChosen',()=>'item');
+async function setItem(item,count){try{const r=await api('pe_item',{player:cur,item,count});peSet(r.view);say('#pmsg',r.ok,true)}catch(e){say('#pmsg',e.message)}}
+$('#piTable').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.iset)setItem(b.dataset.iset,+$(`input[data-ic="${b.dataset.iset}"]`).value);
+  if(b.dataset.irm)setItem(b.dataset.irm,0)};
+$('#piAdd').onclick=()=>{const s=piPick.get();if(!s)return say('#pmsg','Search and pick the item first.');setItem(s.id,+$('#piCount').value).then(()=>piPick.clear())};
+// flags
+function drawPeFlags(){
+  $('#pfServer').innerHTML=PE.flags.map(f=>`<div class="flag"><div class="fk"><b>${esc(f.key)}</b><span>${esc(f.info||'')}</span>${f.note?`<span class="tag e">${esc(f.note)}</span>`:''}</div>
+    <div class="fv">${f.big?`<textarea data-fv="${esc(f.key)}">${esc(f.value)}</textarea>`:`<input data-fv="${esc(f.key)}" value="${esc(f.value)}">`}<button class="btn ghost sm" data-fs="${esc(f.key)}">Save</button><button class="btn danger sm" data-fd="${esc(f.key)}">Clear</button></div></div>`).join('');
+  $('#pfGame').innerHTML=PE.userinfo.map(f=>`<div class="flag"><div class="fk"><b>${esc(f.key)}</b><span>${esc(f.info||'')}</span></div>
+    <div class="fv"><input data-uv="${esc(f.key)}" value="${esc(f.value)}"><button class="btn ghost sm" data-us="${esc(f.key)}">Save</button></div></div>`).join('');
+}
+$('#pfServer').onclick=async e=>{const b=e.target.closest('button');if(!b)return;
+  const key=b.dataset.fs||b.dataset.fd, del=!!b.dataset.fd;
+  if(del&&!confirm(`Clear the flag "${key}"?`))return;
+  const el=[...$$('#pfServer [data-fv]')].find(x=>x.dataset.fv===key);
+  try{const r=await api('pe_flag',{player:cur,key,value:el?el.value:'',delete:del});peSet(r.view);say('#pmsg',r.ok,true)}catch(err){say('#pmsg',err.message)}};
+$('#pfAdd').onclick=async()=>{try{const r=await api('pe_flag',{player:cur,key:$('#pfNewKey').value,value:$('#pfNewVal').value});peSet(r.view);$('#pfNewKey').value='';$('#pfNewVal').value='';say('#pmsg',r.ok,true)}catch(e){say('#pmsg',e.message)}};
+$('#pfGame').onclick=async e=>{const b=e.target.closest('button[data-us]');if(!b)return;const key=b.dataset.us;
+  const el=[...$$('#pfGame [data-uv]')].find(x=>x.dataset.uv===key);
+  try{const r=await api('pe_userinfo',{player:cur,key,value:el.value});peSet(r.view);say('#pmsg',r.ok,true);loadPlayers()}catch(err){say('#pmsg',err.message)}};
+// backups
+function drawPeBackups(){
+  $('#pbTable tbody').innerHTML=PE.backups.map(b=>`<tr><td style="font-size:13px">${esc(b.name)}</td><td>${dayStr(b.time)}</td><td class="num">${fmt(Math.round(b.size/1024))} KB</td><td><button class="btn ghost sm" data-rs="${esc(b.name)}">Restore</button></td></tr>`).join('')||'<tr><td colspan="4" style="color:var(--muted)">No backups yet.</td></tr>';
+}
+$('#pbMake').onclick=async()=>{try{const r=await api('pe_backup',{player:cur});peSet(r.view);say('#pmsg',r.ok,true)}catch(e){say('#pmsg',e.message)}};
+$('#pbTable').onclick=async e=>{const b=e.target.closest('button[data-rs]');if(!b)return;
+  if(!confirm(`Put the account back to ${b.dataset.rs}? Everything since then is replaced (the current save is backed up first).`))return;
+  try{const r=await api('pe_restore',{player:cur,name:b.dataset.rs});peSet(r.view);PQ=null;say('#pmsg',r.ok,true);loadPlayers()}catch(err){say('#pmsg',err.message)}};
+// raw
+$('#prLoad').onclick=async()=>{try{const r=await api('pe_raw_get',{player:cur});$('#prText').value=r.raw;say('#pmsg','Save loaded.',true)}catch(e){say('#pmsg',e.message)}};
+$('#prSave').onclick=async()=>{if(!$('#prText').value.trim())return say('#pmsg','Load the save first.');
+  if(!confirm('Write this as the player\'s save? A backup is made first.'))return;
+  try{const r=await api('pe_raw_set',{player:cur,raw:$('#prText').value});peSet(r.view);PQ=null;say('#pmsg',r.ok,true);loadPlayers()}catch(e){say('#pmsg',e.message)}};
+
+// ---------- server gifts
+const sPick=picker('#sPick','#sResults','#sChosen','#sKind');
+kindToggle('#sKind','#sPickWrap','#sPickLabel',sPick);
+async function loadGifts(){
+  const r=await api('gifts');
+  $('#gEmpty').classList.toggle('hide',r.gifts.length>0);
+  $('#gtable tbody').innerHTML=r.gifts.map(g=>`<tr><td>${esc(g.message)}</td><td>${esc(g.label)}</td><td>${g.status==='active'?`<span class="pill on">${g.days_left} days left</span>`:`<span class="pill exp">expired · gone in ${g.days_left} d</span>`}</td><td><button class="btn danger sm" data-id="${g.id}">Withdraw</button></td></tr>`).join('');
+  $$('#gtable button').forEach(b=>b.onclick=async()=>{if(!confirm('Withdraw this gift? Players who have not claimed it yet will lose it.'))return;await api('gift_delete',{id:b.dataset.id});loadGifts()});
+}
+$('#sSend').onclick=async()=>{
+  const kind=$('#sKind').value, sel=sPick.get();
+  if((kind==='unit'||kind==='item')&&!sel) return say('#smsg','Search and pick the '+kind+' first.');
+  try{$('#sSend').disabled=true;const r=await api('gift_create',{kind,target:sel&&sel.id,count:+$('#sCount').value,message:$('#sMsg').value});say('#smsg',r.ok,true);$('#sMsg').value='';sPick.clear();loadGifts()}
+  catch(e){say('#smsg',e.message)}finally{$('#sSend').disabled=false}
+};
+
+// ---------- story areas & rates
+let S=null;
+async function loadSettings(){
+  const r=await api('settings'); S=r.settings;
+  $('#storyGrid').innerHTML=r.story_areas.map(a=>`<label class="tog${S.off.areas.includes(a.id)?' closed':''}"><input type="checkbox" value="${a.id}"${S.off.areas.includes(a.id)?' checked':''}><span>${esc(a.name)} <span style="color:var(--muted);font-size:12px">#${a.id}</span></span></label>`).join('');
+  $$('#storyGrid input').forEach(c=>c.onchange=()=>c.parentElement.classList.toggle('closed',c.checked));
+  for(const k of ['exp','zel','karma','drop','item']) $('#m-'+k).value=S.mult[k];
+  loadSell(); loadFusion();
+}
+let FU=null;
+async function loadFusion(){
+  try{FU=await api('fusion_rates')}catch(e){return say('#fumsg',e.message)}
+  const row=(k,label)=>{const v=FU.fusion[k],n=FU.normal[k];return `<div class="mults" style="align-items:end;margin-bottom:8px">
+    <div><label class="chk" style="margin-top:22px"><input type="checkbox" id="fu-${k}-on"${v.on?' checked':''}> Boost ${label} Success</label></div>
+    <div><label>Chance % <span style="color:var(--muted);font-weight:500">(normal ${n.chance})</span></label><input type="number" min="0" max="100" step="0.1" id="fu-${k}-chance" value="${v.chance}"></div>
+    <div><label>Exp multiplier <span style="color:var(--muted);font-weight:500">(normal x${n.mult})</span></label><input type="number" min="1" max="100" step="0.1" id="fu-${k}-mult" value="${v.mult}"></div></div>`};
+  const lb=FU.fusion.label||'none';
+  $('#fuGrid').innerHTML=row('great','Great')+row('super','Super')+`<label style="margin-top:6px">Label under the Fusion button (Unit screen)</label>
+    <div class="seg" id="fuLabel">${[['none','None'],['great','Great Success Rate Up'],['super','Super Success Rate Up']].map(([v,t])=>`<button data-v="${v}" class="${v===lb?'on':''}">${t}</button>`).join('')}</div>`;
+  $('#fuLabel').onclick=e=>{const b=e.target.closest('button');if(!b)return;$('#fuLabel').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
+}
+async function saveFusion(reset){
+  const g=k=>reset?{on:0,chance:FU.normal[k].chance,mult:FU.normal[k].mult}:{on:$('#fu-'+k+'-on').checked?1:0,chance:$('#fu-'+k+'-chance').value,mult:$('#fu-'+k+'-mult').value};
+  const on=$('#fuLabel button.on'), label=reset?'none':(on?on.dataset.v:'none');
+  try{const r=await api('fusion_rates_save',{fusion:{great:g('great'),super:g('super')},label});say('#fumsg',r.ok,true);loadFusion()}catch(e){say('#fumsg',e.message)}
+}
+$('#fuSave').onclick=()=>saveFusion(false);
+$('#fuReset').onclick=()=>saveFusion(true);
+let SELL=[];
+async function loadSell(){
+  try{SELL=(await api('sell_prices')).units}catch(e){return say('#sellmsg',e.message)}
+  $('#sellGrid').innerHTML=SELL.map(u=>`<div><label>${esc(u.name)} <span style="color:var(--muted);font-weight:500">(normal ${fmt(u.normal)})</span></label><input type="number" min="0" step="1" data-sell="${u.id}" value="${u.price}"></div>`).join('');
+}
+async function saveSell(reset){
+  const prices={};$$('#sellGrid input').forEach(i=>{const u=SELL.find(x=>x.id===i.dataset.sell);prices[i.dataset.sell]=reset?u.normal:i.value});
+  try{const r=await api('sell_prices_save',{prices});say('#sellmsg',r.ok,true);loadSell()}catch(e){say('#sellmsg',e.message)}
+}
+$('#sellSave').onclick=()=>saveSell(false);
+$('#sellReset').onclick=()=>saveSell(true);
+$('#storySave').onclick=async()=>{
+  const areas=$$('#storyGrid input:checked').map(c=>c.value);
+  try{const r=await api('settings_save',{off:{areas}});say('#storymsg',r.ok,true)}catch(e){say('#storymsg',e.message)}
+};
+
+// ---------- units
+const ELEM=['','Fire','Water','Earth','Thunder','Light','Dark'];
+let U=[], uSel=new Set(), uShown=[], uLimit=240;
+async function loadUnits(){
+  if(!U.length){
+    const r=await api('units'); U=r.units.map(([id,name,rar,el,off])=>({id,name,rar,el,off:!!off}));
+    const rs=[...new Set(U.map(u=>u.rar))].sort((a,b)=>b-a);
+    $('#uRarity').innerHTML='<option value="">All rarities</option>'+rs.map(r=>`<option value="${r}">${r}★</option>`).join('');
+  }
+  drawUnitGrid(true);
+}
+function filtered(){
+  const q=$('#uSearch').value.trim().toLowerCase(), r=$('#uRarity').value, e=$('#uElem').value, sh=$('#uShow').value;
+  return U.filter(u=>(!q||u.name.toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!e||u.el==e)&&(!sh||(sh==='closed')===u.off))
+          .sort((a,b)=>b.rar-a.rar||(+a.id)-(+b.id));
+}
+function drawUnitGrid(reset){
+  if(reset) uLimit=240;
+  uShown=filtered();
+  const list=uShown.slice(0,uLimit);
+  $('#uGrid').innerHTML=list.map(u=>`<div class="ut${u.off?' closed':''}${uSel.has(u.id)?' sel':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★ ${ELEM[u.el]||''}</div></div>`).join('')||'<p style="color:var(--muted)">No units match.</p>';
+  $('#uMore').classList.toggle('hide',uShown.length<=uLimit);
+  $('#uMore').textContent=`Show more (${uShown.length-uLimit} left)`;
+  uCount();
+}
+function uCount(){$('#uCount').textContent=`${uShown.length} shown · ${uSel.size} selected · ${U.filter(u=>u.off).length} closed`}
+$('#uGrid').onclick=e=>{const t=e.target.closest('.ut');if(!t)return;const id=t.dataset.id;uSel.has(id)?uSel.delete(id):uSel.add(id);t.classList.toggle('sel');uCount()};
+['#uSearch','#uRarity','#uElem','#uShow'].forEach(x=>$(x).addEventListener(x==='#uSearch'?'input':'change',()=>drawUnitGrid(true)));
+$('#uMore').onclick=()=>{uLimit+=480;drawUnitGrid(false)};
+$('#uAll').onclick=()=>{uShown.forEach(u=>uSel.add(u.id));drawUnitGrid(false)};
+$('#uNone').onclick=()=>{uSel.clear();drawUnitGrid(false)};
+async function unitsSet(close){
+  if(!uSel.size) return say('#umsg','Select some units first.');
+  if(close&&uSel.size>50&&!confirm(`Close ${uSel.size} units?`))return;
+  try{const r=await api('units_set',{ids:[...uSel],close});const c=new Set(r.closed);U.forEach(u=>u.off=c.has(u.id));uSel.clear();say('#umsg',r.ok,true);drawUnitGrid(false)}
+  catch(e){say('#umsg',e.message)}
+}
+$('#uClose').onclick=()=>unitsSet(true); $('#uOpen').onclick=()=>unitsSet(false);
+
+// ---------- game areas
+async function loadFeatures(){
+  try{const r=await api('features');
+    $('#featList').innerHTML=r.features.map(f=>`<label class="tog${f.on?'':' closed'}" style="margin-bottom:8px;align-items:flex-start">
+      <input type="checkbox" data-feat="${f.id}"${f.on?'':' checked'} style="margin-top:3px">
+      <span><b>${esc(f.name)}</b> <span style="color:var(--muted);font-size:12px">· ${esc(f.where)}</span>
+      <br><span style="color:var(--muted);font-size:12.5px">${f.on?'On.':'Off.'} When off: ${esc(f.off_effect)}</span></span></label>`).join('');
+  }catch(e){say('#featmsg',e.message)}
+}
+$('#featList').addEventListener('change',async e=>{const c=e.target.closest('input[data-feat]');if(!c)return;
+  try{const r=await api('feature_set',{id:c.dataset.feat,on:!c.checked});say('#featmsg',r.ok,true);loadFeatures()}catch(err){say('#featmsg',err.message)}});
+
+// ---------- trials
+let TR=[];
+async function loadTrials(){
+  try{TR=(await api('trials')).trials;drawTrials()}catch(e){say('#trmsg',e.message)}
+}
+function drawTrials(){
+  const f=$('#trShow').value;
+  $('#trList').innerHTML=TR.filter(t=>!f||(f==='on')===t.on).map(t=>`<label class="tog${t.on?'':' closed'}" style="margin-bottom:8px;align-items:flex-start">
+    <input type="checkbox" data-trial="${t.id}"${t.on?' checked':''} style="margin-top:3px;accent-color:var(--good)">
+    <span style="flex:1"><b>${esc(t.name)}</b> <span class="pill ${t.on?'on':'off'}">${t.on?'On':'Off'}</span>
+      <span style="color:var(--muted);font-size:12px">· #${t.id} · ${t.battles} round${t.battles>1?'s':''}</span>
+      <br><span style="font-size:12.5px">${esc(t.bosses.join(' → ')||'-')}</span>
+      <br><span style="color:var(--muted);font-size:12.5px">First clear: ${esc(t.first_clear.join(', '))}${t.needs.length?' · Unlocks after: '+esc(t.needs.join(', ')):''} · Cleared by ${t.cleared_by} player${t.cleared_by===1?'':'s'} · ${esc(t.source)}${t.ready?'':' · <b>no battle data</b>'}</span></span></label>`).join('');
+}
+$('#trShow').onchange=drawTrials;
+$('#trList').addEventListener('change',async e=>{const c=e.target.closest('input[data-trial]');if(!c)return;
+  try{const r=await api('trial_set',{id:c.dataset.trial,on:c.checked});say('#trmsg',r.ok,true);loadTrials()}catch(err){say('#trmsg',err.message);loadTrials()}});
+
+// ---------- summons
+let SM=[], smView='summons', smCur=null, smUnits=[], smSel=new Set(), spSel=new Set();
+async function loadSummons(view){
+  smView=view;
+  try{ if(!U.length){const r=await api('units');U=r.units.map(([id,name,rar,el,off])=>({id,name,rar,el,off:!!off}))}
+    SM=(await api('summons')).summons; drawSummons(); }
+  catch(e){say(view==='honor'?'#hnmsg':'#smmsg',e.message)}
+}
+function smCard(x){
+  const rates=Object.keys(x.rates||{}).sort((a,b)=>b-a).map(r=>`<span>${r}★ ${x.rates[r]}%${x.counts&&x.counts[r]!=null?' · '+x.counts[r]+' units':''}</span>`).join('');
+  const cost=x.kind==='honor'||(x.honor&&!x.gems)?`${x.honor} honor pts`:`${x.gems} gem${x.gems==1?'':'s'}`;
+  return `<div class="sm-card${x.hidden?' off':''}">
+    <div class="pic" style="background-image:url('${x.image?'/admin/img/gacha/'+encodeURIComponent(x.image):''}')">${x.image?'':'no picture'}</div>
+    <div class="bd"><div class="t">${esc(x.name)}${x.edited?'<span class="tag e">changed</span>':''}${x.hidden?'<span class="tag x">hidden</span>':''}${x.kind==='selector'?'<span class="tag c">selector</span>':''}</div>
+    <div class="sub">summon #${x.id} · ${cost} · ${x.units.length} unit${x.units.length==1?'':'s'}${x.default_pool?' (default pool)':''}</div>
+    ${x.kind==='selector'?'<div class="sub">Players pick one of its units.</div>':`<div class="rates">${rates}</div>`}
+    <div class="acts">
+      <button class="btn ghost sm" data-ed="${x.id}">Units, rates &amp; cost</button>
+      <button class="btn ghost sm" data-smpic="${x.id}">Picture</button>
+      ${x.kind==='honor'?'':`<button class="btn ${x.hidden?'':'danger'} sm" data-hide="${x.id}" data-v="${x.hidden?0:1}">${x.hidden?'Show in game':'Hide'}</button>`}
+      ${x.edited?`<button class="btn ghost sm" data-smrest="${x.id}">Restore original</button>`:''}
+    </div></div></div>`;
+}
+function drawSummons(){
+  if(smView==='honor'){ $('#hnGrid').innerHTML=SM.filter(x=>x.kind==='honor').map(smCard).join('')||'<p class="hint">No honor summon found.</p>'; return; }
+  const q=$('#smSearch').value.trim().toLowerCase(), sh=$('#smShow').value, k=$('#smKind').value;
+  const list=SM.filter(x=>x.kind!=='honor'&&(!q||x.name.toLowerCase().includes(q)||x.id===q)&&(!sh||(sh==='hidden')===x.hidden)&&(!k||x.kind===k));
+  $('#smGrid').innerHTML=list.map(smCard).join('')||'<p class="hint">No summons match.</p>';
+}
+['#smSearch','#smShow','#smKind'].forEach(x=>$(x).addEventListener(x==='#smSearch'?'input':'change',drawSummons));
+async function smClick(e){
+  const b=e.target.closest('button'); if(!b)return; const msg=smView==='honor'?'#hnmsg':'#smmsg';
+  try{
+    if(b.dataset.ed) return openSummon(b.dataset.ed);
+    if(b.dataset.smpic){smPicFor=b.dataset.smpic;smPicImg=null;$('#smPicTitle').textContent='Picture for '+SM.find(x=>x.id===smPicFor).name;$('#smPicFile').value='';const c=$('#smPicCanvas');c.getContext('2d').clearRect(0,0,640,632);$('#smPicMsg').textContent='';return $('#smPicDlg').showModal()}
+    if(b.dataset.hide){const r=await api('summon_save',{id:b.dataset.hide,hidden:b.dataset.v==='1'});say(msg,r.ok,true);return loadSummons(smView)}
+    if(b.dataset.smrest){if(!confirm('Put this summon back to its original cost, units, rates and picture?'))return;const r=await api('summon_restore',{id:b.dataset.smrest});say(msg,r.ok,true);return loadSummons(smView)}
+  }catch(err){say(msg,err.message)}
+}
+$('#smGrid').onclick=smClick; $('#hnGrid').onclick=smClick;
+const unitById=id=>U.find(u=>u.id===id)||{id,name:id,rar:0,el:0};
+function openSummon(id){
+  smCur=SM.find(x=>x.id===id); smUnits=[...smCur.units]; smSel.clear(); spSel.clear();
+  $('#suSearch').value=''; $('#suRarity').value=''; $('#suElem').value='';
+  $('#smTitle').textContent=smCur.name+' (#'+id+')';
+  $('#smHint').textContent=smCur.kind==='selector'?'A selector: players choose one of these units.':(smCur.default_pool?'This summon uses the server\'s default pool until you change its units.':'');
+  $('#smGems').value=smCur.gems; $('#smHonor').value=smCur.honor;
+  $('#smText').value=smCur.text||''; $('#smText').placeholder=smCur.auto_text||''; smPreview();
+  $('#smRatesWrap').classList.toggle('hide',smCur.kind==='selector');
+  $('#smPicker').classList.add('hide'); $('#smDmsg').textContent='';
+  const rs=[...new Set(U.map(u=>u.rar))].sort((a,b)=>b-a);
+  $('#spRarity').innerHTML='<option value="">All rarities</option>'+rs.map(r=>`<option value="${r}">${r}★</option>`).join('');
+  drawSmUnits(); drawRates(smCur.rates); $('#smDlg').showModal();
+}
+function rarCounts(){const c={};smUnits.forEach(id=>{const r=unitById(id).rar;c[r]=(c[r]||0)+1});return c}
+function drawRates(rates){
+  if(smCur.kind==='selector')return;
+  const c=rarCounts(), old={}; $('#smRates').querySelectorAll('input').forEach(i=>old[i.dataset.r]=i.value);
+  const rs=Object.keys(c).sort((a,b)=>b-a);
+  $('#smRates').innerHTML=rs.map(r=>`<div class="rrow"><b>${r}★</b><input type="number" min="0" step="0.1" data-r="${r}" value="${rates&&rates[r]!=null?rates[r]:(old[r]??'')}"><span>% · ${c[r]} unit${c[r]==1?'':'s'}</span></div>`).join('')||'<p class="hint">Add units first.</p>';
+  rateSum();
+}
+function rateSum(){let t=0;$('#smRates').querySelectorAll('input').forEach(i=>t+=parseFloat(i.value)||0);$('#smRateSum').textContent=`Total ${Math.round(t*100)/100}%`+(Math.abs(t-100)>0.01&&t>0?' - the chances are scaled to 100% when rolling':'')}
+$('#smRates').oninput=rateSum;
+function smShownUnits(){
+  const q=$('#suSearch').value.trim().toLowerCase(), r=$('#suRarity').value, el=$('#suElem').value;
+  return smUnits.map(unitById).filter(u=>(!q||String(u.name).toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!el||u.el==el)).sort((a,b)=>b.rar-a.rar||(+a.id)-(+b.id));
+}
+function drawSmUnits(){
+  const rs=[...new Set(smUnits.map(id=>unitById(id).rar))].sort((a,b)=>b-a), cur=$('#suRarity').value;
+  $('#suRarity').innerHTML='<option value="">All rarities</option>'+rs.map(r=>`<option value="${r}"${String(r)===cur?' selected':''}>${r}★</option>`).join('');
+  const list=smShownUnits();
+  $('#smUnits').innerHTML=list.map(u=>`<div class="ut${smSel.has(u.id)?' sel':''}${u.off?' closed':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★</div></div>`).join('')||'<p class="hint">No units yet.</p>';
+  const c=rarCounts(), nOff=smUnits.filter(id=>unitById(id).off).length; $('#smUnitCount').textContent=`${smUnits.length} units${nOff?` (${nOff} switched off - never given)`:''} · `+Object.keys(c).sort((a,b)=>b-a).map(r=>`${r}★ ${c[r]}`).join(', ')+(list.length!==smUnits.length?` · ${list.length} shown`:'')+(smSel.size?` · ${smSel.size} selected`:'');
+  $('#smClearSel').textContent=smSel.size?`Remove ${smSel.size} selected`:'Remove selected';
+}
+$('#smUnits').onclick=e=>{const t=e.target.closest('.ut');if(!t)return;const id=t.dataset.id;smSel.has(id)?smSel.delete(id):smSel.add(id);drawSmUnits()};
+['#suSearch','#suRarity','#suElem'].forEach(x=>$(x).addEventListener(x==='#suSearch'?'input':'change',drawSmUnits));
+$('#suAll').onclick=()=>{smShownUnits().forEach(u=>smSel.add(u.id));drawSmUnits()};
+$('#suNone').onclick=()=>{smSel.clear();drawSmUnits()};
+$('#smClearSel').onclick=()=>{if(!smSel.size)return;smUnits=smUnits.filter(id=>!smSel.has(id));smSel.clear();drawSmUnits();drawRates()};
+$('#smAddBtn').onclick=()=>{$('#smPicker').classList.toggle('hide');drawPicker()};
+function pickerList(){const q=$('#spSearch').value.trim().toLowerCase(),r=$('#spRarity').value,el=$('#spElem').value,have=new Set(smUnits);
+  return U.filter(u=>!have.has(u.id)&&!u.off&&(!q||u.name.toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!el||u.el==el)).sort((a,b)=>b.rar-a.rar||(+a.id)-(+b.id))}
+function drawPicker(){const l=pickerList().slice(0,300);
+  $('#spGrid').innerHTML=l.map(u=>`<div class="ut${spSel.has(u.id)?' sel':''}${u.off?' closed':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★</div></div>`).join('')||'<p class="hint">No units match.</p>';
+  $('#spAdd').textContent=spSel.size?`Add ${spSel.size} selected`:'Add selected'}
+['#spSearch','#spRarity','#spElem'].forEach(x=>$(x).addEventListener(x==='#spSearch'?'input':'change',drawPicker));
+$('#spGrid').onclick=e=>{const t=e.target.closest('.ut');if(!t)return;const id=t.dataset.id;spSel.has(id)?spSel.delete(id):spSel.add(id);drawPicker()};
+$('#spAll').onclick=()=>{pickerList().slice(0,300).forEach(u=>spSel.add(u.id));drawPicker()};
+$('#spAdd').onclick=()=>{if(!spSel.size)return;smUnits=[...smUnits,...spSel];spSel.clear();drawPicker();drawSmUnits();drawRates()};
+$('#smCancel').onclick=()=>$('#smDlg').close();
+$('#smSave').onclick=async()=>{
+  const d={id:smCur.id,gems:$('#smGems').value,honor:$('#smHonor').value,units:smUnits,text:$('#smText').value};
+  if(smCur.kind!=='selector'){d.rates={};$('#smRates').querySelectorAll('input').forEach(i=>{if(i.value!=='')d.rates[i.dataset.r]=i.value})}
+  const unchanged=JSON.stringify([...smCur.units].sort())===JSON.stringify([...smUnits].sort());
+  if(unchanged&&smCur.default_pool) delete d.units;   // keep following the default pool
+  try{$('#smSave').disabled=true;const r=await api('summon_save',d);$('#smDlg').close();say(smView==='honor'?'#hnmsg':'#smmsg',r.ok,true);loadSummons(smView)}
+  catch(err){say('#smDmsg',err.message)} finally{$('#smSave').disabled=false}
+};
+function smPreview(){
+  const raw=$('#smText').value;
+  const src=raw.trim()?raw:((smCur&&smCur.auto_markup)||'');
+  const flat=l=>{const st=[];return l.split(/(\[color=#[0-9a-fA-F]{6}\]|\[\/color\])/).map(t=>{
+      if(/^\[color=#[0-9a-fA-F]{6}\]$/.test(t)){st.push(t.slice(7,14));return ''}
+      if(t==='[/color]'){st.pop();return ''}
+      return t?(st.length?`<span style="color:${st[st.length-1]}">${esc(t)}</span>`:esc(t)):''}).join('')};
+  $('#smPreview').innerHTML=src.split('\n').map(flat).join('<br>');
+}
+$('#smText').addEventListener('input',smPreview);
+function wrapColour(c){
+  const t=$('#smText'); let a=t.selectionStart, b=t.selectionEnd;
+  if(!t.value.trim()){ t.value=(smCur&&smCur.auto_markup)||''; a=0; b=0; }
+  if(a===b) return say('#smDmsg','Select the words to colour first.');
+  const sel=t.value.slice(a,b).replace(/\[\/?color[^\]]*\]/g,'');
+  const parts=sel.split('\n').map(x=>x?(c?`[color=${c}]${x}[/color]`:x):x).join('\n');
+  t.value=t.value.slice(0,a)+parts+t.value.slice(b); t.focus(); t.setSelectionRange(a,a+parts.length); smPreview(); $('#smDmsg').textContent='';
+}
+$('#smColors').onclick=e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();
+  if(b.id==='smFromAuto'){$('#smText').value=(smCur&&smCur.auto_markup)||'';smPreview();return $('#smText').focus()}
+  if(b.id==='smUncolor')return wrapColour(null);wrapColour(b.dataset.c)};
+$('#smPick').addEventListener('change',e=>wrapColour(e.target.value));
+let smPicFor=null, smPicImg=null;
+$('#smPicFile').onchange=()=>{const f=$('#smPicFile').files[0];if(!f)return;const img=new Image();img.onload=()=>{const c=$('#smPicCanvas'),x=c.getContext('2d');x.clearRect(0,0,640,632);const sc=Math.min(640/img.width,632/img.height),w=img.width*sc,h=img.height*sc;x.drawImage(img,(640-w)/2,(632-h)/2,w,h);smPicImg=c.toDataURL('image/png')};img.onerror=()=>say('#smPicMsg','That file is not a picture.');img.src=URL.createObjectURL(f)};
+$('#smPicCancel').onclick=()=>$('#smPicDlg').close();
+$('#smPicSave').onclick=async()=>{if(!smPicImg)return say('#smPicMsg','Pick a picture first.');
+  try{$('#smPicSave').disabled=true;const r=await api('summon_image',{id:smPicFor,png:smPicImg});$('#smPicDlg').close();say(smView==='honor'?'#hnmsg':'#smmsg',r.ok,true);loadSummons(smView)}
+  catch(err){say('#smPicMsg',err.message)} finally{$('#smPicSave').disabled=false}};
+
+// ---------- vortex
+let VX=null, picFor=null, picImg=null;
+async function loadVortex(){VX=await api('vortex');drawVortex()}
+function drawVortex(){
+  const q=$('#vSearch').value.trim().toLowerCase(), only=$('#vListed').checked, co=$('#vClosedOnly').checked, so=$('#vSchedOnly').checked, oo=$('#vOpenOnly').checked;
+  const SC=VX.schedules||{}; BO=VX.boosts||{};
+  const closed=new Set(VX.closed), ctab=new Set(VX.closed_tabs);
+  const byId={}, kids={};
+  VX.tabs.forEach(t=>byId[t.id]=t);
+  VX.tabs.forEach(t=>{if(t.parent&&byId[t.parent]&&t.parent!==t.id)(kids[t.parent]=kids[t.parent]||[]).push(t)});
+  const tabOpts=VX.tabs.filter(t=>t.listed).map(t=>`<option value="${t.id}">${esc(t.parent&&byId[t.parent]?byId[t.parent].name+' › ':'')}${esc(t.name)} (#${t.id})</option>`).join('');
+  $('#nTab').innerHTML=tabOpts;
+  // the closed tab a tab is hidden by (itself or one it sits in)
+  const hiddenBy=(t,seen=new Set())=>{if(!t||seen.has(t.id))return null;seen.add(t.id);if(ctab.has(t.id))return t;return t.parent?hiddenBy(byId[t.parent],seen):null};
+  const offNow=b=>SC[b.id]&&SC[b.id].mode==='off'&&!(SC[b.id].until*1000>Date.now());
+  const card=(b,c)=>`<div class="bn${c?' closed':''}">
+        <div class="pic" style="background-image:url('${b.image?'/admin/img/banner/'+encodeURIComponent(b.image):''}')">${b.image?'':'no picture'}</div>
+        <div class="bd"><div class="t">${esc(b.name)}${b.custom?'<span class="tag c">custom</span>':''}${b.edited?'<span class="tag e">changed</span>':''}${closed.has(b.id)?'<span class="tag x">closed</span>':''}${BO[b.id]?`<span class="tag b">${esc(boText(BO[b.id]))}</span>`:''}</div>
+        <div class="sub">banner #${b.id} · ${b.quests.length} quest${b.quests.length==1?'':'s'}${b.listed?'':' · not listed in the game'}</div>
+        ${SC[b.id]?`<div style="margin:-2px 0 8px"><span class="tag d${SC[b.id].open_now?'':' no'}" style="margin-left:0">${esc(schText(SC[b.id]))} · ${SC[b.id].open_now?'open today':'closed today'}</span></div>`:''}
+        <div class="acts">
+          <button class="btn ghost sm" data-q="${b.id}">Quests</button>
+          <button class="btn ${closed.has(b.id)?'':'danger'} sm" data-close="${closed.has(b.id)?0:1}" data-b="${b.id}">${closed.has(b.id)?'Open':'Close'}</button>
+          <button class="btn ghost sm" data-pic="${b.id}" data-name="${esc(b.name)}">Picture</button>
+          <button class="btn ghost sm" data-sch="${b.id}" data-name="${esc(b.name)}">Days</button>
+          <button class="btn ghost sm" data-boost="${b.id}">Boost</button>
+          <select class="mv" data-mv="${b.id}" style="width:auto;padding:5px 8px;font-size:13px"><option value="">Move to tab…</option>${tabOpts}</select>
+          ${b.edited?`<button class="btn ghost sm" data-restore="${b.id}">Restore original</button>`:''}
+          ${b.custom?`<button class="btn danger sm" data-del="${b.id}">Delete</button>`:''}
+        </div>
+        <ul class="qs hide" id="qs-${b.id}">${b.quests.map(x=>`<li>${esc(x.name)}<span>#${x.id}${x.energy?' · '+x.energy+' energy':''}</span></li>`).join('')||'<li>No quests</li>'}</ul></div></div>`;
+  // one tab with its banners, then the tabs inside it
+  const block=(t,depth,seen,parentHit)=>{
+    if(seen.has(t.id))return '';seen.add(t.id);
+    const hb=hiddenBy(t), tc=ctab.has(t.id), pc=hb&&hb.id!==t.id?hb:null;
+    if(oo&&hb)return '';
+    const tabHit=parentHit||(q&&t.name.toLowerCase().includes(q));
+    const bs=t.banners.filter(b=>(!oo||(!closed.has(b.id)&&!offNow(b)))&&(!so||SC[b.id])&&(!only||b.listed)&&(!co||closed.has(b.id)||hb)&&(!q||tabHit||b.name.toLowerCase().includes(q)||b.quests.some(x=>String(x.name).toLowerCase().includes(q))));
+    const inner=(kids[t.id]||[]).map(k=>block(k,depth+1,seen,tabHit)).join('');
+    if(!bs.length&&!inner)return '';
+    const nk=(kids[t.id]||[]).length;
+    const info=[`tab #${t.id}`];
+    if(nk)info.push(`${nk} tab${nk>1?'s':''} inside`);
+    if(bs.length)info.push(`${bs.length} banner${bs.length>1?'s':''}`);
+    return `<div class="${depth?'subtab':'card'}"><div class="tabhead"><h3>${esc(t.name)} <span style="color:var(--muted);font-weight:500;font-size:12px">${info.join(' · ')}</span>${tc?'<span class="tag x">tab closed</span>':''}${pc?`<span class="tag x">hidden - ${esc(pc.name)} is closed</span>`:''}${tc&&nk?'<span class="tag x">hides the tabs inside</span>':''}</h3>
+      <button class="btn ${tc?'':'danger'} sm" data-tab="${t.id}" data-close="${tc?0:1}">${tc?'Open tab':'Close tab'}</button></div>
+      ${bs.length?`<div class="banners">${bs.map(b=>card(b,closed.has(b.id)||!!hb)).join('')}</div>`:''}
+      ${inner}</div>`;
+  };
+  const seen=new Set();
+  let html=VX.tabs.filter(t=>!t.parent||!byId[t.parent]).map(t=>block(t,0,seen,false)).join('');
+  html+=VX.tabs.filter(t=>!seen.has(t.id)).map(t=>block(t,0,seen,false)).join('');   // anything in a loop
+  $('#vTabs').innerHTML=html||'<div class="card"><p class="hint">No banners match.</p></div>';
+}
+$('#vOpenOnly').addEventListener('change',()=>{if($('#vOpenOnly').checked)$('#vClosedOnly').checked=false});
+$('#vClosedOnly').addEventListener('change',()=>{if($('#vClosedOnly').checked)$('#vOpenOnly').checked=false});
+['#vSearch','#vListed','#vClosedOnly','#vSchedOnly','#vOpenOnly'].forEach(x=>$(x).addEventListener(x==='#vSearch'?'input':'change',drawVortex));
+$('#vTabs').onclick=async e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  try{
+    if(b.dataset.q) return $('#qs-'+b.dataset.q).classList.toggle('hide');
+    if(b.dataset.tab){await api('banner_close',{tab:1,ids:[b.dataset.tab],close:b.dataset.close==='1'});return loadVortex()}
+    if(b.dataset.b){await api('banner_close',{ids:[b.dataset.b],close:b.dataset.close==='1'});return loadVortex()}
+    if(b.dataset.sch) return openSchedule(b.dataset.sch,b.dataset.name);
+    if(b.dataset.boost) return openBoost([b.dataset.boost]);
+    if(b.dataset.pic){picFor=b.dataset.pic;picImg=null;$('#picTitle').textContent='Picture for '+b.dataset.name;$('#picFile').value='';clearCanvas('#picCanvas');$('#picmsg').textContent='';return $('#picDlg').showModal()}
+    if(b.dataset.restore){if(!confirm('Put this banner back to its original picture and tab?'))return;const r=await api('banner_restore',{id:b.dataset.restore});say('#vmsg',r.ok,true);return loadVortex()}
+    if(b.dataset.del){if(!confirm('Delete this custom banner? Its copied quests disappear with it.'))return;const r=await api('banner_delete',{id:b.dataset.del});say('#vmsg',r.ok,true);return loadVortex()}
+  }catch(err){say('#vmsg',err.message)}
+};
+$('#vTabs').onchange=async e=>{
+  const s=e.target.closest('select.mv'); if(!s||!s.value)return;
+  try{const r=await api('banner_move',{id:s.dataset.mv,tab:s.value});say('#vmsg',r.ok,true);loadVortex()}catch(err){say('#vmsg',err.message)}
+};
+const DAYN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], DAYL=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+function fmtDate(t){const d=new Date(t*1000);return d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})}
+function schText(sc){
+  let t=sc.mode==='off'?'Off':sc.mode==='always'?'Every day':(sc.days||[]).length===7?'Every day':(sc.days||[]).map(d=>DAYN[d]).join(', ')+' only';
+  if(sc.until&&sc.until*1000>Date.now()) t+=' · every day until '+fmtDate(sc.until);
+  return t;
+}
+// ---------- news
+let NW={banner:'',posts:[]}, nwKinds={};
+async function loadNews(){const r=await api('news_get');NW={banner:r.banner||'',posts:r.posts||[]};nwKinds=r.kinds||{};drawNews()}
+function nwRead(){NW.posts=[...document.querySelectorAll('#nwPosts .nwp')].map(el=>({id:el.dataset.id,title:el.querySelector('.nwt').value,date:el.querySelector('.nwd').value,kind:el.querySelector('.nwk').value,body:el.querySelector('.nwb').value}))}
+function drawNews(){
+  const b=$('#nwBanner'); if(NW.banner){b.src=NW.banner;b.style.display='block'}else{b.removeAttribute('src');b.style.display='none'}
+  $('#nwPosts').innerHTML=NW.posts.map((p,i)=>`<div class="card nwp" data-id="${esc(p.id||'')}">
+    <div class="row" style="gap:8px;align-items:end">
+      <div style="flex:3 1 260px"><label>Title</label><input class="nwt" maxlength="120" value="${esc(p.title)}"></div>
+      <div style="flex:1 1 140px"><label>Date (shown under the title)</label><input class="nwd" maxlength="40" value="${esc(p.date)}"></div>
+      <div style="flex:1 1 140px"><label>Kind</label><select class="nwk">${Object.entries(nwKinds).map(([k,t])=>`<option value="${k}"${k===p.kind?' selected':''}>${esc(t)}</option>`).join('')}</select></div>
+    </div>
+    <label>Text</label><textarea class="nwb" rows="8" maxlength="8000">${esc(p.body)}</textarea>
+    <div class="row" style="margin-top:8px;gap:8px"><button class="btn ghost sm" data-up="${i}" style="flex:0 0 auto">&uarr; Up</button><button class="btn ghost sm" data-down="${i}" style="flex:0 0 auto">&darr; Down</button><button class="btn danger sm" data-delp="${i}" style="flex:0 0 auto">Delete post</button></div>
+  </div>`).join('')||'<div class="card"><p class="hint">No posts yet - press Add post.</p></div>';
+}
+$('#nwAdd').onclick=()=>{nwRead();const d=new Date();NW.posts.unshift({id:'',title:'',date:d.toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'}),kind:'new',body:''});drawNews()};
+$('#nwPosts').onclick=e=>{const b=e.target.closest('button');if(!b)return;nwRead();
+  if(b.dataset.delp){if(!confirm('Delete this post?'))return;NW.posts.splice(+b.dataset.delp,1)}
+  if(b.dataset.up&&+b.dataset.up>0){const i=+b.dataset.up;[NW.posts[i-1],NW.posts[i]]=[NW.posts[i],NW.posts[i-1]]}
+  if(b.dataset.down&&+b.dataset.down<NW.posts.length-1){const i=+b.dataset.down;[NW.posts[i+1],NW.posts[i]]=[NW.posts[i],NW.posts[i+1]]}
+  drawNews()};
+$('#nwFile').onchange=()=>{const f=$('#nwFile').files[0];if(!f)return;const img=new Image();img.onload=()=>{
+  const w=Math.min(720,img.width),h=Math.round(img.height*w/img.width),c=document.createElement('canvas');c.width=w;c.height=h;
+  c.getContext('2d').drawImage(img,0,0,w,h);let q=0.85,u=c.toDataURL('image/jpeg',q);while(u.length>550000&&q>0.4){q-=0.1;u=c.toDataURL('image/jpeg',q)}
+  NW.banner=u;drawNews();say('#nwmsg','Banner ready - press Save news.',true)};img.src=URL.createObjectURL(f)};
+$('#nwNoBanner').onclick=()=>{NW.banner='';$('#nwFile').value='';drawNews()};
+$('#nwSave').onclick=async()=>{nwRead();try{const r=await api('news_save',{banner:NW.banner,posts:NW.posts});NW={banner:r.banner||'',posts:r.posts||[]};drawNews();say('#nwmsg',r.ok,true)}catch(e){say('#nwmsg',e.message)}};
+
+// ---------- reward boosts
+let BO={}, boT='exp', boR='2', boSel=new Set();
+const BON={exp:'EXP',zel:'Zel',karma:'Karma'};
+function boText(b){let t=BON[b.type]+' x'+(+b.rate);if(b.until)t+=' until '+fmtDate(b.until);return t}
+function boBanners(){
+  const byId={};VX.tabs.forEach(t=>byId[t.id]=t);
+  const out=[];
+  VX.tabs.forEach(t=>t.banners.forEach(b=>{if(b.listed||BO[b.id])out.push({b,tab:(t.parent&&byId[t.parent]?byId[t.parent].name+' › ':'')+t.name})}));
+  return out;
+}
+function drawBoost(){
+  $('#boType').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.v===boT));
+  const custom=$('#boRateC').value.trim();
+  $('#boRate').querySelectorAll('button').forEach(x=>x.classList.toggle('on',!custom&&x.dataset.v===boR));
+  const q=$('#boSearch').value.trim().toLowerCase(), only=$('#boOnly').checked;
+  let html='',last=null;
+  boBanners().forEach(({b,tab})=>{
+    if(only&&!boSel.has(b.id)&&!BO[b.id])return;
+    if(q&&!b.name.toLowerCase().includes(q)&&!tab.toLowerCase().includes(q)&&!String(b.id).includes(q))return;
+    if(tab!==last){html+=`<div class="grp">${esc(tab)}</div>`;last=tab}
+    html+=`<label><input type="checkbox" data-bo="${b.id}" ${boSel.has(b.id)?'checked':''}> ${esc(b.name)} <span style="color:var(--muted);font-size:12px">#${b.id}</span>${BO[b.id]?`<span class="tag b">${esc(boText(BO[b.id]))}</span>`:''}</label>`;
+  });
+  $('#boList').innerHTML=html||'<p class="hint" style="padding:6px 10px">No banners match.</p>';
+  $('#boSave').textContent=`Apply to ticked banners (${boSel.size})`;
+  $('#boRemove').textContent=`Remove boost from ticked (${boSel.size})`;
+}
+function openBoost(ids){
+  boSel=new Set(ids||[]);
+  const cur=ids&&ids.length===1?BO[ids[0]]:null;
+  boT=cur?cur.type:'exp';
+  const r=cur?String(+cur.rate):'2';
+  if(['2','3','4','5'].includes(r)){boR=r;$('#boRateC').value=''}else{boR='2';$('#boRateC').value=r}
+  const u=cur&&cur.until?new Date(cur.until*1000):null;
+  $('#boUntil').value=u?`${u.getFullYear()}-${String(u.getMonth()+1).padStart(2,'0')}-${String(u.getDate()).padStart(2,'0')}`:'';
+  $('#boSearch').value='';$('#boOnly').checked=!!(ids&&ids.length);$('#bomsg').textContent='';
+  drawBoost();$('#boDlg').showModal();
+}
+$('#vBoost').onclick=()=>openBoost([]);
+$('#boType').onclick=e=>{const b=e.target.closest('button');if(!b)return;boT=b.dataset.v;drawBoost()};
+$('#boRate').onclick=e=>{const b=e.target.closest('button');if(!b)return;boR=b.dataset.v;$('#boRateC').value='';drawBoost()};
+$('#boRateC').addEventListener('input',drawBoost);
+$('#boSearch').addEventListener('input',drawBoost);
+$('#boOnly').addEventListener('change',drawBoost);
+$('#boList').onchange=e=>{const c=e.target.closest('input[data-bo]');if(!c)return;c.checked?boSel.add(c.dataset.bo):boSel.delete(c.dataset.bo);drawBoost()};
+$('#boNone').onclick=()=>{boSel.clear();drawBoost()};
+$('#boUntilClear').onclick=()=>{$('#boUntil').value=''};
+$('#boCancel').onclick=()=>$('#boDlg').close();
+$('#boSave').onclick=async()=>{
+  try{const r=await api('banner_boost',{ids:[...boSel],type:boT,rate:$('#boRateC').value.trim()||boR,until:$('#boUntil').value||''});$('#boDlg').close();say('#vmsg',r.ok,true);loadVortex()}
+  catch(err){say('#bomsg',err.message)}
+};
+$('#boRemove').onclick=async()=>{
+  try{const r=await api('banner_boost',{ids:[...boSel],type:''});$('#boDlg').close();say('#vmsg',r.ok,true);loadVortex()}
+  catch(err){say('#bomsg',err.message)}
+};
+let schFor=null, schM='days', schD=new Set();
+function drawSch(){
+  $('#schMode').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.m===schM));
+  $('#schDays').innerHTML=DAYN.map((d,i)=>`<button data-d="${i}" class="${schD.has(i)?'on':''}${i===VX.today?' today':''}" ${schM==='days'?'':'disabled style="opacity:.4"'}>${d}</button>`).join('');
+}
+function openSchedule(id,name){
+  schFor=id; const sc=(VX.schedules||{})[id];
+  schM=sc?sc.mode:'always'; schD=new Set(sc&&sc.days?sc.days:[]);
+  $('#schTitle').textContent='Days for '+name;
+  $('#schHint').textContent='Choose when this banner is in the Vortex. Days follow the server PC\'s clock - today is '+DAYL[VX.today]+'.'+(sc&&sc.game_days?' This is one of the game\'s weekday banners (normally '+sc.game_days.map(d=>DAYN[d]).join(', ')+').':'');
+  const u=sc&&sc.until&&sc.until*1000>Date.now()?new Date(sc.until*1000):null;
+  $('#schUntil').value=u?`${u.getFullYear()}-${String(u.getMonth()+1).padStart(2,'0')}-${String(u.getDate()).padStart(2,'0')}`:'';
+  $('#schReset').classList.toggle('hide',!sc||sc.default);
+  $('#schReset').textContent=sc&&sc.game_days?'Back to game\'s days':'Remove schedule';
+  $('#schmsg').textContent=''; drawSch(); $('#schDlg').showModal();
+}
+$('#schMode').onclick=e=>{const b=e.target.closest('button');if(!b)return;schM=b.dataset.m;drawSch()};
+$('#schDays').onclick=e=>{const b=e.target.closest('button');if(!b||schM!=='days')return;const d=+b.dataset.d;schD.has(d)?schD.delete(d):schD.add(d);drawSch()};
+$('#schUntilClear').onclick=()=>{$('#schUntil').value=''};
+$('#schCancel').onclick=()=>$('#schDlg').close();
+$('#schSave').onclick=async()=>{
+  try{const r=await api('banner_schedule',{id:schFor,mode:schM,days:[...schD],until:$('#schUntil').value||''});$('#schDlg').close();say('#vmsg',r.ok,true);loadVortex()}
+  catch(err){say('#schmsg',err.message)}
+};
+$('#schReset').onclick=async()=>{
+  try{const r=await api('banner_schedule',{id:schFor,mode:'reset'});$('#schDlg').close();say('#vmsg',r.ok,true);loadVortex()}
+  catch(err){say('#schmsg',err.message)}
+};
+function clearCanvas(sel){const c=$(sel),x=c.getContext('2d');x.clearRect(0,0,c.width,c.height)}
+function fitImage(file,canvasSel,done){
+  const img=new Image(); img.onload=()=>{const c=$(canvasSel),x=c.getContext('2d');x.clearRect(0,0,640,224);
+    const sc=Math.max(640/img.width,224/img.height),w=img.width*sc,h=img.height*sc;x.drawImage(img,(640-w)/2,(224-h)/2,w,h);done(c.toDataURL('image/png'))};
+  img.onerror=()=>done(null); img.src=URL.createObjectURL(file);
+}
+$('#picFile').onchange=()=>{const f=$('#picFile').files[0];if(f)fitImage(f,'#picCanvas',d=>{picImg=d;if(!d)say('#picmsg','That file is not a picture.')})};
+$('#picCancel').onclick=()=>$('#picDlg').close();
+$('#picSave').onclick=async()=>{
+  if(!picImg)return say('#picmsg','Pick a picture first.');
+  try{$('#picSave').disabled=true;const r=await api('banner_image',{id:picFor,png:picImg});$('#picDlg').close();say('#vmsg',r.ok,true);loadVortex()}
+  catch(e){say('#picmsg',e.message)}finally{$('#picSave').disabled=false}
+};
+let nQuests=[], nImg=null;
+function drawChips(){$('#nChips').innerHTML=nQuests.map((q,i)=>`<span class="chip">${esc(q.name)} <button data-i="${i}" title="Remove">×</button></span>`).join('')}
+$('#nChips').onclick=e=>{const b=e.target.closest('button');if(!b)return;nQuests.splice(+b.dataset.i,1);drawChips()};
+let nqT=null;
+$('#nQ').oninput=()=>{clearTimeout(nqT);nqT=setTimeout(async()=>{
+  const q=$('#nQ').value.trim(); if(q.length<2){$('#nQRes').style.display='none';return}
+  const r=await api('quest_search',{q});
+  $('#nQRes').innerHTML=r.results.map(x=>`<div data-id="${x.id}" data-name="${esc(x.name)}">${esc(x.name)} <span style="color:var(--muted)">#${x.id} · ${esc(x.banner)}</span></div>`).join('')||'<div style="color:var(--muted)">Nothing found</div>';
+  $('#nQRes').style.display='block'},220)};
+$('#nQRes').onclick=e=>{const d=e.target.closest('div[data-id]');if(!d)return;if(!nQuests.some(q=>q.id===d.dataset.id))nQuests.push({id:d.dataset.id,name:d.dataset.name});drawChips();$('#nQRes').style.display='none';$('#nQ').value=''};
+$('#vNew').onclick=()=>{nQuests=[];nImg=null;drawChips();$('#nName').value='';$('#nFile').value='';$('#nCanvas').classList.add('hide');$('#nmsg').textContent='';$('#newDlg').showModal()};
+$('#nCancel').onclick=()=>$('#newDlg').close();
+$('#nFile').onchange=()=>{const f=$('#nFile').files[0];if(f)fitImage(f,'#nCanvas',d=>{nImg=d;$('#nCanvas').classList.toggle('hide',!d)})};
+$('#nSave').onclick=async()=>{
+  try{$('#nSave').disabled=true;const r=await api('banner_create',{name:$('#nName').value,tab:$('#nTab').value,quests:nQuests.map(q=>q.id),png:nImg});$('#newDlg').close();say('#vmsg',r.ok,true);loadVortex()}
+  catch(e){say('#nmsg',e.message)}finally{$('#nSave').disabled=false}
+};
+$('#rSave').onclick=async()=>{
+  const mult={};for(const k of ['exp','zel','karma','drop','item'])mult[k]=+$('#m-'+k).value;
+  try{const r=await api('settings_save',{mult});say('#rmsg',r.ok,true)}catch(e){say('#rmsg',e.message)}
+};
+$('#rReset').onclick=()=>{for(const k of ['exp','zel','karma','drop','item'])$('#m-'+k).value=1};
+boot().catch(e=>{document.body.innerHTML='<p style="padding:20px">Could not reach the server: '+esc(e.message)+'</p>'});
+</script>
+</body>
+</html>

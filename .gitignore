@@ -1,0 +1,17 @@
+# Never in the repository
+config.json
+saves/
+certs/ca.key
+certs/server.crt
+certs/server.key
+cdn/
+server.log
+crashlog.txt
+dl_state.json
+mst_check.txt
+import_unplaced.txt
+.content_imported
+quest_recordings/_*.json
+__pycache__/
+*.pyc
+bfserver/
