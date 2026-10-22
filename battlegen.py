@@ -65,6 +65,29 @@ class Battlegen:
         for mid in missions:
             by_dun[missions[mid].get('dungeon')].append(mid)
         self.family = {mid: sorted(by_dun[missions[mid].get('dungeon')], key=int) for mid in missions}
+        # units the real game let you capture from ordinary enemies: the datamine's drop rates and
+        # what recorded runs actually dropped, over every quest (Goblin 25%, Thief Leon 15%...)
+        rates, seen, got = defaultdict(list), Counter(), Counter()
+        for runs in self.refs.values():
+            for run in runs:
+                for bi, b in enumerate(run['battles']):
+                    for m in b:
+                        if m.get('boss') or m.get('filler'):
+                            continue
+                        seen[m['u']] += 1
+                        if run['drops'] is None and (m.get('drop') or {}).get('u') == m['u'] and m['drop'].get('pct'):
+                            rates[m['u']].append(m['drop']['pct'])
+                    # a recorded drop counts only when an ordinary enemy of that unit was in that
+                    # battle (boss drops are boss captures, handled separately)
+                    if run['drops'] is not None and bi < len(run['drops']) and bi < len(run['battles']) - 1:
+                        here = {m['u'] for m in b if not m.get('filler')}
+                        for u, c in run['drops'][bi].items():
+                            if u in here:
+                                got[u] += c
+        self.capturable = {u: _med(ps) / 100 for u, ps in rates.items()}
+        for u, c in got.items():
+            if u not in self.capturable and seen[u]:
+                self.capturable[u] = min(0.5, c / seen[u])
 
     # ------------------------------------------------------------------ references
     def _from_recording(self, r):
@@ -128,9 +151,11 @@ class Battlegen:
         return str((self.U.get(u) or {}).get('xP9oi5Z2', '0'))
 
     def may_drop_self(self, u, wiki):
-        """User rule: ordinary enemies only drop as themselves when they are materials (crystals,
-        frogs, imps, nymphs, ghosts...) or units the wiki lists as this quest's rare drops."""
-        return u != MIMIC and (self.kind(u) != '0' or u in (wiki.get('captures') or []))
+        """Ordinary enemies drop as themselves when they are materials (crystals, frogs, imps, nymphs,
+        ghosts...), units the wiki lists as this quest's captures, or units the real game let you
+        capture from enemies (datamine drop rates / recorded drops) - e.g. Goblin, Burny, Thief Leon.
+        Enemies that never dropped anywhere (bosses' units, high-rarity enemies) still don't."""
+        return u != MIMIC and (self.kind(u) != '0' or u in (wiki.get('captures') or []) or u in self.capturable)
 
     def difficulty(self, mid):
         """Quest exp is the difficulty scale; a quest with no known exp (JP-only arcs) gets the exp
@@ -367,6 +392,8 @@ class Battlegen:
                 return _med([p for _, p in pct[u]]) / 100
             if seen[u] and dropped[u]:
                 return min(0.95, dropped[u] / seen[u])
+            if u in self.capturable:
+                return self.capturable[u]
             return 0.2 if self.kind(u) != '0' else 0.08
         items = [i for i in (wiki.get('qitems') or []) + (wiki.get('items') or [])]
         rare = wiki.get('rare') or []
