@@ -13,6 +13,8 @@ Usage:  python probe_bfrevive.py              (next 60 quests not fetched yet)
         python probe_bfrevive.py vortex       (Vortex quests bfrevive has open right now)
         python probe_bfrevive.py vortex 150   (the same, up to 150 quests this run)
         add "again" to fetch quests already fetched once more (bfrevive improves its battles)
+        python probe_bfrevive.py story        (CLEAR the story on bfrevive, ~20 s a quest, saving
+                                               each quest's battle on the way; story 50 = up to 50)
 
 When energy runs out it uses the free energy refill; if a refill ever costs
 gems it stops instead.
@@ -27,6 +29,7 @@ except Exception:
 HERE = os.path.dirname(os.path.abspath(__file__))
 API = 'https://api.bfrevive.net'
 OUT = os.path.join(HERE, 'quest_recordings')
+CLEAR_SECONDS = 20  # story mode: about this long from starting a quest to finishing it
 LIMIT = 60          # quests per run (run again to continue - already fetched ones are skipped)
 WAIT = 5            # seconds between requests - keep it gentle
 # the bfrevive account you recorded with (from your recordings)
@@ -76,6 +79,51 @@ def action(cls, obj):
 def template(cls):
     return json.loads(json.dumps([a for a in T['action'] if a['cls'] == cls][-1]['req']))
 
+def mission_end(ui, signal, start, info):
+    """A MissionEnd for a won battle, from what MissionStart sent: every enemy beaten, its zel and
+    karma, a normal number of turns - and nothing dropped or picked up."""
+    tpl = [a for a in T['action'] if a['cls'] == 'MissionEndRequest']
+    req = json.loads(json.dumps(tpl[-1]['req']))           # your latest recorded clear: its battle stats
+    req['IKqx1Cn9'], req['6FrKacq7'] = [dict(ui)], signal
+    num = (start.get('Kz7qfSs5') or [{}])[0]
+    req['Kz7qfSs5'] = [{'k9cxD7Ba': num.get('k9cxD7Ba', '0'), 'j3g5P4cq': '2'}]
+    team = (info.get('fEi17cnx') or [{}])[0]
+    squad = str(team.get('Z0Y4RoD7', '0'))
+    rows = [x for x in info.get('dX7S2Lc1') or [] if str(x.get('U9ABSYEp')) == '1' and str(x.get('zsiAn9P1')) == squad]
+    req['0xgIw1Ns'] = [{'edy7fq3L': x['edy7fq3L'], 'gr48vsdJ': x.get('gr48vsdJ', '1'), 'XuJL4pc5': x.get('XuJL4pc5', '0')}
+                       for x in rows] or req['0xgIw1Ns']
+    units = {u.get('edy7fq3L'): u.get('pn16CNah') for u in info.get('4ceMWH6k') or [] if isinstance(u, dict)}
+    party = [units.get(x['edy7fq3L']) for x in req['0xgIw1Ns'] if units.get(x['edy7fq3L'])] or ['10011']
+    groups = {g['Qzhp8B40'] for g in start.get('pj41dy9g') or []}
+    mons = {m['o49dYfpH']: m for m in start.get('U0v5IeJo') or []}
+    beaten = [mons[b['o49dYfpH']] for b in start.get('75t0sx9z') or [] if b['Qzhp8B40'] in groups and b['o49dYfpH'] in mons]
+    def counts(vals):
+        c = {}
+        for v in vals:
+            c[v] = c.get(v, 0) + 1
+        return ','.join(f'{k}:{n}' for k, n in c.items())
+    turns = [random.randint(1, 3) for _ in groups]
+    kills = {}
+    for _ in beaten:
+        u = random.choice(party)
+        kills[u] = kills.get(u, 0) + 1
+    r = req['rXvA1E5y'][0]
+    for f in ('e6BKoYy9', 'C2aU1feD', '5NRJQ1LU', '32edsbP0', 'CwN87TyL', 'hoG2ieT5', '6PLsn8xo', 'EcDR3f6M',
+              'XP06YWdT', 'U8uZLA34', '13HeZJ0o', '8vHibp6o', 'B0p2kASC', 'vELiH4Q1', 'xFH5i4o8', '2IHBUL5i', 'GFu2Oh2N'):
+        if str(r.get(f, '')).isdigit():                     # damage, hits, sparks... like your own runs, varied
+            r[f] = str(int(int(r[f]) * random.uniform(0.85, 1.15)))
+    r.update({'Najhr8m6': str(sum(int(m.get('Najhr8m6') or 0) for m in beaten)),
+              'HTVh8a65': str(sum(int(m.get('HTVh8a65') or 0) for m in beaten)),
+              '47cJBUxz': '', '3MAT6quo': '', '4T0Q2Bh5': '',
+              '1CxU2MPn': counts(m['pn16CNah'] for m in beaten), 'L16VDrk5': counts(m['o49dYfpH'] for m in beaten),
+              'Fw2dr06x': counts(str(m.get('iNy0ZU5M', '1')) for m in beaten),
+              'BJNh3g2I': counts(str(m.get('iNy0ZU5M', '1')) for m in beaten), 'vgBY76Ky': '',
+              'Lu0pAk1R': ','.join(map(str, turns)), '2z8kTtBy': str(sum(turns) + len(beaten)),
+              'TNtQBS49': str(random.randint(1, max(1, len(groups)))),
+              'VJzlXxyM': ','.join(f'{k}:{n}' for k, n in kills.items()),
+              'zbPlgZU6': ','.join(f'{k}:{n}' for k, n in kills.items()), 'XOlcsuRn': ''})
+    return req
+
 def vortex_dungeons():
     """{dungeon id} of the Vortex (land 99) - from data/dungeon_area.json."""
     try:
@@ -88,9 +136,9 @@ def vortex_dungeons():
 def main():
     global LIMIT
     words = [a.lower() for a in sys.argv[1:]]
-    vortex, again = 'vortex' in words, 'again' in words
+    vortex, again, story = 'vortex' in words, 'again' in words, 'story' in words
     args = [a for a in sys.argv[1:] if a.isdigit()]
-    if vortex and args:
+    if (vortex or story) and args:
         LIMIT, args = int(args[0]), []
     explicit = bool(args)
     ids = args
@@ -137,7 +185,13 @@ def main():
     have |= {str(((a['req'].get('9Q1Lq5FS') or [{}])[0]).get('j28VNcUW')) for a in T['action'] if a['cls'] == 'MissionStartRequest'}
     if again:
         have = set()
-    if vortex and not explicit:
+    if story and not explicit:
+        ids = [k for k in sorted(MISSIONS, key=int) if int(k) < 100000 and k not in cleared
+               and MISSIONS[k]['name'].isascii()]
+        print(f'Story: {len(ids)} story quests not cleared on bfrevive yet; this run clears up to {LIMIT} '
+              f'(about {CLEAR_SECONDS} s each)')
+        ids = ids[:LIMIT]
+    elif vortex and not explicit:
         vd = vortex_dungeons()
         open_now = {str(r.get('MHx05sXt')) for r in info.get('Y73tHKS8') or [] if isinstance(r, dict) and r.get('MHx05sXt')}
         pool = [k for k in sorted(MISSIONS, key=int) if str(MISSIONS[k].get('dungeon')) in vd and k not in have]
@@ -152,7 +206,7 @@ def main():
                and MISSIONS[k]['name'].isascii() and not MISSIONS[k]['name'].startswith(('Frontier Spire', 'Uncharted Frontier'))]
         print(f'{len(ids)} quests still to fetch; this run does up to {LIMIT}')
         ids = ids[:LIMIT]
-    got = refused = fails = 0
+    got = refused = fails = refused_run = cleared_now = 0
 
     def refill():
         nonlocal ap, gems, signal
@@ -209,7 +263,13 @@ def main():
             refused += 1
             print(f'  {mid} "{name}": bfrevive refused - {r.get("o5Tt0NV7") or list(r)}')
             json.dump({'mission': mid, 'refused': r, 'cleared_then': len(cleared)}, open(os.path.join(OUT, f'_refused_{mid}.json'), 'w'))
+            if story:
+                refused_run += 1
+                if refused_run >= 5:
+                    print('  5 quests in a row refused (locked or not on bfrevive) - stopping the story run.')
+                    break
             continue
+        refused_run = 0
         signal = r.get('6FrKacq7') or signal
         ap = max(0, ap - cost)
         mons = r['U0v5IeJo']
@@ -223,6 +283,21 @@ def main():
                   open(os.path.join(OUT, f'mission_{mid}.json'), 'w', encoding='utf-8'), ensure_ascii=False)
         got += 1
         print(f'  {mid} "{name}": {kind} - boss: {", ".join(x.get("3evIn0zZ", "?") for x in bosses)}  (energy {ap})')
+        if story:
+            # play time: about CLEAR_SECONDS from start to finish, a little different each time
+            time.sleep(max(5, CLEAR_SECONDS - WAIT + random.uniform(-3, 4)))
+            er = action('MissionEndRequest', mission_end(ui, signal, r, info))
+            if 'o5Tt0NV7' in er or not er.get('UT1SVg59'):
+                print(f'  {mid}: bfrevive did not accept the clear - {er.get("o5Tt0NV7") or list(er)[:6]}; stopping.')
+                break
+            signal = er.get('6FrKacq7') or signal
+            t = (er.get('fEi17cnx') or [{}])[0]
+            ap = int(t.get('0P9X1YHs') or ap)
+            cleared.add(mid)
+            cleared_now += 1
+            print(f'      cleared ({cleared_now} this run)')
+    if story:
+        print(f'story run: cleared {cleared_now} quests.')
     print(f'fetched {got}, refused {refused}.')
     print('done. Results are in quest_recordings\\ (restart the private server to use them).')
 
