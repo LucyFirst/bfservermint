@@ -2750,11 +2750,20 @@ FUSION_LABEL_ROWS = {
     'great': {'v80VfcXr': '3', 'b4D63uav': '3', '1wHpzcy5': '0', 't5R47iwj': 'Great Success Rate Up!'},
     'super': {'v80VfcXr': '9905', 'b4D63uav': '5', '1wHpzcy5': '0', 't5R47iwj': 'Super Success Rate Up!'}}
 
+# Title screen music: general event type 4000, params = a file in content/sound. On the home screen
+# the game downloads it and remembers it; the title screen plays it from the next start (the app's own
+# bf001_title.mp3 when there is none). Set with "title_music" in config.json.
+TITLE_MUSIC_TYPE = '4000'
+
 def fusion_label_events(rows):
     rows = [r for r in (rows or []) if not (isinstance(r, dict) and str(r.get('b4D63uav')) in FUSION_LABEL_TYPES)]
     label = (admin_settings().get('fusion') or {}).get('label', 'none')
     if label in FUSION_LABEL_ROWS:
         rows.append(dict(FUSION_LABEL_ROWS[label]))
+    music = str(CFG.get('title_music', 'bf001_title.mp3') or '')
+    rows = [r for r in rows if not (isinstance(r, dict) and str(r.get('b4D63uav')) == TITLE_MUSIC_TYPE)]
+    if music:
+        rows.append({'v80VfcXr': '8000', 'b4D63uav': TITLE_MUSIC_TYPE, '1wHpzcy5': '0', 't5R47iwj': music})
     return rows
 
 def _num_text(x):
