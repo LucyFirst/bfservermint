@@ -213,8 +213,11 @@ def _adopt_save(u, gl):
 
 def account_api(path, form):
     """The app's sign-in box. Replies with two lines: "ok"/"error", then the key or a message."""
-    apply_account_ops()
     f = {k: (v[0] if v else '') for k, v in form.items()}
+    if path.endswith('/version'):          # app 1.0.4+ on start: is there a newer app? (appupdate.py)
+        txt = app_update().check(f.get('v', ''), HOST)
+        return ('update\n' + txt) if txt else 'ok\n'
+    apply_account_ops()
     with LOCK:
         if path.endswith('/check'):
             key = f.get('key', '')
@@ -733,6 +736,14 @@ def active_squad(pl):
 G_FRIEND_GIFTS = '30uygM9m'          # friend gifts waiting (yDiG31Fe from, 1px2dbX3 to)
 
 _GIFTS = None
+_APPUPD = None
+
+def app_update():
+    global _APPUPD
+    if _APPUPD is None:
+        import appupdate
+        _APPUPD = appupdate.AppUpdate(sys.modules[__name__])
+    return _APPUPD
 
 def gift_box():
     global _GIFTS
@@ -3528,6 +3539,25 @@ class Handler(BaseHTTPRequestHandler):
         if self.command != 'HEAD':
             self.wfile.write(body)
 
+    def send_file(self, fp, ctype, extra=None):
+        """Big files (the app): sent in pieces, not read into memory."""
+        size = os.path.getsize(fp)
+        self.send_response(200)
+        self.send_header('Content-Type', ctype)
+        self.send_header('Content-Length', str(size))
+        for k, v in (extra or {}).items():
+            self.send_header(k, v)
+        self.end_headers()
+        if self.command == 'HEAD':
+            return
+        log.info('app download started by %s: %s', self.client_address[0], os.path.basename(fp))
+        with open(fp, 'rb') as f:
+            while True:
+                chunk = f.read(1 << 20)
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+
     def do_HEAD(self):
         self.do_GET()
 
@@ -3557,6 +3587,15 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, {'SREE': enc_dls({
                     'game': PUBLIC, 'resource': PUBLIC, 'mstv': CFG.get('mstv', '21900'),
                     'gumilive': PUBLIC + '/', 'bgimage': '/wallpaper/' + CFG.get('title_wallpaper', 'title3_logo.jpg')})})
+            if p == '/app/check':
+                have = (q.get('v') or [''])[0]
+                return self._send(200, app_update().check(have, HOST), 'text/plain; charset=utf-8')
+            if p.startswith('/app/'):
+                fp = app_update().file(p[len('/app/'):])
+                if not fp:
+                    return self._send(404, 'No such app file.', 'text/plain; charset=utf-8')
+                return self.send_file(fp, 'application/vnd.android.package-archive',
+                                      {'Content-Disposition': f'attachment; filename="{os.path.basename(fp)}"'})
             if p.startswith('/accounts/guest/login'):
                 dev = (q.get('vid') or [''])[0] or (q.get('altvid') or [''])[0] or self.client_address[0]
                 apply_account_ops()
