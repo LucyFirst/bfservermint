@@ -40,6 +40,7 @@ def _med(xs, d=0):
 
 
 # set by the server from the admin page: unit drop / item chest chance multipliers, closed units
+RARE_ENEMY_WEIGHT = 0.12      # story quests: how often a rare enemy shows up compared with an ordinary one
 SETTINGS = {'drop': 1.0, 'item': 1.0, 'off_units': set()}
 
 def _chance(p, k):
@@ -280,10 +281,21 @@ class Battlegen:
             m = dict(unit_lvl[key], u=u, zel=int(zel * rng.uniform(.8, 1.2)), karma=int(karma * rng.uniform(.8, 1.2)))
             return m
 
+        # rare enemies (nymphs, spirits, idols, totems... and the wiki's rare captures) turn up now and
+        # then, not as often as the area's ordinary enemies - unless real runs of this area show them a lot
+        seen_n = Counter(seen)
+        common = max([c for u, c in seen_n.items() if self.kind(u) == '0'] or [1])
+        caps = set(wiki.get('captures') or [])
+
+        def weight(u):
+            if seen_n.get(u):
+                return max(0.15, seen_n[u] / common)
+            return RARE_ENEMY_WEIGHT if (self.kind(u) != '0' or u in caps) else 1.0
+        weights = [weight(u) for u in pool]
         battles = []
         for _ in range(n - 1):
             k = max(1, min(5, rng.choice(sizes)))
-            battles.append([enemy(rng.choice(pool), lvl) for _ in range(k)])
+            battles.append([enemy(u, lvl) for u in rng.choices(pool, weights=weights, k=k)])
         battles.append(self._story_boss(mid, wiki, runs, pool, enemy, lvl, blvl, rng))
         return self._finish(mid, wiki, battles, runs, rng, story=True)
 
@@ -404,6 +416,8 @@ class Battlegen:
                     for m in b:
                         for it in m.get('items') or []:
                             dm_items[m['u']].append(it)
+        present = {m['u'] for b in battles for m in b}
+        extra_caps = [u for u in caps if u not in present and u != MIMIC]
         out_b = []
         for bi, b in enumerate(battles):
             mons, unit_drops, chests = [], [], []
@@ -419,8 +433,8 @@ class Battlegen:
                         drop = tgt
                 elif self.may_drop_self(m['u'], wiki) and rng.random() < _chance(unit_rate(m['u']), 'drop'):
                     drop = m['u']
-                elif caps and story and rng.random() < _chance(0.04, 'drop'):
-                    drop = rng.choice(caps)       # a wiki-listed rare drop now and then
+                elif extra_caps and story and rng.random() < _chance(0.01, 'drop'):
+                    drop = rng.choice(extra_caps)  # a wiki-listed rare drop now and then (one not fought here)
                 if drop and str(drop) in SETTINGS.get('off_units', ()):
                     drop = None                   # closed on the admin page
                 mons.append(dict(m, drop=drop))
