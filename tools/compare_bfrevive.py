@@ -18,6 +18,8 @@ and a verdict:
   BETTER       ours was a stand-in (borrowed, wiki-only or guessed) and bfrevive has the real one
   SAME BOSS    both have the same boss; bfrevive adds its real stats/skills
   CHECK        bfrevive and the wiki disagree on the boss - look before trusting it
+  STAND-IN?    bfrevive uses the same boss in 3+ unrelated dungeons and the wiki doesn't confirm
+               it - probably their own placeholder boss (real stats, wrong boss)
   PLACEHOLDER  bfrevive itself only has filler enemies (keep ours)
 """
 import html
@@ -57,6 +59,20 @@ def fmt(n):
     n = int(n or 0)
     return f'{n / 1e6:.1f}M' if n >= 1e6 else f'{n / 1e3:.0f}k' if n >= 1e4 else str(n)
 
+import re
+def family(name):
+    """'[Hard] Foo Lv. 3' / 'Foo - Battle 2' / 'Floor 11-20' -> one family name"""
+    name = re.sub(r'\[.*?\]|Lv\.?\s*\d+|Battle\s*\d+|Sector\s*\d+|Floor\s*[\d-]+|最終層|[\d\s.:\-]+', ' ', str(name))
+    return ' '.join(name.split()).lower()
+
+# bosses bfrevive puts in many unrelated quests (their stand-ins)
+boss_dungeons = {}
+for mid, rec in fetched.items():
+    r = gen._from_recording(rec['response'])
+    if r and r['battles'] and r['battles'][-1]:
+        key = r['battles'][-1][0]['u']
+        boss_dungeons.setdefault(key, set()).add(family(rec.get('name') or (s.MISSIONS.get(mid) or {}).get('name', mid)))
+
 rows, counts = [], {}
 for mid in sorted(fetched, key=int):
     rec = fetched[mid]
@@ -93,7 +109,12 @@ for mid in sorted(fetched, key=int):
     real = t_filler <= len(t_all) // 2 and t_all
     if not real:
         verdict = 'PLACEHOLDER'
-    elif wiki_boss and not set(wiki_boss) & set(t_names):
+    elif wiki_boss and set(wiki_boss) & set(t_names):
+        verdict = 'NEW' if ours_src.startswith(('not playable', 'error')) else \
+                  'SAME BOSS' if ours_src.startswith('its own data') and set(o_names) & set(t_names) else 'BETTER'
+    elif t_boss and len(boss_dungeons.get(t_boss[0]['u'], ())) >= 3:
+        verdict = 'STAND-IN?'
+    elif wiki_boss:
         verdict = 'CHECK'
     elif ours_src.startswith(('not playable', 'error')):
         verdict = 'NEW'
@@ -107,15 +128,16 @@ for mid in sorted(fetched, key=int):
                  'their_boss': ', '.join(t_names) or '-', 'their_stats': t_stats, 'their_skills': t_skills,
                  'their_waves': len((theirs or {}).get('battles', [])), 'wiki_boss': ', '.join(wiki_boss) or '-'})
 
+COL = {'NEW': '#2e7d32', 'BETTER': '#1565c0', 'SAME BOSS': '#6d6d6d', 'CHECK': '#c62828',
+       'STAND-IN?': '#8e24aa', 'PLACEHOLDER': '#ef6c00'}
 print()
-for k in ('NEW', 'BETTER', 'SAME BOSS', 'CHECK', 'PLACEHOLDER'):
+for k in COL:
     print(f'{k:12} {counts.get(k, 0)}')
 print()
 for r in rows:
-    if r['verdict'] in ('CHECK', 'PLACEHOLDER'):
+    if r['verdict'] in ('CHECK', 'STAND-IN?'):
         print(f"{r['verdict']:12} {r['mid']} {r['name']}: bfrevive boss {r['their_boss']} | wiki {r['wiki_boss']}")
 
-COL = {'NEW': '#2e7d32', 'BETTER': '#1565c0', 'SAME BOSS': '#6d6d6d', 'CHECK': '#c62828', 'PLACEHOLDER': '#ef6c00'}
 e = html.escape
 body = ''.join(
     f"<tr><td>{r['mid']}</td><td>{e(r['name'])}</td>"

@@ -2109,8 +2109,28 @@ def trial_mission_start(mid, req, base, spec):
     log.info('trial battle for %s: %s', mid, ' / '.join(','.join(b) for b in spec['names']))
     return resp
 
+# fights fetched from bfrevive that are played exactly as recorded (bosses with several forms,
+# fixed line-ups): trials and the Brave Dance hall, when we have no hand-built spec for them
+EXACT_DUNGEONS = {TRIAL_DUNGEON, '2100000'}
+
+def recorded_spec(mid):
+    r = QUEST_REC.get(str(mid))
+    if not r or (MISSIONS.get(str(mid)) or {}).get('dungeon') not in EXACT_DUNGEONS:
+        return None
+    order = {g['Qzhp8B40']: str(int(_num(g.get('VETu07N6')) or 0)) for g in r.get(G_BGROUP) or []}
+    if not order:
+        return None
+    groups = [dict(b, Qzhp8B40=order[b['Qzhp8B40']]) for b in r.get(G_BMON) or [] if b.get('Qzhp8B40') in order]
+    mons = {m['o49dYfpH']: m for m in r.get(G_MON) or []}
+    used = {b['o49dYfpH'] for b in groups}
+    names = [[mons[b['o49dYfpH']].get('3evIn0zZ', '?') for b in groups
+              if b['Qzhp8B40'] == str(i) and b['o49dYfpH'] in mons] for i in range(1, len(order) + 1)]
+    return {'battles': len(order), 'groups': groups, 'monsters': [m for k, m in mons.items() if k in used],
+            'ai': [a for a in r.get(G_AI) or [] if a.get('4eEVw5hL') != '1'],
+            'skills': r.get('8aiBoHg5') or [], 'cgs': r.get('8hoyIF9Q') or [], 'names': names, 'src': 'bfrevive'}
+
 def generate_mission_start(pl, mid, req, base):
-    spec = TRIAL_SPECS.get(str(mid))
+    spec = TRIAL_SPECS.get(str(mid)) or recorded_spec(mid)
     if spec and not str(mid).startswith('_'):
         return trial_mission_start(str(mid), req, base, spec)
     plan = battle_generator().plan(mission_alias(mid))
