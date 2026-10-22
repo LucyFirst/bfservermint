@@ -36,7 +36,7 @@ class Discord:
     def post(self, title, text, kind='update'):
         if not self.url:
             return
-        body = json.dumps({'username': 'BF Server', 'embeds': [{
+        body = json.dumps({'username': 'BF Mint', 'embeds': [{
             'title': title[:250], 'description': text[:3900], 'color': COLOR.get(kind, 0x95a5a6),
             'timestamp': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}]}).encode()
 
