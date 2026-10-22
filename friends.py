@@ -93,7 +93,8 @@ class Friends:
             seen = int(time.time())
         return {self.S.F_USERID: p['user_id'], 'B5JQyV8j': self.S.shown_name(p), '2Fh3J7ng': str(t.get('D9wXQI2V', '1')),
                 '98WfKiyA': str(p.get('friend_id', '')), 'bM7RLu5K': str(ui.get('bM7RLu5K', '') or ''),
-                '0CAQ6wUe': str(max(0, int(time.time()) - seen))}      # seconds since last seen (not a date)
+                '0CAQ6wUe': str(max(0, int(time.time()) - seen)),      # seconds since last seen (not a date)
+                's2WnRw9N': str(t.get('s2WnRw9N') or '100,200,300')}    # the gifts they want
 
     def friend_row(self, me, p, st):
         row = dict(self.friend_tmpl or {})

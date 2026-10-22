@@ -732,11 +732,14 @@ def active_squad(pl):
 
 G_FRIEND_GIFTS = '30uygM9m'          # friend gifts waiting (yDiG31Fe from, 1px2dbX3 to)
 
-def real_friend_gifts(pl):
-    """Friend gifts in the save that come from real players on this server (none of the recorded ones)."""
-    ids = {p.get('user_id') for p in all_players()}
-    return [r for r in _rows(pl['state'].get(G_FRIEND_GIFTS))
-            if isinstance(r, dict) and r.get('yDiG31Fe') in ids and r.get('yDiG31Fe') != pl['user_id']]
+_GIFTS = None
+
+def gift_box():
+    global _GIFTS
+    if _GIFTS is None:
+        import giftbox
+        _GIFTS = giftbox.GiftBox(sys.modules[__name__])
+    return _GIFTS
 
 def merge_party(pl, rows):
     rows = [r for r in _rows(rows) if isinstance(r, dict)]
@@ -783,8 +786,7 @@ def full_user_info(pl):
         repair_party(pl)
     except Exception:
         log.exception('could not check the squads')
-    if pl['state'].get(G_FRIEND_GIFTS):
-        pl['state'][G_FRIEND_GIFTS] = real_friend_gifts(pl)
+    pl['state'][G_FRIEND_GIFTS] = []         # friend gifts live in giftbox.py (added to the reply below)
     tmpl = BY_ID[RID['GetUserInfoRequest']][-1]
     out = personalise(pl, BLOBS[tmpl['resp']])
     for g in list(out):
@@ -795,6 +797,10 @@ def full_user_info(pl):
         elif g in PLAYER_GROUPS:
             out[g] = fresh_value(pl, g)
     out[G_UNITS] = list(pl['units'].values())
+    try:
+        out[G_FRIEND_GIFTS] = gift_box().rows(pl)
+    except Exception:
+        log.exception('could not list the friend gifts')
     out[G_SIGNAL] = [{F_SIGNAL: pl['signal_key']}]
     if UNLOCK:
         pl['state'][G_PERMIT] = out[G_PERMIT] = story_permits(pl)
@@ -3408,11 +3414,11 @@ def handle_action(rid, req):
             save_player(pl)
             return resp
         if cls in ('FixGiftInfoRequest', 'GetGiftInfoRequest'):
-            # Friend gifts are not run by this server yet: the recordings' gift lists belong to the
-            # recorded account (a karma gift from "DecompFriend" that came back every time)
-            pl['state'][G_FRIEND_GIFTS] = real_friend_gifts(pl)
+            # friend gifts between players here (giftbox.py) - never the recordings' gift lists
+            resp = gift_box().fix(pl, req) if cls == 'FixGiftInfoRequest' else {G_FRIEND_GIFTS: gift_box().rows(pl)}
+            pl['state'][G_FRIEND_GIFTS] = []
             save_player(pl)
-            return {G_FRIEND_GIFTS: pl['state'][G_FRIEND_GIFTS]}
+            return resp
         if cls == 'GetUserInfoRequest':
             welcome_gifts(pl)
             login_gifts(pl)
