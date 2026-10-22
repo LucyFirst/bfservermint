@@ -218,22 +218,22 @@ class Friends:
     def search(self, pl, req):
         q, _ = self._target(req)
         fid = str(q.get('98WfKiyA') or '').strip()
+        # The game shows its own messages from the reply, and takes an error reply as a lost
+        # connection - so never answer with an error here. It looks for a row of friend type 4:
+        # none = "User not found."; your own user ID = "this is your ID".
+        lst = {'tojMy68W': self.friend_list(pl), '6e4b7sQt': self.limits}
         if fid and fid == str(pl.get('friend_id')):
-            return None, 'That is your own ID.'
+            lst['tojMy68W'].append(dict(self.friend_row(pl['user_id'], pl, 4)))
+            return lst, None
         found = next((p for p in self.players().values() if str(p.get('friend_id')) == fid and p['user_id'] != pl['user_id']), None)
         if not found:
-            return None, 'No player has that ID.'
-        # the game only takes a search result it can send a request to (friend type 4)
-        name = found.get('handle') or 'That player'
-        st = self.status(pl['user_id'], found['user_id'])
-        if st == 'friend':
-            return None, f'You are already friends with {name}.'
-        if st == 'sent':
-            return None, f'You already sent {name} a friend request. It shows under Friend Requests until they answer.'
-        if st == 'received':
-            return None, f'{name} already sent you a friend request - accept it under Friend Requests.'
-        extra = self.friend_row(pl['user_id'], found, 4)
-        return {'tojMy68W': self.friend_list(pl, extra), '6e4b7sQt': self.limits}, None
+            self.S.log.info('friends: %s searched for %s - no such player', pl.get('handle'), fid)
+            return lst, None
+        # already friends / already asked: still shown, so the game finds them (applying again
+        # does no harm: it accepts their request, or changes nothing)
+        lst['tojMy68W'] = [r for r in lst['tojMy68W'] if r.get(self.S.F_USERID) != found['user_id']]
+        lst['tojMy68W'].append(self.friend_row(pl['user_id'], found, 4))
+        return lst, None
 
     def waiting(self, pl):
         """Friend requests sent to this player and not answered yet (the friend badge)."""
@@ -256,16 +256,17 @@ class Friends:
         me = pl['user_id']
         if self.is_own(other):                   # your own unit used as helper: nothing to befriend
             return {'tojMy68W': self.friend_list(pl), '6e4b7sQt': self.limits}, None
-        if other.startswith('npc'):
-            return None, ('This helper is a computer summoner, not a player, so it cannot be added as a '
-                          'friend. Helpers from real players can be added.')
-        if other not in self.players() or other == me:
-            return None, 'That player could not be found.'
+        same = {'tojMy68W': self.friend_list(pl), '6e4b7sQt': self.limits}
+        if other.startswith('npc') or other not in self.players() or other == me:
+            # computer helpers are not players (and errors show as a lost connection): nothing to do
+            self.S.log.info('friends: %s asked %s - not a player, nothing sent', pl.get('handle'), other)
+            return same, None
         st = self.status(me, other)
-        if st == 'friend':
-            return None, 'You are already friends.'
+        if st in ('friend', 'sent'):
+            return same, None
         if self.count(me) >= MAX_FRIENDS - 1:          # one place is your own unit
-            return None, f'Your friend list is full ({MAX_FRIENDS}).'
+            self.S.log.info('friends: %s friend list is full - request not sent', pl.get('handle'))
+            return same, None
         if st == 'received':                     # they asked first: just become friends
             self.set(me, other, 'friend', 'friend')
         else:
@@ -276,10 +277,12 @@ class Friends:
     def agree(self, pl, req):
         _, other = self._target(req)
         me = pl['user_id']
+        same = {'tojMy68W': self.friend_list(pl), '6e4b7sQt': self.limits}
         if self.status(me, other) != 'received':
-            return None, 'That friend request is no longer there.'
+            return same, None                      # gone already (errors show as a lost connection)
         if self.count(me) >= MAX_FRIENDS or self.count(other) >= MAX_FRIENDS:
-            return None, 'A friend list is full.'
+            self.S.log.info('friends: %s could not accept %s - a friend list is full', pl.get('handle'), other)
+            return same, None
         self.set(me, other, 'friend', 'friend')
         self.S.log.info('friends: %s and %s are now friends', pl.get('handle'), other)
         return {'tojMy68W': self.friend_list(pl), '6e4b7sQt': self.limits}, None
