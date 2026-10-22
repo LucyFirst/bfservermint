@@ -96,16 +96,18 @@ class Arena:
     # ------------------------------------------------------------------ opponents
     def squad_units(self, pl):
         """The player's arena squad (or their quest squad if they never set one): [(unit row, leader?)].
-        Squad rows: U9ABSYEp squad no., zsiAn9P1 kind (0 quests, 1 arena), gr48vsdJ 0 = leader."""
+        Squad rows: U9ABSYEp kind (1 quests, 2 arena), zsiAn9P1 squad no., gr48vsdJ 0 = leader."""
         rows = [r for r in self.S._rows(pl['state'].get('dX7S2Lc1')) if isinstance(r, dict)]
         if not rows:
             return []
-        kinds = {str(r.get('zsiAn9P1')) for r in rows}
-        kind = '1' if '1' in kinds else '0' if '0' in kinds else sorted(kinds)[0]
-        rows = [r for r in rows if str(r.get('zsiAn9P1')) == kind]
-        sq = sorted({str(r.get('U9ABSYEp')) for r in rows}, key=lambda x: _i(x))[0]
+        kinds = {str(r.get('U9ABSYEp')) for r in rows}
+        kind = '2' if '2' in kinds else '1' if '1' in kinds else sorted(kinds)[0]
+        rows = [r for r in rows if str(r.get('U9ABSYEp')) == kind]
+        nums = sorted({str(r.get('zsiAn9P1')) for r in rows}, key=lambda x: _i(x))
+        sq = self.S.active_squad(pl) if kind == '1' else nums[0]
+        sq = sq if sq in nums else nums[0]
         out, seen = [], set()
-        for r in sorted((r for r in rows if str(r.get('U9ABSYEp')) == sq), key=lambda r: _i(r.get('XuJL4pc5'))):
+        for r in sorted((r for r in rows if str(r.get('zsiAn9P1')) == sq), key=lambda r: _i(r.get('XuJL4pc5'))):
             u = pl['units'].get(r.get('edy7fq3L'))
             if u and r.get('edy7fq3L') not in seen:
                 seen.add(r.get('edy7fq3L'))

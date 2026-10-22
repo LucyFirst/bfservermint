@@ -64,8 +64,10 @@ class Friends:
 
     def leader(self, p):
         """(unit row, level) a player lends as a helper: the leader of their quest squad."""
-        rows = [r for r in self.S._rows(p['state'].get('dX7S2Lc1')) if isinstance(r, dict) and str(r.get('zsiAn9P1')) == '0']
-        rows.sort(key=lambda r: (_i(r.get('U9ABSYEp')), str(r.get('gr48vsdJ')) != '0'))
+        sq = self.S.active_squad(p)
+        rows = [r for r in self.S._rows(p['state'].get('dX7S2Lc1')) if isinstance(r, dict)]
+        rows.sort(key=lambda r: (str(r.get('U9ABSYEp')) != '1', str(r.get('zsiAn9P1')) != sq,
+                                 str(r.get('gr48vsdJ')) != '0'))
         for r in rows:
             u = p['units'].get(r.get('edy7fq3L'))
             if u:

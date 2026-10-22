@@ -457,6 +457,8 @@ def apply_request(pl, cls, req):
         if g in STATE_GROUPS and g != G_USERINFO and g not in MASTER_GROUPS:
             if is_selector(pl, g, v):
                 continue          # just "which one?" (e.g. a token id) - not a new copy of the list
+            if g == G_PARTY:
+                v = merge_party(pl, v)
             pl['state'][g] = v
     ui = (req.get(G_USERINFO) or [{}])[0]
     # progress the game keeps in your user info and reports itself: area cutscenes seen (N4XVE1uA)
@@ -717,8 +719,62 @@ def apply_overrides(pl, resp):
                     row[code] = val if isinstance(row.get(code), int) else str(val)
     return resp
 
+# --------------------------------------------------------------------------- squads
+# dX7S2Lc1 rows: U9ABSYEp = kind of squad (1 quests, 2 Arena, 3 raid, 4 Ep3, 5 multi, 100 guild
+# raid), zsiAn9P1 = squad number, gr48vsdJ 0 = leader, XuJL4pc5 = place. The game sends only the
+# kind it edited (e.g. the Arena squads), so the other kinds must be kept.
+G_PARTY, F_PARTY_KIND = 'dX7S2Lc1', 'U9ABSYEp'
+
+def active_squad(pl):
+    """The quest squad in use (UserTeamInfo Z0Y4RoD7), as a string squad number."""
+    t = team_row(pl['state']) or {}
+    return str(_num(t.get('Z0Y4RoD7')) or 0)
+
+def merge_party(pl, rows):
+    rows = [r for r in _rows(rows) if isinstance(r, dict)]
+    kinds = {str(r.get(F_PARTY_KIND)) for r in rows}
+    if not rows or not kinds:
+        return pl['state'].get(G_PARTY) or rows
+    kept = [r for r in _rows(pl['state'].get(G_PARTY))
+            if isinstance(r, dict) and str(r.get(F_PARTY_KIND)) not in kinds]
+    return kept + rows
+
+def repair_party(pl):
+    """Saves where an Arena squad edit had replaced the quest squads (EMPTY_PARTY_INFO at login):
+    take the quest squads back from the newest backup that has them, else give squad 1 a leader."""
+    rows = [r for r in _rows(pl['state'].get(G_PARTY)) if isinstance(r, dict)]
+    have = set(pl['units'])
+    if any(str(r.get(F_PARTY_KIND)) == '1' and r.get(F_UNIT_ID) in have for r in rows):
+        return
+    found, src = [], 'a new leader'
+    bdir = os.path.join(SAVE_DIR, 'backups')
+    for f in sorted(glob.glob(os.path.join(bdir, f"player_{pl['user_id']}_*.json")), reverse=True):
+        try:
+            old = json.load(open(f, encoding='utf-8'))
+        except Exception:
+            continue
+        found = [r for r in _rows((old.get('state') or {}).get(G_PARTY))
+                 if isinstance(r, dict) and str(r.get(F_PARTY_KIND)) == '1' and r.get(F_UNIT_ID) in have]
+        if found:
+            src = os.path.basename(f)
+            break
+    if not found and have:
+        leader = next((r.get(F_UNIT_ID) for r in rows if r.get(F_UNIT_ID) in have), None) or sorted(have)[0]
+        found = [{F_PARTY_KIND: '1', 'zsiAn9P1': '0', F_UNIT_ID: leader, 'gr48vsdJ': '0', 'XuJL4pc5': '0'}]
+    if found:
+        # every squad needs a leader
+        for sq in {str(r.get('zsiAn9P1')) for r in found}:
+            if not any(str(r.get('zsiAn9P1')) == sq and str(r.get('gr48vsdJ')) == '0' for r in found):
+                next(r for r in found if str(r.get('zsiAn9P1')) == sq)['gr48vsdJ'] = '0'
+        pl['state'][G_PARTY] = [r for r in rows if str(r.get(F_PARTY_KIND)) != '1'] + found
+        log.info('repaired the quest squads of %s (%d rows, from %s)', pl['user_id'], len(found), src)
+
 def full_user_info(pl):
     """GetUserInfo built from the saved player."""
+    try:
+        repair_party(pl)
+    except Exception:
+        log.exception('could not check the squads')
     tmpl = BY_ID[RID['GetUserInfoRequest']][-1]
     out = personalise(pl, BLOBS[tmpl['resp']])
     for g in list(out):
@@ -3054,9 +3110,11 @@ def trial_deck(pl):
     """The two Research Lab squads (zsiAn9P1 0 and 1). Until set, both start as the quest squad."""
     if pl.get('trial_deck'):
         return pl['trial_deck']
-    rows = [r for r in _rows(pl['state'].get('dX7S2Lc1')) if isinstance(r, dict) and str(r.get('zsiAn9P1')) == '0']
-    sq = sorted({str(r.get('U9ABSYEp')) for r in rows}, key=lambda x: _num(x) or 0)
-    rows = [r for r in rows if sq and str(r.get('U9ABSYEp')) == sq[0]]
+    rows = [r for r in _rows(pl['state'].get(G_PARTY)) if isinstance(r, dict) and str(r.get(F_PARTY_KIND)) == '1']
+    sq = active_squad(pl)
+    if not any(str(r.get('zsiAn9P1')) == sq for r in rows):
+        sq = min((str(r.get('zsiAn9P1')) for r in rows), key=lambda x: _num(x) or 0, default=sq)
+    rows = [r for r in rows if str(r.get('zsiAn9P1')) == sq]
     out = []
     for deck in ('0', '1'):
         for r in rows:
