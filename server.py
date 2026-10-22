@@ -3805,6 +3805,15 @@ def main():
              PUBLIC, len(T['action']), n_cdn)
     log.info('Saves: %s   Press Ctrl+C to stop.', SAVE_DIR)
     try:
+        import discordlog
+        d = discordlog.Discord(sys.modules[__name__])
+        if d.url:
+            log.addHandler(discordlog.ErrorHandler(d))
+            d.started()
+            log.info('posting server news to Discord')
+    except Exception:
+        log.exception('could not set up the Discord posts')
+    try:
         vortex_editor().build()
     except Exception:
         log.exception('could not prepare the edited Vortex tables')
