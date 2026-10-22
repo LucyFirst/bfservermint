@@ -104,7 +104,11 @@ class Arena:
         kind = '2' if '2' in kinds else '1' if '1' in kinds else sorted(kinds)[0]
         rows = [r for r in rows if str(r.get('U9ABSYEp')) == kind]
         nums = sorted({str(r.get('zsiAn9P1')) for r in rows}, key=lambda x: _i(x))
-        sq = self.S.active_squad(pl) if kind == '1' else nums[0]
+        if kind == '1':
+            sq = self.S.active_squad(pl)
+        else:                                   # the Arena squad chosen in the game (gKNfIZiA)
+            t = self.S.team_row(pl['state']) or {}
+            sq = str(_i(t.get('gKNfIZiA')))
         sq = sq if sq in nums else nums[0]
         out, seen = [], set()
         for r in sorted((r for r in rows if str(r.get('zsiAn9P1')) == sq), key=lambda r: _i(r.get('XuJL4pc5'))):

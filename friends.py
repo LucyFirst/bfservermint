@@ -218,12 +218,28 @@ class Friends:
     def search(self, pl, req):
         q, _ = self._target(req)
         fid = str(q.get('98WfKiyA') or '').strip()
+        if fid and fid == str(pl.get('friend_id')):
+            return None, 'That is your own ID.'
         found = next((p for p in self.players().values() if str(p.get('friend_id')) == fid and p['user_id'] != pl['user_id']), None)
         if not found:
             return None, 'No player has that ID.'
+        # the game only takes a search result it can send a request to (friend type 4)
+        name = found.get('handle') or 'That player'
         st = self.status(pl['user_id'], found['user_id'])
-        extra = None if st else self.friend_row(pl['user_id'], found, 4)
+        if st == 'friend':
+            return None, f'You are already friends with {name}.'
+        if st == 'sent':
+            return None, f'You already sent {name} a friend request. It shows under Friend Requests until they answer.'
+        if st == 'received':
+            return None, f'{name} already sent you a friend request - accept it under Friend Requests.'
+        extra = self.friend_row(pl['user_id'], found, 4)
         return {'tojMy68W': self.friend_list(pl, extra), '6e4b7sQt': self.limits}, None
+
+    def waiting(self, pl):
+        """Friend requests sent to this player and not answered yet (the friend badge)."""
+        ps = self.players()
+        return sum(1 for o, st in (self.links.get(pl['user_id']) or {}).items()
+                   if st == 'received' and not o.startswith('_') and o in ps)
 
     def random_search(self, pl, req):
         me = pl['user_id']
@@ -240,6 +256,9 @@ class Friends:
         me = pl['user_id']
         if self.is_own(other):                   # your own unit used as helper: nothing to befriend
             return {'tojMy68W': self.friend_list(pl), '6e4b7sQt': self.limits}, None
+        if other.startswith('npc'):
+            return None, ('This helper is a computer summoner, not a player, so it cannot be added as a '
+                          'friend. Helpers from real players can be added.')
         if other not in self.players() or other == me:
             return None, 'That player could not be found.'
         st = self.status(me, other)

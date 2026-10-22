@@ -1593,6 +1593,26 @@ def achievement_engine():
         _ACH = _achievements.Achievements(sys.modules[__name__])
     return _ACH
 
+def add_team_counts(req, resp):
+    """UserTeamInfo counts the home screen shows as red badges: gifts waiting in the present box
+    (EfinBo65) and friend requests waiting for an answer (qVBx7g2c)."""
+    rows = resp.get(G_TEAM) if isinstance(resp, dict) else None
+    rows = [r for r in _rows(rows) if isinstance(r, dict)]
+    if not rows:
+        return
+    with LOCK:
+        pl = find_player(req)
+        if not pl:
+            return
+        now = time.time()
+        gifts = sum(1 for r in present_rows(pl) if r.get('g85qMNxf') != '1' and not present_expired(r, now))
+        asks = friend_engine().waiting(pl)
+    for r in rows:
+        if str(r.get(F_USERID) or pl['user_id']) != pl['user_id']:
+            continue
+        r['EfinBo65'] = str(gifts) if isinstance(r.get('EfinBo65', ''), str) else gifts
+        r['qVBx7g2c'] = str(asks) if isinstance(r.get('qVBx7g2c', ''), str) else asks
+
 def fix_badges(req, resp):
     """The Records badges (which sections have rewards waiting) - worked out for this player."""
     try:
@@ -3578,6 +3598,10 @@ class Handler(BaseHTTPRequestHandler):
                     add_display_name(resp)
                 except Exception:
                     log.exception('could not add the display name')
+                try:
+                    add_team_counts(req, resp)
+                except Exception:
+                    log.exception('could not add the gift / friend request counts')
                 log.info('%-34s %5.0f ms', REQS[rid]['cls'], (time.time() - t0) * 1000)
                 return self._send(200, {'F4q6i9xe': {'Hhgi79M1': rid, 'aV6cLn3v': '---'},
                                         'a3vSYuq2': {F_SIGNAL: enc_body(rid, resp)}},
