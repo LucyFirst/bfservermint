@@ -2935,8 +2935,18 @@ def do_fusion(pl, req, resp):
         base['3NbeC8AB'], base['RQ5GnFE2'] = str(bb1), str(sbb1)
         log.info('fusion: BB level %s -> %s, SBB level %s -> %s', bb0, bb1, sbb0, sbb1)
     pl['units'][base_id] = base
-    steps = ','.join(f"{L}:" + ':'.join(unit_stats(bm, L)[k] for k in ('e7DK0FQT', '67CApcti', 'q08xLEsy', 'PWXu25cg'))
-                     for L in range(lv0, lv + 1))
+    # The result screen: 5Hi7MVQe (LvupStatus) "lv:hp:atk:def:rec" for each level passed, and
+    # Xoq6z0VI (ParamUpState) the final stats - the game compares the two and shows the gain. Both
+    # carry the unit's extra stats (type add + imps); the levels before this fusion with the old imps.
+    stat_keys = ('e7DK0FQT', '67CApcti', 'q08xLEsy', 'PWXu25cg')
+    add_keys = ('cuIWp89g', 'RT4CtH5d', 'GcMD0hy6', 'C1HZr3pb')
+    def shown(L, row):
+        st = unit_stats(bm, L)
+        return ':'.join(str(int(st[k]) + (_num(row.get(a)) or 0) + (_num(row.get(e)) or 0))
+                        for k, a, e in zip(stat_keys, add_keys, IMP_FIELDS))
+    before_row = dict(base, **{f: str((_num(base.get(f)) or 0) - g) for f, g in zip(IMP_FIELDS, imp)})
+    steps = ','.join(f"{L}:" + shown(L, before_row if L == lv0 else base) for L in range(lv0, lv + 1))
+    final = f"{lv}:" + shown(lv, base)
     zel = ((req.get('mCE3rUu5') or [{}])[0]).get('Rs7bCE3t', '0')
     tmpl = dict((resp.get(G_MIX_RESULT) or [{}])[0])
     tmpl.update({'pn16CNah': base['pn16CNah'], F_UNIT_ID: base_id, 'Najhr8m6': str(zel), 'd96tuT2E': str(gained),
@@ -2946,7 +2956,7 @@ def do_fusion(pl, req, resp):
                  'g9DXe3HZ': str(sbb0), '0xgWq5bD': str(sbb1),  # SBB level before / after
                  '0xhLsnDv': str(sp0), '3YVEeL2a': str(sp1),    # SP before / after
                  'kuHWF7yc': str(sp_top), 'ksED59z9': str(sp_top),
-                 '5Hi7MVQe': steps, 'Xoq6z0VI': steps.split(',')[-1]})
+                 '5Hi7MVQe': steps, 'Xoq6z0VI': final})
     resp[G_MIX_RESULT] = [tmpl]
     resp[G_UNITS_ADD] = []
     daily_engine().event(pl, 'fuse', len([m for m in mat_ids if m]))
