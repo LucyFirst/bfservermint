@@ -52,3 +52,14 @@ DAY TO DAY (in the Droplet console)
 THE PC COPY
    This folder stays as it was - a full backup. The old app (v15 and earlier) still works with it on
    your home network if you ever start it again, but players' progress then only changes here.
+
+NEW APP VERSIONS
+   Copy the new APK (keep the name BF-Private-<version>.apk) into the app folder from PowerShell:
+     scp "D:\User\downloads\BF-Private-1.0.6.apk" root@bravefmint.com:/opt/bfserver/app/
+   Apps from 1.0.4 on show "New version available" with a Download button on their next start.
+
+DISCORD
+   The server posts to the BF Server Updates channel (start/update, new app, errors).
+   The webhook link is in config.json on the Droplet only. To change it:
+     python3 /opt/bfserver/tools/set_config.py discord_webhook <new link> && systemctl restart bfserver
+
