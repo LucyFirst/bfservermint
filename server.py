@@ -621,6 +621,27 @@ def unit_mst():
             UNIT_MST.update(json.load(open(p, encoding='utf-8')))
     return UNIT_MST
 
+_HL = None
+def highlights():
+    """Player highlights for Discord (highlights.py). Never lets a highlight break the game."""
+    global _HL
+    if _HL is None:
+        try:
+            import highlights as _h
+            _HL = _h.Highlights(sys.modules[__name__])
+        except Exception:
+            log.exception('highlights: could not start')
+            _HL = False
+    return _HL
+
+def highlight(event, *args):
+    try:
+        h = highlights()
+        if h:
+            getattr(h, event)(*args)
+    except Exception:
+        log.exception('highlight %s', event)
+
 def roll_unit(gid):
     try:
         pool = summon_editor().pool(str(gid))
@@ -690,6 +711,7 @@ def do_summon(pl, req, resp):
         ope.append(o)
         if best is None or rare > best[0]:
             best = (rare, o)
+        highlight('summon', pl, unit_id)
         log.info('summon on %s (%s): %s* %s', gid, (POOLS.get(gid) or {}).get('name', 'default pool'), rare,
                  unit_mst().get(unit_id, {}).get('utP1c0CD', unit_id))
     # The game keeps ONE summon gate (OpeUserUnit is a single state, the last row wins). For a multi
@@ -1521,6 +1543,10 @@ def end_mission(pl, resp):
     if done != ('', '0'):
         sent.append(mid)
         log.info('  story: dungeon %s / area %s complete', done[0] or '-', done[1] if done[1] != '0' else '-')
+        if done[1] and done[1] != '0':
+            highlight('area', pl, done[1])
+    if after > before:
+        highlight('level', pl, before, after)
     tmplr = dict((_rows(resp.get(G_REWARD)) or [{}])[0])
     tmplr.update({'92ms7J5M': clear_bonus_text(mid) if first else '',
                   'wPb5uMR9': '1' if after > before else '0', '81CsGAR9': str(before),
@@ -1548,6 +1574,7 @@ def end_mission(pl, resp):
         first_clear_gift(pl, mid)
         if is_trial(mid):
             trial_first_clear(pl, mid)
+            highlight('trial', pl, mid)
     return True
 
 def record_quest_stats(pl, req):
@@ -2245,6 +2272,8 @@ def mission_drops(pl, req, resp):
             d.append({'kixHbe54': item})
     pl['state'][G_WAREHOUSE] = list(wh.values())
     resp[G_WAREHOUSE] = list(wh.values())             # full list, like the real server
+    if new and not trial_replay(pl, pl.get('current_mission')):
+        highlight('drops', pl, [u['pn16CNah'] for u in new], pl.get('current_mission'))
     if new or shown:
         log.info('battle drops: units %s, items %s', [unit_mst()[u['pn16CNah']].get('utP1c0CD') for u in new],
                  res.get('47cJBUxz') or '-')
@@ -3100,6 +3129,7 @@ def do_evo(pl, plan, resp):
     pl['units'][plan['base']] = row
     add_to_dictionary(pl, new)
     daily_engine().event(pl, 'evolve')
+    highlight('evo', pl, old, new)
     resp['I82p0wCL'] = [{'pn16CNah': new, 'edy7fq3L': plan['base'], 't9FEW2KC': old,
                          'u1ECvfg8': plan['base'], 'dV3qji4I': '0'}]
     resp[G_UNITS_ADD] = []
@@ -3225,6 +3255,7 @@ def handle_action(rid, req):
             tok = ui.get(F_GL_TOKEN, '')
             acc = ACCOUNTS['by_token'].get(tok, {})
             pl = new_player(ui.get(F_HANDLE, 'Summoner'), ui.get(F_GL_USER, acc.get('gl_user', '')), tok)
+            highlight('joined', len(glob.glob(os.path.join(SAVE_DIR, 'player_*.json'))) + 1)
             acc['user_id'] = pl['user_id']
             ACCOUNTS['by_token'][tok] = acc
             name = account_for_gl(pl['gl_user'])
