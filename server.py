@@ -636,13 +636,20 @@ def roll_unit(gid):
     rates = {int(r): float(p) for r, p in (pool.get('rates') or {}).items() if int(r) in units}
     if not rates:
         rates = {r: 1.0 for r in units}
+    rateup = {str(u): float(m) for u, m in (pool.get('rateup') or {}).items()}
+
+    def pick(r):          # units of a rarity: equally likely, rate-up units count x times
+        ids = units[r]
+        if not rateup or not any(str(u) in rateup for u in ids):
+            return random.choice(ids)
+        return random.choices(ids, weights=[rateup.get(str(u), 1.0) for u in ids])[0]
     x, acc = random.uniform(0, sum(rates.values())), 0.0
     for r, p in sorted(rates.items()):
         acc += p
         if x <= acc:
-            return random.choice(units[r]), r
+            return pick(r), r
     r = max(units)
-    return random.choice(units[r]), r
+    return pick(r), r
 
 # Unit types (nBTx56W9) and how often a new unit gets each one: the game's own unit type table
 # (F_UNIT_TYPE_MST ChD5b0jR): 1 Lord 23%, 2 Anima 23%, 3 Breaker 22%, 4 Guardian 22%, 5 Oracle 10%,

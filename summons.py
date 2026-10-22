@@ -123,7 +123,26 @@ class Summons:
         rates = {str(r): float(p) for r, p in rates.items() if str(r) in units and float(p) > 0}
         if not rates:
             rates = {r: round(100.0 / len(units), 2) for r in units} if units else {}
-        return {'units': units, 'rates': rates}
+        have = {u for v in units.values() for u in v}
+        rateup = {str(u): float(m) for u, m in (e.get('rateup') or {}).items() if str(u) in have and float(m) > 1}
+        return {'units': units, 'rates': rates, 'rateup': rateup}
+
+    def chances(self, gid, off=()):
+        """{unit id: percent per summon} - rarity chance shared by weight (rate-up units count more)."""
+        p = self.pool(gid)
+        if 'selector' in p:
+            return {}
+        total = sum(p['rates'].values()) or 1
+        out = {}
+        for r, ids in p['units'].items():
+            ids = [u for u in ids if u not in off] or ids
+            if r not in p['rates'] or not ids:
+                continue
+            w = {u: p['rateup'].get(u, 1.0) for u in ids}
+            tw = sum(w.values())
+            for u in ids:
+                out[u] = p['rates'][r] * 100.0 / total * w[u] / tw
+        return out
 
     def uses_default(self, gid):
         e = self.state.get(gid) or {}
@@ -255,7 +274,7 @@ class Summons:
                         'hidden': self.hidden(gid), 'gems': gems, 'honor': honor,
                         'image': self.page_image(gid), 'edited': gid in self.state,
                         'default_pool': self.uses_default(gid), 'rates': p.get('rates', {}),
-                        'counts': counts, 'units': ids,
+                        'counts': counts, 'units': ids, 'rateup': p.get('rateup', {}),
                         'text': (self.state.get(gid) or {}).get('text') or '',
                         'auto_text': self.plain(self.auto_text(gid)),
                         'auto_markup': self.markup(self.auto_text(gid)),
@@ -287,6 +306,20 @@ class Summons:
                 if not ids:
                     raise ValueError('A summon needs at least one unit.')
                 e['units'] = ids
+            if 'rateup' in data and data['rateup'] is not None:
+                ru = {}
+                for u, m in (data['rateup'] or {}).items():
+                    try:
+                        m = float(m)
+                    except (TypeError, ValueError):
+                        continue
+                    if not 0 < m <= 1000:
+                        raise ValueError('A rate-up must be between x1 and x1000.')
+                    if m > 1:
+                        ru[str(u)] = round(m, 2)
+                e['rateup'] = ru
+                if not ru:
+                    e.pop('rateup')
             if 'rates' in data and data['rates'] is not None:
                 rates = {str(r): float(p) for r, p in data['rates'].items() if str(p).strip() not in ('', 'None')}
                 if any(p < 0 for p in rates.values()) or not any(p > 0 for p in rates.values()):
@@ -391,16 +424,33 @@ def rates_page(self, gid):
             off = set(self.S.admin_settings()['off']['units'])
             units = {rr: [u for u in v if u not in off] or v for rr, v in p['units'].items()}
             total = sum(p['rates'].values()) or 1
+            ch0 = self.chances(gid, off)
             rows = []
             for rr in sorted(p['rates'], key=int, reverse=True):
                 pct = p['rates'][rr] * 100.0 / total
                 n = len(units.get(rr, []))
+                normal = [ch0[u] for u in units.get(rr, []) if u in ch0 and u not in p.get('rateup', {})]
+                each = f'{(pct / n if n else 0):.3f}%'
+                if len(normal) < n:
+                    each = (f'{normal[0]:.3f}%' if normal else '-') + '<br><small>rate up more</small>'
                 rows.append(f'<tr><td class="star">{rr}★</td><td>{pct:.2f}%</td><td>{n}</td>'
-                            f'<td>{(pct / n if n else 0):.3f}%</td></tr>')
+                            f'<td>{each}</td></tr>')
             out.append('<h2>Rates</h2><table><tr><th>Rarity</th><th>Chance</th><th>Units</th><th>Each unit</th></tr>'
                        + ''.join(rows) + '</table>')
             groups = [(f'{rr}★ units', p['rates'][rr] * 100.0 / total, units.get(rr, []))
                       for rr in sorted(p['rates'], key=int, reverse=True)]
+            ch = self.chances(gid, off)
+            up = sorted((u for u in p.get('rateup', {}) if u in ch), key=lambda u: -ch[u])
+            if up:
+                cells = []
+                for u in up:
+                    m = um.get(u) or {}
+                    el, col = ELEMENTS.get(str(m.get('iNy0ZU5M')), ('', '#aaa'))
+                    cells.append(f'<div class="u up"><img src="/bf/web/unit_icon/{_esc(u)}.png" alt="" onerror="this.style.visibility=\'hidden\'">'
+                                 f'<span class="n">{_esc(m.get("utP1c0CD") or u)}</span>'
+                                 f'<span class="e" style="color:{col}">{_esc(el)}</span>'
+                                 f'<span class="pc">{ch[u]:.3f}%</span></div>')
+                out.insert(1, '<h2 class="ruh">Rate up!</h2><div class="grid">' + ''.join(cells) + '</div>')
         for name, pct, ids in groups:
             ids = sorted(ids, key=lambda u: (str((um.get(u) or {}).get('iNy0ZU5M') or ''), (um.get(u) or {}).get('utP1c0CD') or u))
             cells = []
@@ -411,6 +461,9 @@ def rates_page(self, gid):
                              f'<span class="n">{_esc(m.get("utP1c0CD") or u)}</span>'
                              f'<span class="e" style="color:{col}">{_esc(el)}</span></div>')
             each = f' &middot; {pct / len(ids):.3f}% each' if pct is not None and ids else ''
+            if pct is not None and any(u in p.get('rateup', {}) for u in ids):
+                normal = [ch[u] for u in ids if u not in p['rateup'] and u in ch]
+                each = f' &middot; {normal[0]:.3f}% each, rate-up units more' if normal else ''
             out.append(f'<h2>{_esc(name)} <small>({len(ids)}{each})</small></h2><div class="grid">{"".join(cells)}</div>')
         body = ''.join(out)
     return f'''<!doctype html><html><head><meta charset="utf-8">
@@ -427,6 +480,9 @@ th,td{{padding:6px 4px;border-bottom:1px solid #3a2c16;text-align:center}}
 th{{color:#c9b48a;font-weight:normal;font-size:12px}}
 td.star{{color:#ffd77a;font-weight:bold}}
 .grid{{display:flex;flex-wrap:wrap;gap:6px}}
+.ruh{{color:#ff7ad9;border-color:#7a2a63}}
+.u.up{{border-color:#ff7ad9;box-shadow:0 0 8px rgba(255,122,217,.35)}}
+.pc{{display:block;color:#ff9be4;font-weight:bold;font-size:12px}}
 .u{{width:23%;min-width:70px;flex-grow:1;max-width:25%;background:#241a0e;border:1px solid #4a3818;border-radius:8px;padding:4px 2px;text-align:center;box-sizing:border-box}}
 .u img{{width:56px;height:56px;display:block;margin:0 auto 2px}}
 .u .n{{display:block;font-size:11px;line-height:1.2;min-height:2.4em}}

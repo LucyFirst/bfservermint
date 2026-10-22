@@ -116,6 +116,9 @@ main.wide{max-width:1180px}
 .minigrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px;max-height:300px;overflow:auto;padding:2px;margin-top:6px}
 .minigrid .ut{padding:4px 2px} .minigrid .ut img{width:48px;height:48px}
 .minigrid .ut .nm{font-size:10.5px}
+.ut.up{border-color:#ff7ad9;box-shadow:0 0 0 1px #ff7ad9 inset}
+.ut .ru{position:absolute;top:2px;left:2px;background:#ff3fb4;color:#fff;font-size:10px;font-weight:bold;border-radius:6px;padding:0 4px;line-height:15px}
+.ut .pct{font-size:10px;color:#ff9be4}
 dialog.big{width:min(900px,96vw)}
 .colbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 6px;font-size:13px;color:var(--muted)}
 .colbar button{width:26px;height:26px;border-radius:6px;border:2px solid var(--line);cursor:pointer;padding:0}
@@ -483,6 +486,14 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
     <button class="btn ghost sm" id="suAll">Select all shown</button>
     <button class="btn ghost sm" id="suNone">Clear selection</button>
   </div>
+  <div class="toolbar" id="smRuBar" style="margin:6px 0 0">
+    <span style="font-size:13px;color:var(--muted)">Rate up the selected units:</span>
+    <span style="font-size:13px">×</span><input type="number" id="smRuX" min="1.1" max="1000" step="0.5" value="5" style="width:70px;flex:0 0 auto">
+    <button class="btn sm" id="smRuSet">Rate up</button>
+    <button class="btn ghost sm" id="smRuClear">Back to normal</button>
+    <span id="smRuInfo" style="font-size:12.5px;color:#ff9be4"></span>
+  </div>
+  <p class="hint" id="smRuHint" style="color:var(--muted);font-size:12.5px;margin:4px 0 0">A ×5 unit is 5 times as likely as a normal unit of the same rarity; the rarity chances above stay the same. Pink badges show the multiplier and the chance per summon.</p>
   <div class="minigrid" id="smUnits"></div>
   <div id="smPicker" class="hide" style="margin-top:10px;border-top:1px solid var(--line);padding-top:10px">
     <p class="hint" style="color:var(--muted);font-size:13px;margin:0 0 6px">Only units switched on in the Units section can be added.</p>
@@ -930,7 +941,7 @@ $('#trList').addEventListener('change',async e=>{const c=e.target.closest('input
   try{const r=await api('trial_set',{id:c.dataset.trial,on:c.checked});say('#trmsg',r.ok,true);loadTrials()}catch(err){say('#trmsg',err.message);loadTrials()}});
 
 // ---------- summons
-let SM=[], smView='summons', smCur=null, smUnits=[], smSel=new Set(), spSel=new Set();
+let SM=[], smView='summons', smCur=null, smUnits=[], smSel=new Set(), spSel=new Set(), smRU={};
 async function loadSummons(view){
   smView=view;
   try{ if(!U.length){const r=await api('units');U=r.units.map(([id,name,rar,el,off])=>({id,name,rar,el,off:!!off}))}
@@ -943,7 +954,7 @@ function smCard(x){
   return `<div class="sm-card${x.hidden?' off':''}">
     <div class="pic" style="background-image:url('${x.image?'/admin/img/gacha/'+encodeURIComponent(x.image):''}')">${x.image?'':'no picture'}</div>
     <div class="bd"><div class="t">${esc(x.name)}${x.edited?'<span class="tag e">changed</span>':''}${x.hidden?'<span class="tag x">hidden</span>':''}${x.kind==='selector'?'<span class="tag c">selector</span>':''}</div>
-    <div class="sub">summon #${x.id} · ${cost} · ${x.units.length} unit${x.units.length==1?'':'s'}${x.default_pool?' (default pool)':''}</div>
+    <div class="sub">summon #${x.id} · ${cost} · ${x.units.length} unit${x.units.length==1?'':'s'}${x.default_pool?' (default pool)':''}${Object.keys(x.rateup||{}).length?` · <span style="color:#ff7ad9">${Object.keys(x.rateup).length} rated up</span>`:''}</div>
     ${x.kind==='selector'?'<div class="sub">Players pick one of its units.</div>':`<div class="rates">${rates}</div>`}
     <div class="acts">
       <button class="btn ghost sm" data-ed="${x.id}">Units, rates &amp; cost</button>
@@ -971,7 +982,8 @@ async function smClick(e){
 $('#smGrid').onclick=smClick; $('#hnGrid').onclick=smClick;
 const unitById=id=>U.find(u=>u.id===id)||{id,name:id,rar:0,el:0};
 function openSummon(id){
-  smCur=SM.find(x=>x.id===id); smUnits=[...smCur.units]; smSel.clear(); spSel.clear();
+  smCur=SM.find(x=>x.id===id); smUnits=[...smCur.units]; smSel.clear(); spSel.clear(); smRU={...(smCur.rateup||{})};
+  $('#smRuBar').classList.toggle('hide',smCur.kind==='selector'); $('#smRuHint').classList.toggle('hide',smCur.kind==='selector');
   $('#suSearch').value=''; $('#suRarity').value=''; $('#suElem').value='';
   $('#smTitle').textContent=smCur.name+' (#'+id+')';
   $('#smHint').textContent=smCur.kind==='selector'?'A selector: players choose one of these units.':(smCur.default_pool?'This summon uses the server\'s default pool until you change its units.':'');
@@ -990,9 +1002,21 @@ function drawRates(rates){
   const rs=Object.keys(c).sort((a,b)=>b-a);
   $('#smRates').innerHTML=rs.map(r=>`<div class="rrow"><b>${r}★</b><input type="number" min="0" step="0.1" data-r="${r}" value="${rates&&rates[r]!=null?rates[r]:(old[r]??'')}"><span>% · ${c[r]} unit${c[r]==1?'':'s'}</span></div>`).join('')||'<p class="hint">Add units first.</p>';
   rateSum();
+  drawSmUnits();
 }
 function rateSum(){let t=0;$('#smRates').querySelectorAll('input').forEach(i=>t+=parseFloat(i.value)||0);$('#smRateSum').textContent=`Total ${Math.round(t*100)/100}%`+(Math.abs(t-100)>0.01&&t>0?' - the chances are scaled to 100% when rolling':'')}
-$('#smRates').oninput=rateSum;
+$('#smRates').oninput=()=>{rateSum();drawSmUnits()};
+$('#smRuSet').onclick=()=>{const x=Math.round((parseFloat($('#smRuX').value)||0)*100)/100;if(!smSel.size){say('#smDmsg','Select the units to rate up first.');return}
+  if(!(x>1&&x<=1000)){say('#smDmsg','Pick a multiplier above ×1 (up to ×1000).');return}smSel.forEach(id=>smRU[id]=x);smSel.clear();$('#smDmsg').textContent='';drawSmUnits()};
+$('#smRuClear').onclick=()=>{if(!smSel.size){say('#smDmsg','Select rated-up units to put back to normal.');return}smSel.forEach(id=>delete smRU[id]);smSel.clear();drawSmUnits()};
+function smChances(){
+  if(!smCur||smCur.kind==='selector')return {};
+  const rates={};let tot=0;$('#smRates').querySelectorAll('input').forEach(i=>{const v=parseFloat(i.value)||0;rates[i.dataset.r]=v;tot+=v});
+  if(!tot)return {};
+  const by={};smUnits.forEach(id=>{const u=unitById(id);if(u.off)return;(by[u.rar]=by[u.rar]||[]).push(id)});
+  const out={};for(const r in by){const w=by[r].map(id=>smRU[id]||1),tw=w.reduce((a,b)=>a+b,0);by[r].forEach((id,k)=>out[id]=(rates[r]||0)/tot*100*w[k]/tw)}
+  return out;
+}
 function smShownUnits(){
   const q=$('#suSearch').value.trim().toLowerCase(), r=$('#suRarity').value, el=$('#suElem').value;
   return smUnits.map(unitById).filter(u=>(!q||String(u.name).toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!el||u.el==el)).sort((a,b)=>b.rar-a.rar||(+a.id)-(+b.id));
@@ -1000,8 +1024,10 @@ function smShownUnits(){
 function drawSmUnits(){
   const rs=[...new Set(smUnits.map(id=>unitById(id).rar))].sort((a,b)=>b-a), cur=$('#suRarity').value;
   $('#suRarity').innerHTML='<option value="">All rarities</option>'+rs.map(r=>`<option value="${r}"${String(r)===cur?' selected':''}>${r}★</option>`).join('');
-  const list=smShownUnits();
-  $('#smUnits').innerHTML=list.map(u=>`<div class="ut${smSel.has(u.id)?' sel':''}${u.off?' closed':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★</div></div>`).join('')||'<p class="hint">No units yet.</p>';
+  const list=smShownUnits(), ch=smChances();
+  Object.keys(smRU).forEach(id=>{if(!smUnits.includes(id))delete smRU[id]});
+  $('#smUnits').innerHTML=list.map(u=>{const x=smRU[u.id];return `<div class="ut${smSel.has(u.id)?' sel':''}${u.off?' closed':''}${x?' up':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}${ch[u.id]!=null?' - '+ch[u.id].toFixed(3)+'% per summon':''}">${x?`<span class="ru">×${x}</span>`:''}<img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★</div>${x&&ch[u.id]!=null?`<div class="pct">${ch[u.id].toFixed(3)}%</div>`:''}</div>`}).join('')||'<p class="hint">No units yet.</p>';
+  const nRU=Object.keys(smRU).length; $('#smRuInfo').textContent=nRU?`${nRU} unit${nRU==1?'':'s'} rated up`:'';
   const c=rarCounts(), nOff=smUnits.filter(id=>unitById(id).off).length; $('#smUnitCount').textContent=`${smUnits.length} units${nOff?` (${nOff} switched off - never given)`:''} · `+Object.keys(c).sort((a,b)=>b-a).map(r=>`${r}★ ${c[r]}`).join(', ')+(list.length!==smUnits.length?` · ${list.length} shown`:'')+(smSel.size?` · ${smSel.size} selected`:'');
   $('#smClearSel').textContent=smSel.size?`Remove ${smSel.size} selected`:'Remove selected';
 }
@@ -1023,7 +1049,7 @@ $('#spAdd').onclick=()=>{if(!spSel.size)return;smUnits=[...smUnits,...spSel];spS
 $('#smCancel').onclick=()=>$('#smDlg').close();
 $('#smSave').onclick=async()=>{
   const d={id:smCur.id,gems:$('#smGems').value,honor:$('#smHonor').value,units:smUnits,text:$('#smText').value};
-  if(smCur.kind!=='selector'){d.rates={};$('#smRates').querySelectorAll('input').forEach(i=>{if(i.value!=='')d.rates[i.dataset.r]=i.value})}
+  if(smCur.kind!=='selector'){d.rates={};$('#smRates').querySelectorAll('input').forEach(i=>{if(i.value!=='')d.rates[i.dataset.r]=i.value});d.rateup=smRU}
   const unchanged=JSON.stringify([...smCur.units].sort())===JSON.stringify([...smUnits].sort());
   if(unchanged&&smCur.default_pool) delete d.units;   // keep following the default pool
   try{$('#smSave').disabled=true;const r=await api('summon_save',d);$('#smDlg').close();say(smView==='honor'?'#hnmsg':'#smmsg',r.ok,true);loadSummons(smView)}
