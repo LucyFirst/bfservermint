@@ -730,6 +730,14 @@ def active_squad(pl):
     t = team_row(pl['state']) or {}
     return str(_num(t.get('Z0Y4RoD7')) or 0)
 
+G_FRIEND_GIFTS = '30uygM9m'          # friend gifts waiting (yDiG31Fe from, 1px2dbX3 to)
+
+def real_friend_gifts(pl):
+    """Friend gifts in the save that come from real players on this server (none of the recorded ones)."""
+    ids = {p.get('user_id') for p in all_players()}
+    return [r for r in _rows(pl['state'].get(G_FRIEND_GIFTS))
+            if isinstance(r, dict) and r.get('yDiG31Fe') in ids and r.get('yDiG31Fe') != pl['user_id']]
+
 def merge_party(pl, rows):
     rows = [r for r in _rows(rows) if isinstance(r, dict)]
     kinds = {str(r.get(F_PARTY_KIND)) for r in rows}
@@ -775,6 +783,8 @@ def full_user_info(pl):
         repair_party(pl)
     except Exception:
         log.exception('could not check the squads')
+    if pl['state'].get(G_FRIEND_GIFTS):
+        pl['state'][G_FRIEND_GIFTS] = real_friend_gifts(pl)
     tmpl = BY_ID[RID['GetUserInfoRequest']][-1]
     out = personalise(pl, BLOBS[tmpl['resp']])
     for g in list(out):
@@ -3397,6 +3407,12 @@ def handle_action(rid, req):
             apply_overrides(pl, resp)
             save_player(pl)
             return resp
+        if cls in ('FixGiftInfoRequest', 'GetGiftInfoRequest'):
+            # Friend gifts are not run by this server yet: the recordings' gift lists belong to the
+            # recorded account (a karma gift from "DecompFriend" that came back every time)
+            pl['state'][G_FRIEND_GIFTS] = real_friend_gifts(pl)
+            save_player(pl)
+            return {G_FRIEND_GIFTS: pl['state'][G_FRIEND_GIFTS]}
         if cls == 'GetUserInfoRequest':
             welcome_gifts(pl)
             login_gifts(pl)

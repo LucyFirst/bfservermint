@@ -92,7 +92,8 @@ class Friends:
         except OSError:
             seen = int(time.time())
         return {self.S.F_USERID: p['user_id'], 'B5JQyV8j': self.S.shown_name(p), '2Fh3J7ng': str(t.get('D9wXQI2V', '1')),
-                '98WfKiyA': str(p.get('friend_id', '')), 'bM7RLu5K': str(ui.get('bM7RLu5K', '') or ''), '0CAQ6wUe': str(seen)}
+                '98WfKiyA': str(p.get('friend_id', '')), 'bM7RLu5K': str(ui.get('bM7RLu5K', '') or ''),
+                '0CAQ6wUe': str(max(0, int(time.time()) - seen))}      # seconds since last seen (not a date)
 
     def friend_row(self, me, p, st):
         row = dict(self.friend_tmpl or {})
@@ -124,7 +125,7 @@ class Friends:
         row.update(self._unit_fields(u))
         row.update(self._person(pl))
         row.update({self.S.F_USERID: OWN_PREFIX + uuid, 'q9Arz8Jv': '1', 'J3stQ7jd': '0', 'w28VsQ7h': '0',
-                    '0CAQ6wUe': str(int(time.time())),
+                    '0CAQ6wUe': '0',
                     'edy7fq3L': uuid, 'Ge8Yo32T': '0', 'mZA7fH2v': '0', 'JmFn3g9t': '0'})
         return row
 
@@ -142,7 +143,7 @@ class Friends:
         used_names.add(name)
         row = dict(self.helper_tmpl or {})
         row.update({self.S.F_USERID: f'npc{n:05d}', 'B5JQyV8j': name, '2Fh3J7ng': str(max(1, lv + random.randint(0, 20))),
-                    '98WfKiyA': str(100000000 + n), 'bM7RLu5K': '', '0CAQ6wUe': str(int(time.time())),
+                    '98WfKiyA': str(100000000 + n), 'bM7RLu5K': '', '0CAQ6wUe': str(random.randint(60, 6 * 3600)),
                     'pn16CNah': uid, '4A6LzBxr': u['P_LV'], 'e7DK0FQT': u['P_HP'], '67CApcti': u['P_ATK'],
                     'q08xLEsy': u['P_DEF'], 'PWXu25cg': u['P_HEL'], 'nj9Lw7mV': u['P_SKILL_ID'], '3NbeC8AB': u['P_SKILL_LV'],
                     'nBTx56W9': u['P_UNIT_TYPE_ID'], 'iEFZ6H19': '0', 'RQ5GnFE2': '0',
@@ -165,7 +166,7 @@ class Friends:
         row = dict(self.friend_tmpl or {})
         row.update(self._unit_fields(u))
         row.update(self._person(pl))
-        row.update({self.S.F_USERID: OWN_PREFIX + uuid, '0CAQ6wUe': str(int(time.time())),
+        row.update({self.S.F_USERID: OWN_PREFIX + uuid, '0CAQ6wUe': '0',
                     '96Nxs2WQ': '1', '5JbjC3Pp': '0', 'a1Jp3TVb': '0', '8DtoZdXE': '0',
                     'Ge8Yo32T': '0', 'mZA7fH2v': '0', 'JmFn3g9t': '', 'U4pMNjy0': '0'})
         return row
