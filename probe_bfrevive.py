@@ -19,6 +19,10 @@ gems it stops instead.
 """
 import base64, gzip, json, os, random, ssl, sys, time, urllib.parse, urllib.request
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')   # names with Japanese etc. crashed the Windows console
+except Exception:
+    pass
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 API = 'https://api.bfrevive.net'
