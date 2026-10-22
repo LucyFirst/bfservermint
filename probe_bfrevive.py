@@ -10,6 +10,9 @@ next time you open the real bfrevive app - just give up/retreat).
 
 Usage:  python probe_bfrevive.py              (next 60 quests not fetched yet)
         python probe_bfrevive.py 22 23 504    (these quest ids)
+        python probe_bfrevive.py vortex       (Vortex quests bfrevive has open right now)
+        python probe_bfrevive.py vortex 150   (the same, up to 150 quests this run)
+        add "again" to fetch quests already fetched once more (bfrevive improves its battles)
 
 When energy runs out it uses the free energy refill; if a refill ever costs
 gems it stops instead.
@@ -69,8 +72,22 @@ def action(cls, obj):
 def template(cls):
     return json.loads(json.dumps([a for a in T['action'] if a['cls'] == cls][-1]['req']))
 
+def vortex_dungeons():
+    """{dungeon id} of the Vortex (land 99) - from data/dungeon_area.json."""
+    try:
+        da = json.load(open(os.path.join(HERE, 'data', 'dungeon_area.json'), encoding='utf-8'))['dungeon']
+    except Exception:
+        return set()
+    return {d for d, (area, land) in da.items() if str(land) == '99'}
+
+
 def main():
+    global LIMIT
+    words = [a.lower() for a in sys.argv[1:]]
+    vortex, again = 'vortex' in words, 'again' in words
     args = [a for a in sys.argv[1:] if a.isdigit()]
+    if vortex and args:
+        LIMIT, args = int(args[0]), []
     explicit = bool(args)
     ids = args
     os.makedirs(OUT, exist_ok=True)
@@ -114,7 +131,17 @@ def main():
             except Exception:
                 pass
     have |= {str(((a['req'].get('9Q1Lq5FS') or [{}])[0]).get('j28VNcUW')) for a in T['action'] if a['cls'] == 'MissionStartRequest'}
-    if not explicit:
+    if again:
+        have = set()
+    if vortex and not explicit:
+        vd = vortex_dungeons()
+        open_now = {str(r.get('MHx05sXt')) for r in info.get('Y73tHKS8') or [] if isinstance(r, dict) and r.get('MHx05sXt')}
+        pool = [k for k in sorted(MISSIONS, key=int) if str(MISSIONS[k].get('dungeon')) in vd and k not in have]
+        ids = [k for k in pool if str(MISSIONS[k].get('dungeon')) in open_now]
+        print(f'Vortex: {len(pool)} quests not fetched yet, {len(ids)} of them in dungeons bfrevive has open now; '
+              f'this run does up to {LIMIT}')
+        ids = ids[:LIMIT]
+    elif not explicit:
         # default batch: quests not datamined (those are already exact) and not fetched yet
         ids = [k for k in sorted(MISSIONS, key=int)
                if k not in have and battles.get(k, {}).get('src') != 'datamine'
