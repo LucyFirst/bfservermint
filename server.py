@@ -3282,6 +3282,8 @@ FRIEND_ACTIONS = {'FriendGetRequest': None, 'FriendGetAgreeRequest': None,
                   'FriendRefuseRequest': lambda F: F.remove, 'FriendDeleteRequest': lambda F: F.remove,
                   'FriendFavoriteRequest': lambda F: F.favorite}
 
+WHO = threading.local()           # which player the request being handled belongs to (for the log)
+
 def handle_action(rid, req):
     info = REQS.get(rid)
     cls = info['cls'] if info else f'unknown:{rid}'
@@ -3291,6 +3293,7 @@ def handle_action(rid, req):
         ui = (req.get(G_USERINFO) or [{}])[0]
         if pl:
             LAST_SEEN[pl['user_id']] = time.time()
+            WHO.name = pl.get('handle') or pl['user_id']
 
         if cls == 'CreateUserRequest':
             tok = ui.get(F_GL_TOKEN, '')
@@ -3761,6 +3764,7 @@ class Handler(BaseHTTPRequestHandler):
                     return self._send(200, {'F4q6i9xe': {'Hhgi79M1': rid, 'aV6cLn3v': '---'}, 'a3vSYuq2': {}})
                 req = dec_body(rid, env['a3vSYuq2']['Kn51uR4Y'])
                 t0 = time.time()
+                WHO.name = ''
                 resp = handle_action(rid, req)
                 if resp is None:
                     resp = {}             # the game crashes on a null reply; bfrevive sends {}
@@ -3775,7 +3779,8 @@ class Handler(BaseHTTPRequestHandler):
                     add_team_counts(req, resp)
                 except Exception:
                     log.exception('could not add the gift / friend request counts')
-                log.info('%-34s %5.0f ms', REQS[rid]['cls'], (time.time() - t0) * 1000)
+                log.info('%-34s %5.0f ms  [%s]', REQS[rid]['cls'], (time.time() - t0) * 1000,
+                         re.sub(r'<[^>]+>', '', getattr(WHO, 'name', '') or '-'))
                 return self._send(200, {'F4q6i9xe': {'Hhgi79M1': rid, 'aV6cLn3v': '---'},
                                         'a3vSYuq2': {F_SIGNAL: enc_body(rid, resp)}},
                                   'text/html; charset=utf-8')
