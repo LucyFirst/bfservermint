@@ -714,10 +714,13 @@ def do_summon(pl, req, resp):
         highlight('summon', pl, unit_id)
         log.info('summon on %s (%s): %s* %s', gid, (POOLS.get(gid) or {}).get('name', 'default pool'), rare,
                  unit_mst().get(unit_id, {}).get('utP1c0CD', unit_id))
-    # The game keeps ONE summon gate (OpeUserUnit is a single state, the last row wins). For a multi
-    # summon that must be the best unit's gate - like the real game, the gate shows the top rarity.
     resp[G_UNITS_ADD] = add
-    resp[G_OPE_UNIT] = [best[1]] if best else ope
+    # Every unit gets a row: the game shows a multi summon unit by unit from this list (UserState's
+    # gacha index walks it). The gate itself takes the LAST row's effect, so the best unit goes last.
+    if best and len(ope) > 1:
+        ope.remove(best[1])
+        ope.append(best[1])
+    resp[G_OPE_UNIT] = ope
     if count > 1 and best:
         log.info('  multi summon gate: %s* (effect %s)', best[0], best[1]['u0vkt9yH'])
     return resp
@@ -2861,6 +2864,30 @@ def patch_define_mst(resp):
         row['2inP0tCg'] = _num_text(fp['great']['mult'])
         row['zn65EXYF'] = _num_text(fp['super']['mult'])
 
+# Imps: fusing Power/Guard/Healing/Vigor/Almighty Imps raises a unit's HP/ATK/DEF/REC for good, up to
+# that unit's imp limit (game data, data/unit_imps.json). Unit row: TokWs1B3 HP, t4m1RH6Y ATK,
+# e6mY8Z0k DEF, X6jf8DUw REC on top of the level stats - the game adds them itself.
+IMP_FILE = os.path.join(HERE, 'data', 'unit_imps.json')
+IMPS = json.load(open(IMP_FILE, encoding='utf-8')) if os.path.exists(IMP_FILE) else {'boost': {}, 'caps': {}}
+IMP_FIELDS = ('TokWs1B3', 't4m1RH6Y', 'e6mY8Z0k', 'X6jf8DUw')
+
+def apply_imps(base, mats):
+    """Add the imps among mats to base (a unit row, changed in place). Returns what was added."""
+    add = [0, 0, 0, 0]
+    for m in mats:
+        for i, v in enumerate(IMPS['boost'].get(str(m.get('pn16CNah')), ())):
+            add[i] += v
+    if not any(add):
+        return add
+    caps = IMPS['caps'].get(str(base.get('pn16CNah')), [0, 0, 0, 0])
+    got = [0, 0, 0, 0]
+    for i, f in enumerate(IMP_FIELDS):
+        now = _num(base.get(f)) or 0
+        new = max(now, min(caps[i], now + add[i]))
+        got[i] = new - now
+        base[f] = str(new)
+    return got
+
 def do_fusion(pl, req, resp):
     rows = req.get(G_SELL_UNITS) or []
     base_id = next((r.get(F_UNIT_ID) for r in rows if str(r.get('mnZ5K4Ii')) == '1'), None)
@@ -2891,6 +2918,10 @@ def do_fusion(pl, req, resp):
     sp0 = _num(base.get('bFQbZh3x')) or 0
     sp_top = _num(base.get('GIO9DTif')) or 100
     sp1 = min(sp_top, sp0 + sp_from(base, [pl['units'][m] for m in mat_ids if m in pl['units']])) if sp0 < sp_top else sp0
+    base = dict(base)
+    imp = apply_imps(base, [pl['units'][m] for m in mat_ids if m in pl['units']])
+    if any(imp):
+        log.info('fusion: imps +%s HP +%s ATK +%s DEF +%s REC (now %s)', *imp, '/'.join(base[f] for f in IMP_FIELDS))
     for m in mat_ids:
         pl['units'].pop(m, None)
     if frog and not base.get('5gXxT7LZ'):
