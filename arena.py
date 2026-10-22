@@ -79,7 +79,10 @@ class Arena:
             last += got * ORB_SECONDS
             t['YS2JG9no'] = str(orbs)
         pl['orb_time'] = now if orbs >= mx else last
-        t['jp9s8IyY'] = '0' if orbs >= mx else str(int(ORB_SECONDS - (now - pl['orb_time'])))
+        # The game's timer (FightRestTimer) is the time until ALL orbs are back: it counts it down and
+        # adds an orb each time it passes a whole hour (DefineMst RecoverTimeFight 0BPn68DG = 3600).
+        nxt = int(ORB_SECONDS - (now - pl['orb_time']))
+        t['jp9s8IyY'] = '0' if orbs >= mx else str((mx - orbs - 1) * ORB_SECONDS + max(1, nxt))
 
     def position(self, pl, points):
         """Ranking place among everyone on this server."""

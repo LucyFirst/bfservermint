@@ -3326,6 +3326,10 @@ def handle_action(rid, req):
             fix_selector_overwrites(pl)
             pl['selector_fix'] = 1
         regen_energy(pl)
+        try:
+            arena_engine().regen_orbs(pl)     # every reply that carries the team row has the right orbs/timer
+        except Exception:
+            log.exception('arena orbs')
         if pl.get('user_id') == 'eSqQ1Gdd' and not pl.get('frog_fix_81947') and '81947' in pl['units']:
             # a Sphere Frog was fused into Jack-O' before the server knew about Sphere Frogs
             pl['units']['81947'].update({'5gXxT7LZ': 1, 'RXfC31FA': '0'}) if str(pl['units']['81947'].get('RXfC31FA')) == '-1' else None
