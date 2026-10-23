@@ -124,6 +124,29 @@ def mission_end(ui, signal, start, info):
               'zbPlgZU6': ','.join(f'{k}:{n}' for k, n in kills.items()), 'XOlcsuRn': ''})
     return req
 
+def story_order(todo, cleared):
+    """The story quests in the order the game unlocks them (data/unlock_mst.json: the quest before,
+    the quests a dungeon / area needs), so side stories like Cordelica come when they open."""
+    try:
+        un = json.load(open(os.path.join(HERE, 'data', 'unlock_mst.json'), encoding='utf-8'))
+        da = json.load(open(os.path.join(HERE, 'data', 'dungeon_area.json'), encoding='utf-8'))['dungeon']
+    except Exception:
+        yield from todo[:LIMIT]
+        return
+    def needs(k):
+        d = str(MISSIONS[k].get('dungeon'))
+        req = [un['mission'].get(k, '0'), un['dungeon'].get(d, '0'), un['area'].get(str((da.get(d) or [''])[0]), '0')]
+        return {x for r in req for x in str(r).split(',') if x and x != '0'}
+    left, tried, n = list(todo), set(), 0
+    while n < LIMIT:
+        nxt = next((k for k in left if k not in tried and needs(k) <= cleared), None)
+        if nxt is None:
+            print('  no more story quests unlocked on bfrevive right now.')
+            return
+        tried.add(nxt)
+        n += 1
+        yield nxt
+
 def vortex_dungeons():
     """{dungeon id} of the Vortex (land 99) - from data/dungeon_area.json."""
     try:
@@ -189,8 +212,8 @@ def main():
         ids = [k for k in sorted(MISSIONS, key=int) if int(k) < 100000 and k not in cleared
                and MISSIONS[k]['name'].isascii()]
         print(f'Story: {len(ids)} story quests not cleared on bfrevive yet; this run clears up to {LIMIT} '
-              f'(about {CLEAR_SECONDS} s each)')
-        ids = ids[:LIMIT]
+              f'(about {CLEAR_SECONDS} s each), each as soon as the game unlocks it')
+        ids = story_order(ids, cleared)
     elif vortex and not explicit:
         vd = vortex_dungeons()
         open_now = {str(r.get('MHx05sXt')) for r in info.get('Y73tHKS8') or [] if isinstance(r, dict) and r.get('MHx05sXt')}
