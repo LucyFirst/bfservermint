@@ -120,12 +120,6 @@ main.wide{max-width:1180px}
 .ut .ru{position:absolute;top:2px;left:2px;background:#ff3fb4;color:#fff;font-size:10px;font-weight:bold;border-radius:6px;padding:0 4px;line-height:15px}
 .ut .pct{font-size:10px;color:#ff9be4}
 dialog.big{width:min(900px,96vw)}
-.bm-wrap{display:flex;gap:14px;flex-wrap:wrap}.bm-left{flex:1 1 360px;min-width:0}.bm-right{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:4px}
-#bmCanvas{width:100%;max-width:520px;height:auto;display:block;border-radius:10px;touch-action:none;cursor:grab;
-  background:repeating-conic-gradient(#3a3a3a 0 25%,#2a2a2a 0 50%) 0 0/20px 20px}
-.bm-units{display:flex;flex-wrap:wrap;gap:6px;max-height:170px;overflow:auto;margin-top:4px}
-.bm-units .ut{width:64px;cursor:pointer}.bm-units img{width:56px;height:56px;object-fit:contain}
-.bm-sel{border:1px solid var(--line);border-radius:10px;padding:8px;margin-top:8px}
 .colbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 6px;font-size:13px;color:var(--muted)}
 .colbar button{width:26px;height:26px;border-radius:6px;border:2px solid var(--line);cursor:pointer;padding:0}
 .colbar button.plain{width:auto;height:auto;background:var(--panel2);color:var(--text);padding:4px 9px;font:inherit;font-size:12.5px}
@@ -521,42 +515,8 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
   <p class="hint" style="color:var(--muted);font-size:13px;margin:0">The big picture on this summon's page in the Summon screen. Pick an image - it is fitted to the game's size (640 x 632).</p>
   <input type="file" accept="image/*" id="smPicFile" style="margin-top:10px">
   <canvas class="prev" id="smPicCanvas" width="640" height="632" style="max-width:320px;margin:8px auto 0"></canvas>
-  <div class="row" style="margin-top:8px;gap:8px"><button class="btn ghost" id="smPicMake" style="flex:0 0 auto">Make a banner…</button></div>
   <div class="row" style="margin-top:12px;gap:8px"><button class="btn" id="smPicSave" style="flex:0 0 auto">Save picture</button><button class="btn ghost" id="smPicCancel" style="flex:0 0 auto">Cancel</button></div>
   <div class="msg" id="smPicMsg"></div>
-</dialog>
-
-<dialog id="bmDlg" class="big">
-  <h2 style="margin:0 0 4px;font-size:17px">Make a summon banner</h2>
-  <p class="hint" style="color:var(--muted);font-size:13px;margin:0 0 8px">Pick a background, add units and words. Drag anything on the picture to move it; the one you touched last is the one the controls change.</p>
-  <div class="bm-wrap">
-    <div class="bm-left"><canvas id="bmCanvas" width="640" height="632"></canvas></div>
-    <div class="bm-right">
-      <label>Background</label>
-      <select id="bmBg"><option value="bg_clean.png">Rare Summon background (no words)</option><option value="bg_with_text.png">Rare Summon background with its words</option><option value="file">My own picture…</option><option value="none">Nothing (see-through)</option></select>
-      <input type="file" accept="image/*" id="bmBgFile" class="hide">
-      <label>Title</label>
-      <div class="row" style="gap:6px"><select id="bmTitle" style="flex:1"><option value="orig">"Rare Summon" (original)</option><option value="text">My own words</option><option value="none">None</option></select></div>
-      <input id="bmTitleText" class="hide" placeholder="e.g. Divine Summon" value="Featured Summon">
-      <label>Price badge</label>
-      <select id="bmBadge"><option value="orig">"3 gems per Summon" (original)</option><option value="text">My own words</option><option value="none">None</option></select>
-      <input id="bmBadgeText" class="hide" placeholder="e.g. 5 per Summon" value="5 gems per Summon">
-      <label>Add a unit</label>
-      <input id="bmUnitQ" placeholder="Search a unit by name or id">
-      <div id="bmUnits" class="bm-units"></div>
-      <div id="bmSel" class="bm-sel hide">
-        <div style="font-weight:700;margin-bottom:4px" id="bmSelName"></div>
-        <label style="margin:0">Size <span id="bmSizeV"></span></label>
-        <input type="range" id="bmSize" min="10" max="250" value="100" style="width:100%">
-        <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px">
-          <button class="btn ghost sm" id="bmFlip">Flip</button><button class="btn ghost sm" id="bmUp">To front</button>
-          <button class="btn ghost sm" id="bmDown">To back</button><button class="btn ghost sm" id="bmDel">Remove</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row" style="margin-top:12px;gap:8px"><button class="btn" id="bmUse" style="flex:0 0 auto">Use this banner</button><button class="btn ghost" id="bmCancel" style="flex:0 0 auto">Cancel</button></div>
-  <div class="msg" id="bmMsg"></div>
 </dialog>
 
 <dialog id="newDlg">
@@ -1123,87 +1083,6 @@ $('#smPicCancel').onclick=()=>$('#smPicDlg').close();
 $('#smPicSave').onclick=async()=>{if(!smPicImg)return say('#smPicMsg','Pick a picture first.');
   try{$('#smPicSave').disabled=true;const r=await api('summon_image',{id:smPicFor,png:smPicImg});$('#smPicDlg').close();say(smView==='honor'?'#hnmsg':'#smmsg',r.ok,true);loadSummons(smView)}
   catch(err){say('#smPicMsg',err.message)} finally{$('#smPicSave').disabled=false}};
-
-// ---------- summon banner maker
-const BM={layers:[],sel:null,bg:null,drag:null};
-function bmLoad(src){return new Promise((ok,bad)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>bad(new Error('picture not found'));i.src=src})}
-function bmAlpha(img){const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const x=c.getContext('2d');x.drawImage(img,0,0);return x.getImageData(0,0,c.width,c.height)}
-function bmText(str,kind){
-  const c=document.createElement('canvas'),x=c.getContext('2d'),size=kind==='title'?60:40;
-  const font=`900 ${size}px "Arial Black","Arial Rounded MT Bold",Arial,sans-serif`;x.font=font;
-  const w=Math.ceil(x.measureText(str).width)+40,h=Math.ceil(size*1.6);c.width=w;c.height=h;x.font=font;x.textBaseline='middle';x.lineJoin='round';
-  const g=x.createLinearGradient(0,h*0.2,0,h*0.8);
-  if(kind==='title'){g.addColorStop(0,'#fffbe0');g.addColorStop(.45,'#f3d36b');g.addColorStop(1,'#9c6514')}else{g.addColorStop(0,'#ffe08a');g.addColorStop(.5,'#ff6a1f');g.addColorStop(1,'#c11500')}
-  x.shadowColor='rgba(0,0,0,.55)';x.shadowOffsetX=4;x.shadowOffsetY=5;x.shadowBlur=4;
-  x.lineWidth=kind==='title'?9:7;x.strokeStyle='#241404';x.strokeText(str,20,h/2);
-  x.shadowColor='transparent';x.fillStyle=g;x.fillText(str,20,h/2);
-  x.lineWidth=2;x.strokeStyle='rgba(255,255,255,.35)';x.strokeText(str,20,h/2-1);
-  return c}
-function bmLayer(o){o.alpha=o.alpha||bmAlpha(o.img);o.flip=o.flip||false;o.s=o.s||1;return o}
-function bmDraw(withSel=true){
-  const c=$('#bmCanvas'),x=c.getContext('2d');x.clearRect(0,0,640,632);
-  if(BM.bg) x.drawImage(BM.bg,0,0,640,632);
-  for(const L of BM.layers){x.save();x.translate(L.x,L.y);x.scale(L.flip?-L.s:L.s,L.s);x.drawImage(L.img,-L.img.width/2,-L.img.height/2);x.restore()}
-  const L=BM.sel;if(withSel&&L){x.save();x.strokeStyle='#4fc3ff';x.setLineDash([8,6]);x.lineWidth=2;x.strokeRect(L.x-L.img.width*L.s/2,L.y-L.img.height*L.s/2,L.img.width*L.s,L.img.height*L.s);x.restore()}
-}
-function bmHit(px,py){
-  for(let i=BM.layers.length-1;i>=0;i--){const L=BM.layers[i];
-    let lx=(px-L.x)/L.s,ly=(py-L.y)/L.s;if(L.flip)lx=-lx;lx+=L.img.width/2;ly+=L.img.height/2;
-    if(lx<0||ly<0||lx>=L.img.width||ly>=L.img.height)continue;
-    if(L.alpha.data[(Math.floor(ly)*L.img.width+Math.floor(lx))*4+3]>30)return L}
-  return null}
-function bmSelect(L){BM.sel=L;$('#bmSel').classList.toggle('hide',!L);if(L){$('#bmSelName').textContent=L.name;$('#bmSize').value=Math.round(L.s*100);$('#bmSizeV').textContent=Math.round(L.s*100)+'%'}bmDraw()}
-function bmOrder(){ // units under the words; words keep their order on top
-  BM.layers.sort((a,b)=>(a.kind==='unit'?0:1)-(b.kind==='unit'?0:1))}
-async function bmSetBg(){
-  const v=$('#bmBg').value;$('#bmBgFile').classList.toggle('hide',v!=='file');
-  if(v==='none'){BM.bg=null;return bmDraw()}
-  if(v==='file'){const f=$('#bmBgFile').files[0];if(!f)return bmDraw();try{BM.bg=await bmLoad(URL.createObjectURL(f))}catch(e){say('#bmMsg','That file is not a picture.')}return bmDraw()}
-  try{BM.bg=await bmLoad('/admin/img/parts/'+v)}catch(e){say('#bmMsg','Background picture not found on the server.')}bmDraw()}
-async function bmSetWords(kind){
-  BM.layers=BM.layers.filter(L=>L.kind!==kind);if(BM.sel&&BM.sel.kind===kind)bmSelect(null);
-  const sel=$(kind==='title'?'#bmTitle':'#bmBadge').value,inp=$(kind==='title'?'#bmTitleText':'#bmBadgeText');
-  inp.classList.toggle('hide',sel!=='text');
-  if(sel==='orig'){
-    try{const img=await bmLoad('/admin/img/parts/'+(kind==='title'?'title_rare_summon.png':'badge_3gems.png'));
-      BM.layers.push(bmLayer({kind,name:kind==='title'?'Title':'Price badge',img,x:320,y:316}))}catch(e){say('#bmMsg','Word picture not found on the server.')}}
-  else if(sel==='text'&&inp.value.trim()){
-    const img=bmText(inp.value.trim(),kind);
-    BM.layers.push(bmLayer({kind,name:kind==='title'?'Title':'Price badge',img,x:kind==='title'?320:105,y:kind==='title'?186:455,s:kind==='title'?Math.min(1,560/img.width):Math.min(1,190/img.width)}))}
-  bmOrder();bmDraw()}
-function bmPoolIds(){const x=(typeof SM!=='undefined'?SM:[]).find(v=>v.id===smPicFor);return new Set(((x&&x.units)||[]).map(String))}
-function bmUnitList(){
-  const q=$('#bmUnitQ').value.trim().toLowerCase();
-  const pool=(typeof U!=='undefined'&&U.length?U:[]);
-  const l=(q?pool.filter(u=>u.name.toLowerCase().includes(q)||u.id===q):pool.filter(u=>bmPoolIds().has(u.id))).sort((a,b)=>b.rar-a.rar).slice(0,60);
-  $('#bmUnits').innerHTML=l.map(u=>`<div class="ut" data-bmu="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★</div></div>`).join('')||'<p class="hint">Type a name to find a unit.</p>'}
-$('#bmUnits').onclick=async e=>{const d=e.target.closest('[data-bmu]');if(!d)return;const id=d.dataset.bmu,u=(U||[]).find(x=>x.id===id);
-  try{const img=await bmLoad('/admin/img/unitfull/'+id+'.png');const n=BM.layers.filter(L=>L.kind==='unit').length;
-    const L=bmLayer({kind:'unit',name:(u?u.name:'#'+id),img,x:[320,170,470,240,400][n%5],y:360,s:Math.min(1,380/img.height)});
-    BM.layers.push(L);bmOrder();bmSelect(L);$('#bmMsg').textContent=''}catch(err){say('#bmMsg','No full picture for that unit on the server.')}};
-function bmPos(e){const c=$('#bmCanvas'),r=c.getBoundingClientRect();return[(e.clientX-r.left)*640/r.width,(e.clientY-r.top)*632/r.height]}
-$('#bmCanvas').addEventListener('pointerdown',e=>{const[x,y]=bmPos(e);const L=bmHit(x,y);bmSelect(L);if(L){BM.drag={dx:x-L.x,dy:y-L.y};$('#bmCanvas').setPointerCapture(e.pointerId)}});
-$('#bmCanvas').addEventListener('pointermove',e=>{if(!BM.drag||!BM.sel)return;const[x,y]=bmPos(e);BM.sel.x=x-BM.drag.dx;BM.sel.y=y-BM.drag.dy;bmDraw()});
-$('#bmCanvas').addEventListener('pointerup',()=>{BM.drag=null});
-$('#bmSize').oninput=()=>{if(!BM.sel)return;BM.sel.s=$('#bmSize').value/100;$('#bmSizeV').textContent=$('#bmSize').value+'%';bmDraw()};
-$('#bmFlip').onclick=()=>{if(BM.sel){BM.sel.flip=!BM.sel.flip;bmDraw()}};
-$('#bmUp').onclick=()=>{const L=BM.sel;if(!L)return;const a=BM.layers;a.splice(a.indexOf(L),1);const lastSame=a.map(x=>x.kind==='unit').lastIndexOf(L.kind==='unit');a.splice(L.kind==='unit'?lastSame+1:a.length,0,L);bmDraw()};
-$('#bmDown').onclick=()=>{const L=BM.sel;if(!L)return;const a=BM.layers;a.splice(a.indexOf(L),1);a.splice(L.kind==='unit'?0:a.findIndex(x=>x.kind!=='unit')<0?a.length:a.findIndex(x=>x.kind!=='unit'),0,L);bmDraw()};
-$('#bmDel').onclick=()=>{const L=BM.sel;if(!L)return;BM.layers.splice(BM.layers.indexOf(L),1);
-  if(L.kind!=='unit'){const s=$(L.kind==='title'?'#bmTitle':'#bmBadge');s.value='none';$(L.kind==='title'?'#bmTitleText':'#bmBadgeText').classList.add('hide')}bmSelect(null)};
-$('#bmBg').onchange=bmSetBg;$('#bmBgFile').onchange=bmSetBg;
-$('#bmTitle').onchange=()=>bmSetWords('title');$('#bmBadge').onchange=()=>bmSetWords('badge');
-let bmT=null;for(const [id,k] of [['#bmTitleText','title'],['#bmBadgeText','badge']])$(id).oninput=()=>{clearTimeout(bmT);bmT=setTimeout(()=>bmSetWords(k),250)};
-$('#bmUnitQ').oninput=bmUnitList;
-$('#smPicMake').onclick=async()=>{
-  $('#bmMsg').textContent='';
-  try{if(typeof U!=='undefined'&&!U.length){const r=await api('units');U=r.units.map(([id,name,rar,el,off])=>({id,name,rar,el,off:!!off}))}}catch(e){}
-  if(!BM.layers.length&&!BM.bg){await bmSetBg();await bmSetWords('title');await bmSetWords('badge')}
-  bmUnitList();bmSelect(null);$('#bmDlg').showModal()};
-$('#bmCancel').onclick=()=>$('#bmDlg').close();
-$('#bmUse').onclick=()=>{bmDraw(false);const data=$('#bmCanvas').toDataURL('image/png');bmDraw();
-  const c=$('#smPicCanvas'),x=c.getContext('2d');const i=new Image();i.onload=()=>{x.clearRect(0,0,640,632);x.drawImage(i,0,0)};i.src=data;
-  smPicImg=data;$('#bmDlg').close();say('#smPicMsg','Banner ready - press Save picture to put it on this summon.',true)};
 
 // ---------- vortex
 let VX=null, picFor=null, picImg=null;
