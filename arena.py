@@ -302,9 +302,12 @@ class Arena:
                     self.S.add_present(pl, 8, '', n, f'Arena rank up: {name}')
                 elif kind == '2' and what not in ('', '0'):
                     self.S.add_present(pl, 4, what, n, f'Arena rank up: {name}')
-                rewards.append({'1ef7JNSC': kind or '1', '4T0Q2Bh5': '' if kind != '2' else f'{what}:{n}', 'ZBwx5ct3': str(n)})
+                # 1ef7JNSC = gems given, 4T0Q2Bh5 = item given (as bfrevive sends a 1-gem rank up)
+                rewards.append({'1ef7JNSC': str(n) if kind != '2' else '0',
+                                '4T0Q2Bh5': f'{what}:{n}' if kind == '2' else '', 'ZBwx5ct3': str(n)})
                 pl['arena_best_rank'] = rank
-        me.update({'JmFn3g9t': str(new_rank), '8uJ1XGwx': str(new_rank), 'U4pMNjy0': str(after),
+        best = max(new_rank, _i(me.get('8uJ1XGwx'), 1), _i(pl.get('arena_best_rank'), 1))
+        me.update({'JmFn3g9t': str(new_rank), '8uJ1XGwx': str(best),       # highest rank ever (doesn't drop) 'U4pMNjy0': str(after),
                    '69vnphig': str(_i(me.get('69vnphig')) + 1),
                    '8CEu9Kcm': str(_i(me.get('8CEu9Kcm')) + (1 if win else 0)),
                    '2rqxaZ6K': str(self.position(pl, after)), 'xL0p2MkY': ''})
@@ -324,7 +327,7 @@ class Arena:
                         o.get('name', '?'), after - before, after, karma,
                         f', rank up to {new_rank}' if new_rank > old_rank else '')
         out = {'yTEvm85f': [{'xL0p2MkY': str(res.get('xL0p2MkY') or o.get('battle', '')), '3pAQY5KW': str(res.get('3pAQY5KW', '0')),
-                             's07yWuZR': '1' if win else '0', 'C1w4H62i': str(new_rank), 'jPoM1UV8': str(before),
+                             's07yWuZR': str(old_rank), 'C1w4H62i': str(new_rank), 'jPoM1UV8': str(before),
                              'TJ9cQ8AY': str(after), 'HTVh8a65': str(karma), 'Sx5H0Ikn': '0', 'tvWWL9wI': '0',
                              'ciDqCjAF': str(rule.get('ciDqCjAF', '3')), '59b1eE6N': str(rule.get('59b1eE6N', '100')),
                              '69vnphig': me['69vnphig']}],
