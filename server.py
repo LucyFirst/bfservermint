@@ -1428,6 +1428,8 @@ def start_mission(pl, req):
     cost = _num(m.get('energy')) or 0
     if mission_closed(mid):
         return 'This quest is closed right now.'
+    if str(m.get('dungeon')) in CLOSED_DUNGEONS:
+        return 'This quest is not part of this version of the game.'
     if is_trial(mid) and str(mid) in TRIAL_SPECS.get('_hidden', []):
         return 'This trial is not part of this version of the game.'
     if is_trial(mid) and not TRIAL_SPECS.get(str(mid)) and not battle_generator().refs.get(mid):
@@ -2139,9 +2141,13 @@ def trial_mission_start(mid, req, base, spec):
     log.info('trial battle for %s: %s', mid, ' / '.join(','.join(b) for b in spec['names']))
     return resp
 
-# fights fetched from bfrevive that are played exactly as recorded (bosses with several forms,
-# fixed line-ups): trials and the Brave Dance hall, when we have no hand-built spec for them
-EXACT_DUNGEONS = {TRIAL_DUNGEON, '2100000'}
+# The Brave Dance hall (dungeon 2100000, JP-only, incl. Battle No. X1/X2) is not part of this
+# server's game: its quests can't be started.
+CLOSED_DUNGEONS = {'2100000'}
+
+# fights fetched from bfrevive that could be played exactly as recorded - switched off: trials only
+# use their built specs (data/trial_specs.json)
+EXACT_DUNGEONS = set()
 
 def recorded_spec(mid):
     r = QUEST_REC.get(str(mid))
