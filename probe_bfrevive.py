@@ -209,8 +209,9 @@ def main():
     if again:
         have = set()
     if story and not explicit:
+        jp = lambda t: any('\u3040' <= ch <= '\u30ff' or '\u4e00' <= ch <= '\u9fff' for ch in t)
         ids = [k for k in sorted(MISSIONS, key=int) if int(k) < 100000 and k not in cleared
-               and MISSIONS[k]['name'].isascii()]
+               and not jp(MISSIONS[k]['name'])]          # JP-only story isn't on bfrevive
         print(f'Story: {len(ids)} story quests not cleared on bfrevive yet; this run clears up to {LIMIT} '
               f'(about {CLEAR_SECONDS} s each), each as soon as the game unlocks it')
         ids = story_order(ids, cleared)
