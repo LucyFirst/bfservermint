@@ -198,6 +198,11 @@ class Admin:
     def image(self, sub):
         kind, _, name = sub.partition('/')
         name = os.path.basename(name)
+        if kind == 'parts' and name.endswith('.png') and not name.startswith('.'):
+            fp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'banner_parts', name)
+            return (open(fp, 'rb').read(), 'image/png') if os.path.isfile(fp) else (None, None)
+        if kind == 'unitfull' and name.split('.')[0].isdigit():
+            return self.art([f'content/unit/img/unit_ills_full_{name.split(".")[0]}.png'])
         if kind == 'unit' and name.split('.')[0].isdigit():
             return self.art([f'content/unit/img/unit_ills_thum_{name.split(".")[0]}.png'])
         if kind == 'gacha' and name and not name.startswith('.'):
