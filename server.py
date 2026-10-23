@@ -451,8 +451,52 @@ def absorb(pl, resp, full=False):
             if F_UNIT_ID in u:
                 pl['units'][u[F_UNIT_ID]] = u
 
+# Town upgrades (Spheres, Synthesis... / Mountain, River, Farm, Forest): the game sends the new
+# levels of every facility (YRgx49WG) and place (yj46Q2xw) and the karma it spent (EuY6L7AX).
+# The karma is worked out from the game's own level tables, so it can't be more or less than
+# the upgrades cost.
+TOWN_GROUPS = {'YRgx49WG': ('y9ET7Aub', 'd0EkJ4TB'), 'yj46Q2xw': ('un80kW9Y', '9ekQ4tZq')}
+_TOWN_COST = {}
+
+def town_cost_table(master):
+    if master not in _TOWN_COST:
+        rows = next((b[master] for b in BLOBS.values() if isinstance(b, dict) and b.get(master)), [])
+        key = next(k for g, (k, m) in TOWN_GROUPS.items() if m == master)
+        _TOWN_COST[master] = {(str(r.get(key)), _num(r.get('D9wXQI2V')) or 0): _num(r.get('HTVh8a65')) or 0
+                              for r in rows if isinstance(r, dict)}
+    return _TOWN_COST[master]
+
+def pay_town_upgrade(pl, req):
+    spent, known = 0, True
+    for g, (key, master) in TOWN_GROUPS.items():
+        table = town_cost_table(master)
+        old = {str(r.get(key)): r for r in _rows(pl['state'].get(g) or fresh_value(pl, g)) if isinstance(r, dict)}
+        for r in _rows(req.get(g)):
+            if not isinstance(r, dict):
+                continue
+            o = old.get(str(r.get(key))) or {}
+            lo, hi = _num(o.get('D9wXQI2V')) or 0, _num(r.get('D9wXQI2V')) or 0
+            for lv in range(lo + 1, hi + 1):
+                c = table.get((str(r.get(key)), lv))
+                if c is None:
+                    known = False
+                spent += c or 0
+            # karma put towards the next level without finishing it
+            spent += (_num(r.get('HTVh8a65')) or 0) - ((_num(o.get('HTVh8a65')) or 0) if hi == lo else 0)
+    sent = sum(_num(r.get('HTVh8a65')) or 0 for r in _rows(req.get('EuY6L7AX')) if isinstance(r, dict))
+    if not known or spent < 0:
+        spent = sent
+    if spent != sent:
+        log.warning('town upgrade: the game says %s karma, the level tables say %s - using the tables', sent, spent)
+    if spent > 0:
+        have = int(pl['wallet'].get('karma', 0))
+        pl['wallet']['karma'] = max(0, have - spent)
+        log.info('town upgrade: -%s karma (%s -> %s)', spent, have, pl['wallet']['karma'])
+
 def apply_request(pl, cls, req):
     """Requests that carry the player's own choices."""
+    if cls == 'TownFacilityUpdateRequest':
+        pay_town_upgrade(pl, req)        # before the new levels are saved over the old ones
     if cls == 'DeckEditRequest' and 'UserPartyDeckInfo' in req:
         pass
     # Generic: groups the client sends that are also user state (deck, equipment...)
