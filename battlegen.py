@@ -49,7 +49,9 @@ UNIT_DROP = {'10021': 0.10,   # Beast Zegar
              '30021': 0.10,   # Archer Lario
              '40021': 0.10,   # Advisor Weiss
              '50021': 0.10,   # Luna
-             '60021': 0.10}   # Mifune
+             '60021': 0.10,   # Mifune
+             # evolution Idols (rare drops - they came out of St. Lamia almost every run)
+             '10132': 0.06, '20132': 0.06, '30132': 0.06, '40132': 0.06, '50122': 0.06, '60122': 0.06}
 
 def unit_drop_override(u):
     custom = SETTINGS.get('unit_drop') or {}
