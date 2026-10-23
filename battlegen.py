@@ -42,7 +42,8 @@ def _med(xs, d=0):
 # set by the server from the admin page: unit drop / item chest chance multipliers, closed units
 RARE_ENEMY_WEIGHT = 0.12      # story quests: how often a rare enemy shows up compared with an ordinary one
 SETTINGS = {'drop': 1.0, 'item': 1.0, 'off_units': set(), 'unit_drop': {}}
-# Fixed capture chance (per time the enemy is beaten) for units that otherwise drop too often.
+# Fixed capture chance (per time the enemy is beaten) for units that otherwise drop too often -
+# story quests only: Vortex quests (e.g. the Idol / evolution farming dungeons) keep their own rates.
 # admin_settings.json "unit_drop": {"<unit id>": percent} overrides these.
 UNIT_DROP = {'10021': 0.10,   # Beast Zegar
              '20021': 0.10,   # Zephu
@@ -415,8 +416,13 @@ class Battlegen:
                 for bi, cs in enumerate(run['chests']):
                     n_runs[bi] += 1
                     chest_obs[bi].extend(c for c in cs if not c.startswith('2/'))
+        vortex = self.category(mid) == 'vortex'     # Vortex quests keep their own drop rates
+
+        def fixed_rate(u):
+            return None if vortex else unit_drop_override(u)
+
         def unit_rate(u):
-            fixed = unit_drop_override(u)
+            fixed = fixed_rate(u)
             if fixed is not None:
                 return fixed
             if pct.get(u):
@@ -448,7 +454,7 @@ class Battlegen:
                     tgt = boss_as.get(m['u']) or (m['u'] if m['u'] in boss_ok else None)
                     if not tgt and m['u'] in caps:
                         tgt = m['u']
-                    if tgt and m['u'] not in boss_no and tgt in self.U and rng.random() < _chance(unit_rate(m['u']) if pct.get(m['u']) or unit_drop_override(m['u']) is not None else 0.2, 'drop'):
+                    if tgt and m['u'] not in boss_no and tgt in self.U and rng.random() < _chance(unit_rate(m['u']) if pct.get(m['u']) or fixed_rate(m['u']) is not None else 0.2, 'drop'):
                         drop = tgt
                 elif self.may_drop_self(m['u'], wiki) and rng.random() < _chance(unit_rate(m['u']), 'drop'):
                     drop = m['u']
