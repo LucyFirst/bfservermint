@@ -1806,7 +1806,8 @@ def admin_settings():
             except Exception:
                 log.exception('admin_settings.json could not be read - using normal rates')
         _ADMIN_SETTINGS.update(mtime=mt, data=d)
-        battlegen.SETTINGS.update(drop=d['mult']['drop'], item=d['mult']['item'], off_units=set(d['off']['units']))
+        battlegen.SETTINGS.update(drop=d['mult']['drop'], item=d['mult']['item'], off_units=set(d['off']['units']),
+                                  unit_drop=dict(d.get('unit_drop') or {}))
     return _ADMIN_SETTINGS['data']
 
 def save_admin_settings(d):

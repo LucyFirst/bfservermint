@@ -41,7 +41,21 @@ def _med(xs, d=0):
 
 # set by the server from the admin page: unit drop / item chest chance multipliers, closed units
 RARE_ENEMY_WEIGHT = 0.12      # story quests: how often a rare enemy shows up compared with an ordinary one
-SETTINGS = {'drop': 1.0, 'item': 1.0, 'off_units': set()}
+SETTINGS = {'drop': 1.0, 'item': 1.0, 'off_units': set(), 'unit_drop': {}}
+# Fixed capture chance (per time the enemy is beaten) for units that otherwise drop too often.
+# admin_settings.json "unit_drop": {"<unit id>": percent} overrides these.
+UNIT_DROP = {'10021': 0.10,   # Beast Zegar
+             '20021': 0.10,   # Zephu
+             '30021': 0.10,   # Archer Lario
+             '40021': 0.10,   # Advisor Weiss
+             '50021': 0.10,   # Luna
+             '60021': 0.10}   # Mifune
+
+def unit_drop_override(u):
+    custom = SETTINGS.get('unit_drop') or {}
+    if str(u) in custom:
+        return max(0.0, min(100.0, float(custom[str(u)]))) / 100
+    return UNIT_DROP.get(str(u))
 
 def _chance(p, k):
     return min(0.95, p * SETTINGS.get(k, 1.0)) if p < 1 else p
@@ -400,6 +414,9 @@ class Battlegen:
                     n_runs[bi] += 1
                     chest_obs[bi].extend(c for c in cs if not c.startswith('2/'))
         def unit_rate(u):
+            fixed = unit_drop_override(u)
+            if fixed is not None:
+                return fixed
             if pct.get(u):
                 return _med([p for _, p in pct[u]]) / 100
             if seen[u] and dropped[u]:
@@ -429,7 +446,7 @@ class Battlegen:
                     tgt = boss_as.get(m['u']) or (m['u'] if m['u'] in boss_ok else None)
                     if not tgt and m['u'] in caps:
                         tgt = m['u']
-                    if tgt and m['u'] not in boss_no and tgt in self.U and rng.random() < _chance(unit_rate(m['u']) if pct.get(m['u']) else 0.2, 'drop'):
+                    if tgt and m['u'] not in boss_no and tgt in self.U and rng.random() < _chance(unit_rate(m['u']) if pct.get(m['u']) or unit_drop_override(m['u']) is not None else 0.2, 'drop'):
                         drop = tgt
                 elif self.may_drop_self(m['u'], wiki) and rng.random() < _chance(unit_rate(m['u']), 'drop'):
                     drop = m['u']
