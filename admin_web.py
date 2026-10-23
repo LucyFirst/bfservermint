@@ -270,6 +270,15 @@ class Admin:
             S.log.info('admin page: summon %s changed (%s)', gid, ', '.join(k for k in data if k != 'id'))
             return {'ok': 'Saved - players see it the next time they open the Summon screen.',
                     'summon': next(x for x in S.summon_editor().overview() if x['id'] == gid)}
+        if action == 'summon_create':
+            gid = S.summon_editor().create(str(data.get('from', '')), str(data.get('name', '')))
+            S.log.info('admin page: new summon %s "%s" (copy of %s)', gid, data.get('name'), data.get('from'))
+            return {'ok': f'New summon #{gid} made. It is hidden until you press "Show in game" - set its units, '
+                          'rates, cost and picture first.', 'id': gid}
+        if action == 'summon_delete':
+            S.summon_editor().delete(str(data.get('id', '')))
+            S.log.info('admin page: deleted own summon %s', data.get('id'))
+            return {'ok': 'Summon deleted (a copy is kept in saves/summons_deleted.json).'}
         if action == 'summon_restore':
             S.summon_editor().restore(str(data.get('id', '')))
             return {'ok': 'Back to the original summon.'}

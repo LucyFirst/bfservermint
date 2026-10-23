@@ -370,7 +370,8 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
     <div class="toolbar">
       <input id="smSearch" placeholder="Search summons">
       <select id="smShow"><option value="">Shown and hidden</option><option value="shown">Shown in the game</option><option value="hidden">Hidden</option></select>
-      <select id="smKind"><option value="">All kinds</option><option value="summon">Summons</option><option value="selector">Selectors</option></select>
+      <select id="smKind"><option value="">All kinds</option><option value="summon">Summons</option><option value="selector">Selectors</option><option value="custom">My own summons</option></select>
+      <button class="btn" id="smNew" style="flex:0 0 auto">New summon</button>
     </div>
     <div class="msg" id="smmsg"></div>
   </div>
@@ -508,6 +509,15 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
   </div>
   <div class="row" style="margin-top:14px;gap:8px"><button class="btn" id="smSave" style="flex:0 0 auto">Save</button><button class="btn ghost" id="smCancel" style="flex:0 0 auto">Cancel</button></div>
   <div class="msg" id="smDmsg"></div>
+</dialog>
+
+<dialog id="smNewDlg">
+  <h2 style="margin:0 0 4px;font-size:17px">New summon</h2>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0">Makes a brand-new summon - the one you copy from is not changed. The new one starts with the copy's look, cost, units and rates, and stays hidden until you press "Show in game".</p>
+  <label>Name</label><input id="smNewName" maxlength="60" placeholder="e.g. Featured Summon">
+  <label>Copy from</label><select id="smNewFrom"></select>
+  <div class="row" style="margin-top:12px;gap:8px"><button class="btn" id="smNewGo" style="flex:0 0 auto">Make it</button><button class="btn ghost" id="smNewCancel" style="flex:0 0 auto">Cancel</button></div>
+  <div class="msg" id="smNewMsg"></div>
 </dialog>
 
 <dialog id="smPicDlg">
@@ -953,7 +963,7 @@ function smCard(x){
   const cost=x.kind==='honor'||(x.honor&&!x.gems)?`${x.honor} honor pts`:`${x.gems} gem${x.gems==1?'':'s'}`;
   return `<div class="sm-card${x.hidden?' off':''}">
     <div class="pic" style="background-image:url('${x.image?'/admin/img/gacha/'+encodeURIComponent(x.image):''}')">${x.image?'':'no picture'}</div>
-    <div class="bd"><div class="t">${esc(x.name)}${x.edited?'<span class="tag e">changed</span>':''}${x.hidden?'<span class="tag x">hidden</span>':''}${x.kind==='selector'?'<span class="tag c">selector</span>':''}</div>
+    <div class="bd"><div class="t">${esc(x.name)}${x.edited?'<span class="tag e">changed</span>':''}${x.hidden?'<span class="tag x">hidden</span>':''}${x.kind==='selector'?'<span class="tag c">selector</span>':''}${x.custom?'<span class="tag c">my own</span>':''}</div>
     <div class="sub">summon #${x.id} · ${cost} · ${x.units.length} unit${x.units.length==1?'':'s'}${x.default_pool?' (default pool)':''}${Object.keys(x.rateup||{}).length?` · <span style="color:#ff7ad9">${Object.keys(x.rateup).length} rated up</span>`:''}</div>
     ${x.kind==='selector'?'<div class="sub">Players pick one of its units.</div>':`<div class="rates">${rates}</div>`}
     <div class="acts">
@@ -961,12 +971,13 @@ function smCard(x){
       <button class="btn ghost sm" data-smpic="${x.id}">Picture</button>
       ${x.kind==='honor'?'':`<button class="btn ${x.hidden?'':'danger'} sm" data-hide="${x.id}" data-v="${x.hidden?0:1}">${x.hidden?'Show in game':'Hide'}</button>`}
       ${x.edited?`<button class="btn ghost sm" data-smrest="${x.id}">Restore original</button>`:''}
+      ${x.custom?`<button class="btn ghost sm" data-smname="${x.id}">Rename</button><button class="btn danger sm" data-smdel="${x.id}">Delete</button>`:''}
     </div></div></div>`;
 }
 function drawSummons(){
   if(smView==='honor'){ $('#hnGrid').innerHTML=SM.filter(x=>x.kind==='honor').map(smCard).join('')||'<p class="hint">No honor summon found.</p>'; return; }
   const q=$('#smSearch').value.trim().toLowerCase(), sh=$('#smShow').value, k=$('#smKind').value;
-  const list=SM.filter(x=>x.kind!=='honor'&&(!q||x.name.toLowerCase().includes(q)||x.id===q)&&(!sh||(sh==='hidden')===x.hidden)&&(!k||x.kind===k));
+  const list=SM.filter(x=>x.kind!=='honor'&&(!q||x.name.toLowerCase().includes(q)||x.id===q)&&(!sh||(sh==='hidden')===x.hidden)&&(!k||(k==='custom'?x.custom:x.kind===k)));
   $('#smGrid').innerHTML=list.map(smCard).join('')||'<p class="hint">No summons match.</p>';
 }
 ['#smSearch','#smShow','#smKind'].forEach(x=>$(x).addEventListener(x==='#smSearch'?'input':'change',drawSummons));
@@ -976,10 +987,19 @@ async function smClick(e){
     if(b.dataset.ed) return openSummon(b.dataset.ed);
     if(b.dataset.smpic){smPicFor=b.dataset.smpic;smPicImg=null;$('#smPicTitle').textContent='Picture for '+SM.find(x=>x.id===smPicFor).name;$('#smPicFile').value='';const c=$('#smPicCanvas');c.getContext('2d').clearRect(0,0,640,632);$('#smPicMsg').textContent='';return $('#smPicDlg').showModal()}
     if(b.dataset.hide){const r=await api('summon_save',{id:b.dataset.hide,hidden:b.dataset.v==='1'});say(msg,r.ok,true);return loadSummons(smView)}
+    if(b.dataset.smdel){const x=SM.find(v=>v.id===b.dataset.smdel);if(!confirm(`Delete your summon "${x.name}"? Players who already summoned keep their units.`))return;const r=await api('summon_delete',{id:x.id});say(msg,r.ok,true);return loadSummons(smView)}
+    if(b.dataset.smname){const x=SM.find(v=>v.id===b.dataset.smname);const n=prompt('New name for this summon',x.name);if(!n||!n.trim())return;const r=await api('summon_save',{id:x.id,name:n.trim()});say(msg,r.ok,true);return loadSummons(smView)}
     if(b.dataset.smrest){if(!confirm('Put this summon back to its original cost, units, rates and picture?'))return;const r=await api('summon_restore',{id:b.dataset.smrest});say(msg,r.ok,true);return loadSummons(smView)}
   }catch(err){say(msg,err.message)}
 }
 $('#smGrid').onclick=smClick; $('#hnGrid').onclick=smClick;
+$('#smNew').onclick=()=>{const l=SM.filter(x=>x.kind==='summon');
+  $('#smNewFrom').innerHTML=l.map(x=>`<option value="${x.id}">${esc(x.name)} (#${x.id}${x.hidden?', hidden':''})</option>`).join('');
+  $('#smNewName').value='';$('#smNewMsg').textContent='';$('#smNewDlg').showModal();$('#smNewName').focus()};
+$('#smNewCancel').onclick=()=>$('#smNewDlg').close();
+$('#smNewGo').onclick=async()=>{try{$('#smNewGo').disabled=true;const r=await api('summon_create',{from:$('#smNewFrom').value,name:$('#smNewName').value});
+  $('#smNewDlg').close();say('#smmsg',r.ok,true);$('#smKind').value='';$('#smShow').value='';$('#smSearch').value='';await loadSummons('summons')}
+  catch(err){say('#smNewMsg',err.message)}finally{$('#smNewGo').disabled=false}};
 const unitById=id=>U.find(u=>u.id===id)||{id,name:id,rar:0,el:0};
 function openSummon(id){
   smCur=SM.find(x=>x.id===id); smUnits=[...smCur.units]; smSel.clear(); spSel.clear(); smRU={...(smCur.rateup||{})};

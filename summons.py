@@ -62,6 +62,70 @@ class Summons:
         self.order = shown + [g for g in self.rows if g not in shown]
         self.shown = set(shown)
         self.state = self.load()
+        for gid in sorted((g for g, e in self.state.items() if (e or {}).get('custom')), key=int, reverse=True):
+            self._add_custom_row(gid)
+
+    # ------------------------------------------------------------------ your own summons
+    # A custom summon is a new summon (its own id from 900001 up) made from a copy of an existing one:
+    # same look and kind, then its own name, cost, units, rates and picture. The summon it was copied
+    # from is never changed. Custom summons sit at the front of the Summon screen.
+    CUSTOM_FIRST = 900001
+
+    def is_custom(self, gid):
+        return bool((self.state.get(gid) or {}).get('custom'))
+
+    def _add_custom_row(self, gid):
+        c = self.state[gid]['custom']
+        src = self.rows.get(str(c.get('from'))) or next(iter(self.rows.values()))
+        row = dict(src)
+        row.update({'7Ffmi96v': gid, '4N27mkt1': c.get('name') or f'Summon {gid}'})
+        for k in ('8HM3v3gg', 'SzV0Nps7', 'qA7M9EjP', 'a632bkyQ', '4tswNoV9'):
+            row.pop(k, None)          # no campaign, dates, resummon or once-a-day rules from the copy
+        self.rows[gid] = row
+        if gid not in self.order:
+            self.order.insert(0, gid)
+
+    def create(self, src, name):
+        src = str(src)
+        name = str(name or '').strip()[:60]
+        with self.mu:
+            if src not in self.rows or self.kind(src) != 'summon':
+                raise ValueError('Pick a normal summon to copy (not a selector or the Honor Summon).')
+            if not name:
+                raise ValueError('Give the new summon a name.')
+            gid = str(max([self.CUSTOM_FIRST - 1] + [int(g) for g in self.state if self.is_custom(g)]) + 1)
+            p = self.pool(src)
+            gems, honor = self.price(src)
+            e = {'custom': {'from': src, 'name': name, 'made': int(time.time())}, 'hidden': True,
+                 'gems': gems, 'honor': honor,
+                 'units': [u for v in p['units'].values() for u in v], 'rates': dict(p['rates'])}
+            if p.get('rateup'):
+                e['rateup'] = dict(p['rateup'])
+            src_e = self.state.get(src) or {}
+            if src_e.get('image'):
+                e['image'] = src_e['image']
+            self.state[gid] = e
+            self._add_custom_row(gid)
+            self.save()
+        return gid
+
+    def delete(self, gid):
+        with self.mu:
+            if not self.is_custom(gid):
+                raise ValueError('Only summons you made yourself can be deleted.')
+            old = self.state.pop(gid)
+            self.rows.pop(gid, None)
+            if gid in self.order:
+                self.order.remove(gid)
+            # kept (never thrown away): saves/summons_deleted.json
+            f = os.path.join(self.S.SAVE_DIR, 'summons_deleted.json')
+            try:
+                gone = json.load(open(f, encoding='utf-8'))
+            except Exception:
+                gone = {}
+            gone[f'{gid}_{int(time.time())}'] = old
+            json.dump(gone, open(f, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+            self.save()
 
     # ------------------------------------------------------------------ saved changes
     def load(self):
@@ -245,6 +309,17 @@ class Summons:
                     if self.state[gid].get('image'):
                         r['1Dg0vUX3'] = self.state[gid]['image']
                 out.append(r)
+            have = {str(r.get('7Ffmi96v', '')) for r in out if isinstance(r, dict)}
+            keys = next((list(r) for r in out if isinstance(r, dict)), None)
+            by_id = {str(r.get('7Ffmi96v', '')): r for r in out if isinstance(r, dict)}
+            for gid in self.order:
+                if self.is_custom(gid) and gid not in have and not self.hidden(gid):
+                    row = self.row(gid)
+                    src = by_id.get(str(self.state[gid]['custom'].get('from')))
+                    m = dict(src) if src else {k: row.get(k, '') for k in (keys or row)}
+                    m.update({k: v for k, v in row.items() if k in m})
+                    m['7Ffmi96v'] = gid
+                    out.append(m)
             resp['5Y4GJeo3'] = out
         if isinstance(resp.get('JukkSeNA'), list):
             out = []
@@ -272,7 +347,9 @@ class Summons:
                 counts = {r_: len(v) for r_, v in p['units'].items()}
             out.append({'id': gid, 'name': r.get('4N27mkt1') or gid, 'kind': self.kind(gid),
                         'hidden': self.hidden(gid), 'gems': gems, 'honor': honor,
-                        'image': self.page_image(gid), 'edited': gid in self.state,
+                        'image': self.page_image(gid), 'edited': gid in self.state and not self.is_custom(gid),
+                        'custom': self.is_custom(gid),
+                        'copied_from': ((self.state.get(gid) or {}).get('custom') or {}).get('from'),
                         'default_pool': self.uses_default(gid), 'rates': p.get('rates', {}),
                         'counts': counts, 'units': ids, 'rateup': p.get('rateup', {}),
                         'text': (self.state.get(gid) or {}).get('text') or '',
@@ -294,6 +371,12 @@ class Summons:
                     if not 0 <= v <= 100000:
                         raise ValueError(f'The {k} cost must be between 0 and 100000.')
                     e[k] = v
+            if 'name' in data and data['name'] is not None and e.get('custom'):
+                nm = str(data['name']).strip()[:60]
+                if not nm:
+                    raise ValueError('Give the summon a name.')
+                e['custom'] = dict(e['custom'], name=nm)
+                self.rows[gid]['4N27mkt1'] = nm
             if 'text' in data and data['text'] is not None:
                 t = str(data['text']).strip()[:1200]
                 if t:
@@ -345,6 +428,8 @@ class Summons:
 
     def restore(self, gid):
         with self.mu:
+            if self.is_custom(gid):
+                raise ValueError('This is your own summon - there is no original to go back to.')
             self.state.pop(gid, None)
             self.save()
 
