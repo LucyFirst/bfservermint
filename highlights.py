@@ -8,7 +8,8 @@ server's "discord_webhook" when that is not set. Turn highlights off with "highl
 
 What counts (config.json, all optional):
     "highlight_summon_stars": 5      summons of this rarity or more
-    "highlight_drop_stars": 4        units captured in quests of this rarity or more
+    "highlight_drop_stars": 4        units captured in quests of this rarity or more (never materials:
+                                     crystals, idols, frogs, imps, golems and other evolution/fusion units)
     "highlight_evo_stars": 5         evolutions into this rarity or more
     "highlight_level_every": 10      player level milestones (every 10 levels)
     "highlight_skip": ["userid"]     accounts never posted (e.g. a test account)
@@ -116,6 +117,8 @@ class Highlights:
             return
         quest = (self.S.MISSIONS.get(str(mid)) or {}).get('name', '')
         for uid in uids:
+            if str((self.S.unit_mst().get(str(uid)) or {}).get('xP9oi5Z2', '0')) != '0':
+                continue        # materials (crystals, idols, frogs, imps, golems...) are never highlighted
             name, stars = self._unit(uid)
             if stars >= self.drop_min:
                 first = ' — a first for the server!' if self._server_first('capture', uid) else ''
