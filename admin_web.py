@@ -250,9 +250,14 @@ class Admin:
             if mid not in {t['id'] for t in S.trial_overview()}:
                 raise ValueError('Unknown trial.')
             s = self.settings()
-            cur = set(s['off'].get('trials', []))
-            cur = cur - {mid} if data.get('on') else cur | {mid}
-            s['off']['trials'] = sorted(cur, key=int)
+            if mid in S.EXTRA_FIGHTS:            # off by default: switched on by being listed
+                cur = set(s.get('on_extra', []))
+                cur = cur | {mid} if data.get('on') else cur - {mid}
+                s['on_extra'] = sorted(cur, key=int)
+            else:
+                cur = set(s['off'].get('trials', []))
+                cur = cur - {mid} if data.get('on') else cur | {mid}
+                s['off']['trials'] = sorted(cur, key=int)
             self.save_settings(s)
             S.vortex_editor().changed()          # new quest table version, without (or with) this trial
             S.log.info('admin page: trial %s switched %s', mid, 'on' if data.get('on') else 'off')

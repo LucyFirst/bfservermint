@@ -80,13 +80,15 @@ class VortexEditor:
 
     def hidden_missions(self):
         try:
-            off = set(self.S.admin_settings()['off'].get('trials', []))
+            st = self.S.admin_settings()
+            off = set(st['off'].get('trials', []))
+            on = set(st.get('on_extra', []))
         except Exception:
-            off = set()
-        return HIDDEN_MISSIONS | off
+            off, on = set(), set()
+        return (self.S.EXTRA_FIGHTS - on) | off
 
     def active(self):
-        return bool(self.state['edits'] or self.state['custom'] or HIDDEN_MISSIONS)
+        return True          # always: the off-by-default fights are left out of the game's table
 
     # ------------------------------------------------------------------ the game's tables
     def tables(self):
@@ -107,6 +109,16 @@ class VortexEditor:
                     out.append(x)
             return out
         missions = [r for r in missions if r['j28VNcUW'] not in hide]
+        # Brave Dance fights switched on: listed in the Research Lab, after the trials, open to all
+        lab = next((r for r in dungeons if r['MHx05sXt'] == self.S.TRIAL_DUNGEON), None)
+        if lab is not None:
+            last = max([int(r.get('XuJL4pc5') or 0) for r in missions if r.get('MHx05sXt') == lab['MHx05sXt']] or [0])
+            for r in missions:
+                if r['j28VNcUW'] in self.S.BRAVE_DANCES:
+                    last += 1
+                    r.update({'MHx05sXt': lab['MHx05sXt'], 'VjCY7rX4': lab.get('VjCY7rX4', r.get('VjCY7rX4')),
+                              '9C64Qwe0': lab.get('9C64Qwe0', r.get('9C64Qwe0')), 'XuJL4pc5': str(last),
+                              'HSRhkf70': '0'})
         for r in missions:
             if any(x.strip() in hide for x in str(r.get('HSRhkf70') or '').split(',')):
                 r['HSRhkf70'] = ','.join(bridge(r['HSRhkf70'])) or '0'

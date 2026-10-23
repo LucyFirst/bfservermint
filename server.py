@@ -1428,8 +1428,8 @@ def start_mission(pl, req):
     cost = _num(m.get('energy')) or 0
     if mission_closed(mid):
         return 'This quest is closed right now.'
-    if is_trial(mid) and str(mid) in TRIAL_SPECS.get('_hidden', []):
-        return 'This trial is not part of this version of the game.'
+    if str(mid) in EXTRA_FIGHTS and str(mid) not in admin_settings()['on_extra']:
+        return 'This quest is not open yet.'
     if is_trial(mid) and not TRIAL_SPECS.get(str(mid)) and not battle_generator().refs.get(mid):
         # no real battle data for this trial yet - better closed than a made-up boss fight
         return 'This trial is not open yet.'
@@ -1702,7 +1702,8 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'sell': {},
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
                                'super': {'on': 0, 'chance': 3.0, 'mult': 2.0}, 'label': 'none'},
-                    'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0}}
+                    'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0},
+                    'on_extra': []}         # off-by-default extras switched on (JP trials, Brave Dances)
 
 # Game areas the admin page can switch off (the game's own featureCheck switches). What the game does
 # with each switch off was read from its code.
@@ -1748,6 +1749,7 @@ def admin_settings():
                              if str(v).lstrip('-').isdigit()}
                 d['features'].update({str(k): 1 if v else 0 for k, v in (f.get('features') or {}).items()
                                       if str(k) in d['features']})
+                d['on_extra'] = [str(x) for x in (f.get('on_extra') or [])]
             except Exception:
                 log.exception('admin_settings.json could not be read - using normal rates')
         _ADMIN_SETTINGS.update(mtime=mt, data=d)
@@ -1931,7 +1933,19 @@ def area_closed(area):
 def trial_closed(mid):
     """A trial switched off on the admin page (or a Japan-only one) - not offered, cannot be started."""
     mid = str(mid)
-    return is_trial(mid) and (mid in admin_settings()['off'].get('trials', []) or mid in TRIAL_SPECS.get('_hidden', []))
+    if mid in EXTRA_FIGHTS:
+        return mid not in admin_settings()['on_extra']
+    return is_trial(mid) and mid in admin_settings()['off'].get('trials', [])
+
+# Off until switched on (admin page, Trials section) - so they can be worked on before release:
+# the JP-only trials and the Brave Dance hall (its fights show in the Research Lab when on).
+JP_TRIALS = ['2000012', '2000013', '2000014', '2000015']
+BRAVE_DANCES = ['2100000', '2100001', '2100002', '2100003', '2100004', '2100005', '2100006', '2100007',
+                '82100001', '82100002']
+EXTRA_FIGHTS = set(JP_TRIALS) | set(BRAVE_DANCES)
+
+def extra_on(mid):
+    return str(mid) in admin_settings()['on_extra']
 
 # the trials in the order Global released them (the order the admin page lists them)
 TRIAL_ORDER = ['2000000', '2000001', '2000002', '2000003', '2000005', '8360021', '8300031', '2000004', '2000006',
@@ -1940,9 +1954,9 @@ TRIAL_ORDER = ['2000000', '2000001', '2000002', '2000003', '2000005', '8360021',
 def trial_overview():
     """Every trial for the admin page: on/off, who it pits you against, what the first clear gives."""
     off = set(admin_settings()['off'].get('trials', []))
-    hidden = set(TRIAL_SPECS.get('_hidden', []))
     ids = [m for m in TRIAL_ORDER if m in MISSIONS] + sorted(
-        (m for m in MISSIONS if is_trial(m) and m not in TRIAL_ORDER and m not in hidden), key=int)
+        (m for m in MISSIONS if is_trial(m) and m not in TRIAL_ORDER and m not in EXTRA_FIGHTS), key=int) + \
+        [m for m in JP_TRIALS + BRAVE_DANCES if m in MISSIONS]
     need = {}
     try:
         need = {r['j28VNcUW']: r.get('HSRhkf70', '') for r in vortex_editor().tables()[2]}
@@ -1958,7 +1972,7 @@ def trial_overview():
         pass
     out = []
     for mid in ids:
-        spec = TRIAL_SPECS.get(mid) or {}
+        spec = TRIAL_SPECS.get(mid) or recorded_spec(mid) or {}
         bosses = []
         for m in spec.get('monsters') or []:
             if m.get('3evIn0zZ') and m['3evIn0zZ'] not in bosses:
@@ -1967,7 +1981,9 @@ def trial_overview():
         gift = ([f"{rw['gems']} gem{'s' if _num(rw['gems']) != 1 else ''}"] if _num(rw.get('gems')) else []) + \
                [unit_mst().get(str(u.get('id')), {}).get('utP1c0CD', str(u.get('id'))) for u in rw.get('units') or []]
         m = MISSIONS[mid]
-        out.append({'id': mid, 'name': m.get('name', mid), 'on': mid not in off,
+        extra = mid in EXTRA_FIGHTS
+        out.append({'id': mid, 'name': m.get('name', mid), 'on': extra_on(mid) if extra else mid not in off,
+                    'extra': ('JP-only trial' if mid in JP_TRIALS else 'Brave Dance hall') if extra else '',
                     'ready': bool(spec) or bool(battle_generator().refs.get(mid)),
                     'source': {'bfrevive': 'bfrevive recording', 'built': 'built from the game files'}.get(spec.get('src'), '-'),
                     'battles': spec.get('battles') or _num(m.get('battles')) or 1, 'bosses': bosses,
