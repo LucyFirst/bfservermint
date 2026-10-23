@@ -2170,6 +2170,20 @@ for _rs in _RECORDED.values():
                 AI_ROWS[_row['4eEVw5hL']].append(_row)
         for _row in _r.get('8aiBoHg5', []) or []:
             SKILL_ROWS.setdefault(_row.get('nj9Lw7mV'), _row)
+# Monster-only enemies (no unit behind them, e.g. Creator Maxwell, Juggernaut) need their animation
+# list (8hoyIF9Q) sent with the quest, keyed by the monster's id - without it the game crashes as
+# the enemy appears. Indexed by the monster's own animation file, from every recording.
+MON_CGS = {}
+for _rs in _RECORDED.values():
+    for _r in _rs:
+        _by_id = {}
+        for _c in _r.get('8hoyIF9Q', []) or []:
+            if isinstance(_c, dict):
+                _by_id.setdefault(_c.get('o49dYfpH'), []).append(_c)
+        for _m in _r.get(G_MON, []) or []:
+            _k = _m.get('QqfI9mM4') or _m.get('2EF0d6ue')
+            if _k and _m.get('o49dYfpH') in _by_id and _k not in MON_CGS:
+                MON_CGS[_k] = [{'fpc3rbs7': c.get('fpc3rbs7'), '0QxL2is7': c.get('0QxL2is7')} for c in _by_id[_m['o49dYfpH']]]
 _GEN = None
 MIMIC_ROW = next((m for _rs in _RECORDED.values() for _r in _rs for m in _r.get(G_MON, [])
                   if m.get('pn16CNah') == '60142'), None)
@@ -2281,10 +2295,16 @@ def generate_mission_start(pl, mid, req, base):
     resp[G_AI] = [row for a in sorted(ai_ids) for row in AI_ROWS.get(a, [])]
     skills = {r.get('nj9Lw7mV'): r for r in plan['skills']}
     for r in mons:             # every skill an enemy row names must be sent with it
-        for part in filter(None, (r.get('F4bQ7r8C') or '').split(',')):
+        for part in filter(None, (r.get('F4bQ7r8C') or '').replace('@', ',').split(',')):
             sid = part.split(':')[0]
             if sid not in skills and sid in SKILL_ROWS:
                 skills[sid] = SKILL_ROWS[sid]
+    cgs = []
+    for r in mons:             # animation lists for monster-only enemies, under this quest's monster ids
+        for c in MON_CGS.get(r.get('QqfI9mM4') or r.get('2EF0d6ue')) or []:
+            cgs.append({'o49dYfpH': r['o49dYfpH'], **c})
+    if cgs:
+        resp['8hoyIF9Q'] = cgs
     if skills:
         resp['8aiBoHg5'] = list(skills.values())
     else:

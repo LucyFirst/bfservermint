@@ -77,8 +77,8 @@ class Friends:
     def _unit_fields(self, u):
         keys = ('pn16CNah', 'e7DK0FQT', '67CApcti', 'q08xLEsy', 'PWXu25cg', 'cuIWp89g', 'TokWs1B3', 'RT4CtH5d',
                 't4m1RH6Y', 'GcMD0hy6', 'e6mY8Z0k', 'C1HZr3pb', 'X6jf8DUw', 'nj9Lw7mV', '3NbeC8AB', 'nBTx56W9',
-                'iEFZ6H19', 'RQ5GnFE2', 'iNy0ZU5M')
-        out = {k: str(u.get(k, '0') if u.get(k) not in (None, '') else '0') for k in keys}
+                'iEFZ6H19', 'RQ5GnFE2', 'iNy0ZU5M', 'Ge8Yo32T', 'mZA7fH2v')     # last two: the spheres
+        out = {k: str(u.get(k, '0') if u.get(k) not in (None, '', '-1') else '0') for k in keys}
         out['4A6LzBxr'] = str(u.get('D9wXQI2V', '1'))
         if not out['iNy0ZU5M'] or out['iNy0ZU5M'] == '0':
             out['iNy0ZU5M'] = str((self.S.unit_mst().get(out['pn16CNah']) or {}).get('iNy0ZU5M', '1'))
@@ -102,7 +102,7 @@ class Friends:
         row.update(self._person(p))
         fav = p['user_id'] in (self.links.get(me) or {}).get('_fav', [])
         row.update({'96Nxs2WQ': str(st), '5JbjC3Pp': '1' if fav else '0', 'a1Jp3TVb': '0', '8DtoZdXE': '0',
-                    'Ge8Yo32T': '0', 'mZA7fH2v': '0', 'JmFn3g9t': '', 'U4pMNjy0': '0'})
+                    'JmFn3g9t': '', 'U4pMNjy0': '0'})
         return row
 
     def helper_row(self, p, is_friend, n):
@@ -110,7 +110,7 @@ class Friends:
         row.update(self._unit_fields(self.leader(p)))
         row.update(self._person(p))
         row.update({'q9Arz8Jv': '1' if is_friend else '0', 'J3stQ7jd': '50' if is_friend else '10', 'w28VsQ7h': '10',
-                    'edy7fq3L': str(992000 + n), 'Ge8Yo32T': '0', 'mZA7fH2v': '0', 'JmFn3g9t': '0'})
+                    'edy7fq3L': str(992000 + n), 'JmFn3g9t': '0'})
         return row
 
     def own_helper(self, pl):
@@ -127,7 +127,7 @@ class Friends:
         row.update(self._person(pl))
         row.update({self.S.F_USERID: OWN_PREFIX + uuid, 'q9Arz8Jv': '1', 'J3stQ7jd': '0', 'w28VsQ7h': '0',
                     '0CAQ6wUe': '0',
-                    'edy7fq3L': uuid, 'Ge8Yo32T': '0', 'mZA7fH2v': '0', 'JmFn3g9t': '0'})
+                    'edy7fq3L': uuid, 'JmFn3g9t': '0'})
         return row
 
     def npc_helper(self, pl, n, used_names):
@@ -169,7 +169,7 @@ class Friends:
         row.update(self._person(pl))
         row.update({self.S.F_USERID: OWN_PREFIX + uuid, '0CAQ6wUe': '0',
                     '96Nxs2WQ': '1', '5JbjC3Pp': '0', 'a1Jp3TVb': '0', '8DtoZdXE': '0',
-                    'Ge8Yo32T': '0', 'mZA7fH2v': '0', 'JmFn3g9t': '', 'U4pMNjy0': '0'})
+                    'JmFn3g9t': '', 'U4pMNjy0': '0'})
         return row
 
     def friend_list(self, pl, extra=None):
