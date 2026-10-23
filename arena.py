@@ -131,20 +131,42 @@ class Arena:
         return rar[len(rar) // 2], lv[len(lv) // 2]
 
     def unit_pool(self):
-        if getattr(self, '_pool', None) is None:
-            um = self.S.unit_mst()
+        """Units NPC opponents and NPC helpers may use: only ones players can actually get right now -
+        units on summons that are showing and capturable units from quests that are open (minus units
+        switched off on the admin page). Unreleased units (e.g. collab units like Deemo) can crash the
+        game's unit pages, so they never show up. Rebuilt every 5 minutes so admin changes count."""
+        now = time.time()
+        if getattr(self, '_pool', None) is not None and now - getattr(self, '_pool_at', 0) < 300:
+            return self._pool
+        um = self.S.unit_mst()
+        ids = set()
+        try:
+            sm = self.S.summon_editor()
+            for gid in list(sm.order) + [g for g in (self.S.POOLS or {}) if g not in sm.order]:
+                if gid == 'default' or sm.hidden(gid):
+                    continue
+                for lst in (sm.pool(gid).get('units') or {}).values():
+                    ids.update(str(x) for x in lst)
+            for mid, spec in self.S.BATTLES.items():
+                if spec.get('captures') and str(mid) in self.S.MISSIONS and not self.S.mission_closed(mid):
+                    ids.update(str(x) for x in spec['captures'])
+            ids -= {str(x) for x in self.S.admin_settings()['off'].get('units', [])}
+        except Exception:
+            self.S.log.exception('arena: could not work out the live unit pool')
             ids = set()
+        if not ids:                                  # fall back to every known unit
             for p in (self.S.POOLS or {}).values():
                 for lst in (p.get('units') or {}).values():
                     ids.update(lst)
-            for spec in self.S.BATTLES.values():
-                ids.update(spec.get('captures') or [])
-            self._pool = {}
-            for u in ids:
-                m = um.get(u)
-                if m and str(m.get('xP9oi5Z2', '0')) == '0':
-                    self._pool.setdefault(_i(m.get('7ofj5xa1'), 1), []).append(u)
-        return self._pool
+        pool = {}
+        for u in ids:
+            m = um.get(u)
+            if m and str(m.get('xP9oi5Z2', '0')) == '0':
+                pool.setdefault(_i(m.get('7ofj5xa1'), 1), []).append(u)
+        for v in pool.values():
+            v.sort()
+        self._pool, self._pool_at = pool, now
+        return pool
 
     def unit_json(self, uid, lv, n):
         """One opponent unit, stats from the game's unit data at that level."""
