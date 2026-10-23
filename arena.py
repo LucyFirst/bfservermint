@@ -293,9 +293,14 @@ class Arena:
         karma = 100 * new_rank if win else 0
         if karma:
             self.S.check_and_apply(pl, {'karma': karma})
+        # Rank-up cutscenes are an event flag: each rank's cutscene (and its reward) comes once per account.
+        # The game plays a cutscene for every rank between "rank before" and "rank after", so after a
+        # drop and climb back, "rank before" is sent as the highest rank already seen.
+        seen = max(_i(pl.get('arena_best_rank'), 1), _i(me.get('8uJ1XGwx'), 1))
+        shown_from = max(old_rank, min(seen, new_rank))
         rewards = []
         for rank, name, lo, hi, kind, reward in self.ranks:
-            if old_rank < rank <= new_rank and rank > _i(pl.get('arena_best_rank'), 1):
+            if shown_from < rank <= new_rank:
                 what, _, n = reward.partition(':')
                 n = _i(n, 1)
                 if kind == '1':
@@ -306,8 +311,9 @@ class Arena:
                 rewards.append({'1ef7JNSC': str(n) if kind != '2' else '0',
                                 '4T0Q2Bh5': f'{what}:{n}' if kind == '2' else '', 'ZBwx5ct3': str(n)})
                 pl['arena_best_rank'] = rank
-        best = max(new_rank, _i(me.get('8uJ1XGwx'), 1), _i(pl.get('arena_best_rank'), 1))
-        me.update({'JmFn3g9t': str(new_rank), '8uJ1XGwx': str(best),       # highest rank ever (doesn't drop) 'U4pMNjy0': str(after),
+        best = max(new_rank, seen)
+        me.update({'JmFn3g9t': str(new_rank), '8uJ1XGwx': str(best),       # highest rank ever (doesn't drop)
+                   'U4pMNjy0': str(after),
                    '69vnphig': str(_i(me.get('69vnphig')) + 1),
                    '8CEu9Kcm': str(_i(me.get('8CEu9Kcm')) + (1 if win else 0)),
                    '2rqxaZ6K': str(self.position(pl, after)), 'xL0p2MkY': ''})
@@ -327,7 +333,7 @@ class Arena:
                         o.get('name', '?'), after - before, after, karma,
                         f', rank up to {new_rank}' if new_rank > old_rank else '')
         out = {'yTEvm85f': [{'xL0p2MkY': str(res.get('xL0p2MkY') or o.get('battle', '')), '3pAQY5KW': str(res.get('3pAQY5KW', '0')),
-                             's07yWuZR': str(old_rank), 'C1w4H62i': str(new_rank), 'jPoM1UV8': str(before),
+                             's07yWuZR': str(shown_from), 'C1w4H62i': str(new_rank), 'jPoM1UV8': str(before),
                              'TJ9cQ8AY': str(after), 'HTVh8a65': str(karma), 'Sx5H0Ikn': '0', 'tvWWL9wI': '0',
                              'ciDqCjAF': str(rule.get('ciDqCjAF', '3')), '59b1eE6N': str(rule.get('59b1eE6N', '100')),
                              '69vnphig': me['69vnphig']}],
