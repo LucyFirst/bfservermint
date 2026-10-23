@@ -803,6 +803,7 @@ def apply_overrides(pl, resp):
 # raid), zsiAn9P1 = squad number, gr48vsdJ 0 = leader, XuJL4pc5 = place. The game sends only the
 # kind it edited (e.g. the Arena squads), so the other kinds must be kept.
 G_PARTY, F_PARTY_KIND = 'dX7S2Lc1', 'U9ABSYEp'
+RAID_SQUAD = '3'                          # squad types: 1 quest, 2 arena, 3 raid (the game's own code)
 
 def active_squad(pl):
     """The quest squad in use (UserTeamInfo Z0Y4RoD7), as a string squad number."""
@@ -835,7 +836,7 @@ def merge_party(pl, rows):
         return pl['state'].get(G_PARTY) or rows
     kept = [r for r in _rows(pl['state'].get(G_PARTY))
             if isinstance(r, dict) and str(r.get(F_PARTY_KIND)) not in kinds]
-    return kept + rows
+    return [r for r in kept + rows if str(r.get(F_PARTY_KIND)) != RAID_SQUAD]
 
 def repair_party(pl):
     """Saves where an Arena squad edit had replaced the quest squads (EMPTY_PARTY_INFO at login):
@@ -1037,6 +1038,14 @@ def fix_squad(pl):
             if k in t:
                 t[k] = '0' if isinstance(t[k], str) else 0
         pl['team_fixed'] = 1
+    # Raid squads (squad type 3): Raid isn't on this server, but new accounts got the recorded
+    # account's raid squads with their starter units in them - and the game won't sell or fuse
+    # a unit that's in a raid squad ("Raid Squad is being edited"). Nobody can edit them, so
+    # they're dropped.
+    party = pl['state'].get(G_PARTY)
+    if isinstance(party, list) and any(isinstance(r, dict) and str(r.get(F_PARTY_KIND)) == RAID_SQUAD for r in party):
+        pl['state'][G_PARTY] = [r for r in party if not (isinstance(r, dict) and str(r.get(F_PARTY_KIND)) == RAID_SQUAD)]
+        log.info('removed the raid squads (they locked units from being sold)')
     if t is not None and not (0 <= (_num(t.get('Z0Y4RoD7')) or 0) <= 9):
         log.info('squad number %s was invalid - back to squad 1', t.get('Z0Y4RoD7'))
         t['Z0Y4RoD7'] = '0' if isinstance(t.get('Z0Y4RoD7'), str) else 0
