@@ -3732,7 +3732,13 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         if self.command != 'HEAD':
-            self.wfile.write(body)
+            try:
+                self.wfile.write(body)
+            except (TimeoutError, ConnectionError, ssl.SSLError, OSError) as e:
+                # the phone stopped listening (lost signal, app closed or in the background) - nothing to fix
+                self.close_connection = True
+                log.warning('reply not delivered to %s (%s): the connection dropped (%s)',
+                            getattr(WHO, 'name', None) or self.client_address[0], self.path, type(e).__name__)
 
     def send_file(self, fp, ctype, extra=None):
         """Big files (the app): sent in pieces, not read into memory."""
