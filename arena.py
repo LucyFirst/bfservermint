@@ -298,19 +298,27 @@ class Arena:
         # drop and climb back, "rank before" is sent as the highest rank already seen.
         seen = max(_i(pl.get('arena_best_rank'), 1), _i(me.get('8uJ1XGwx'), 1))
         shown_from = max(old_rank, min(seen, new_rank))
+        # a cutscene someone missed (e.g. the game crashed) can be shown again once: pl['arena_show_from']
+        # = the rank to show from. Rewards already given are only shown, not given twice.
+        again = _i(pl.get('arena_show_from'), 0)
+        if again and new_rank > again:
+            shown_from = min(shown_from, again)
+            pl.pop('arena_show_from', None)
         rewards = []
         for rank, name, lo, hi, kind, reward in self.ranks:
             if shown_from < rank <= new_rank:
                 what, _, n = reward.partition(':')
                 n = _i(n, 1)
-                if kind == '1':
+                if rank <= seen:
+                    pass                  # replayed cutscene: the reward was given the first time
+                elif kind == '1':
                     self.S.add_present(pl, 8, '', n, f'Arena rank up: {name}')
                 elif kind == '2' and what not in ('', '0'):
                     self.S.add_present(pl, 4, what, n, f'Arena rank up: {name}')
                 # 1ef7JNSC = gems given, 4T0Q2Bh5 = item given (as bfrevive sends a 1-gem rank up)
                 rewards.append({'1ef7JNSC': str(n) if kind != '2' else '0',
                                 '4T0Q2Bh5': f'{what}:{n}' if kind == '2' else '', 'ZBwx5ct3': str(n)})
-                pl['arena_best_rank'] = rank
+                pl['arena_best_rank'] = max(rank, _i(pl.get('arena_best_rank'), 1))
         best = max(new_rank, seen)
         me.update({'JmFn3g9t': str(new_rank), '8uJ1XGwx': str(best),       # highest rank ever (doesn't drop)
                    'U4pMNjy0': str(after),

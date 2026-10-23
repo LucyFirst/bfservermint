@@ -3432,6 +3432,9 @@ def handle_action(rid, req):
             arena_engine().regen_orbs(pl)     # every reply that carries the team row has the right orbs/timer
         except Exception:
             log.exception('arena orbs')
+        if pl.get('user_id') == '5tX43IlP' and not pl.get('arena_cutscene_fix'):
+            pl['arena_show_from'] = 2         # the game crashed before their Novice -> Amateur cutscene
+            pl['arena_cutscene_fix'] = 1
         if pl.get('user_id') == 'eSqQ1Gdd' and not pl.get('frog_fix_81947') and '81947' in pl['units']:
             # a Sphere Frog was fused into Jack-O' before the server knew about Sphere Frogs
             pl['units']['81947'].update({'5gXxT7LZ': 1, 'RXfC31FA': '0'}) if str(pl['units']['81947'].get('RXfC31FA')) == '-1' else None
