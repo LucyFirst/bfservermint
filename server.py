@@ -3900,6 +3900,8 @@ class Handler(BaseHTTPRequestHandler):
 
     # ---- content (art, sound, data files)
     def serve_cdn(self, p):
+        from urllib.parse import unquote
+        p = unquote(p)        # the game sometimes asks for sgtext%5f...: the same file as sgtext_...
         rel = os.path.normpath(p.lstrip('/')).replace('\\', '/')
         if rel.startswith('..'):
             return self._send(403, '')
