@@ -724,8 +724,39 @@ UNIT_TYPE_CHANCE = {'1': 23, '2': 23, '3': 22, '4': 22, '5': 10}
 def roll_unit_type():
     return random.choices(list(UNIT_TYPE_CHANCE), weights=list(UNIT_TYPE_CHANCE.values()))[0]
 
+LORD = '1'
+
+def is_material(unit_id):
+    """Evolution / fusion / sell materials (crystals, ghosts, kings, gods, imps, nymphs, spirits, idols,
+    totems, pots, frogs, golems...): the game's unit kind is not 0."""
+    return str((unit_mst().get(str(unit_id)) or {}).get('xP9oi5Z2', '0')) != '0'
+
+def materials_to_lord(pl):
+    """Materials are always Lord, so copies of the same material are alike and can stack. A save is
+    copied to saves/backups/old once before its first change."""
+    change = [u for u in pl['units'].values() if is_material(u.get('pn16CNah')) and str(u.get('nBTx56W9')) != LORD]
+    if not change:
+        return
+    if not pl.get('materials_lord'):
+        try:
+            import shutil
+            d = os.path.join(SAVE_DIR, 'backups', 'old')
+            os.makedirs(d, exist_ok=True)
+            dst = os.path.join(d, f"player_{pl['user_id']}_before_lord_materials.json")
+            if os.path.exists(player_path(pl['user_id'])) and not os.path.exists(dst):
+                shutil.copy2(player_path(pl['user_id']), dst)
+        except Exception:
+            log.exception('could not back up %s before turning materials into Lord', pl['user_id'])
+            return
+        pl['materials_lord'] = 1
+    for u in change:
+        u['nBTx56W9'] = LORD
+    log.info('%d material unit(s) of %s are now Lord', len(change), pl['user_id'])
+
 def new_unit_row(pl, template, unit_id, uuid, unit_type=None):
     m = unit_mst().get(unit_id, {})
+    if is_material(unit_id):
+        unit_type = LORD
     row = dict(template)
     sk, ex = m.get('nj9Lw7mV', '0'), m.get('iEFZ6H19', '0')
     row.update({'edy7fq3L': uuid, 'h7eY3sAK': pl['user_id'], 'pn16CNah': unit_id,
@@ -3257,6 +3288,8 @@ def do_evo(pl, plan, resp):
                 'nj9Lw7mV': sk if sk not in ('0', '') else '', '3NbeC8AB': '1' if sk not in ('0', '') else '0',
                 'iEFZ6H19': ex if ex not in ('0', '') else '0',
                 'iNy0ZU5M': ELEMENTS.get(str(m.get('iNy0ZU5M')), base.get('iNy0ZU5M', ''))}, **unit_stats(m, 1))
+    if is_material(new):
+        row['nBTx56W9'] = LORD
     pl['units'][plan['base']] = row
     add_to_dictionary(pl, new)
     daily_engine().event(pl, 'evolve')
@@ -3425,6 +3458,7 @@ def handle_action(rid, req):
         fix_exp_model(pl)
         fix_squad(pl)
         fix_progress(pl)
+        materials_to_lord(pl)
         if pl.get('selector_fix') != 1:
             fix_selector_overwrites(pl)
             pl['selector_fix'] = 1
