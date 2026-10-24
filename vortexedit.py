@@ -26,7 +26,7 @@ CUSTOM_MISSION_BASE = 99000000
 # doesn't list them
 HIDDEN_MISSIONS = {'2000012', '2000013', '2000014', '2000015'}
 VERSION_STEP = 5000                  # edited tables: original version + 5000 + revision
-TABLE_FORMAT = 2                     # raise when the way the tables are built changes (+10000 each),
+TABLE_FORMAT = 3                     # raise when the way the tables are built changes (+10000 each),
                                      # so the game fetches them again even if no edit changed
 BANNER_W, BANNER_H = 640, 224
 
@@ -156,7 +156,47 @@ class VortexEditor:
                 m.update({'j28VNcUW': q['id'], 'MHx05sXt': did, 'VjCY7rX4': c['area'], '9C64Qwe0': '99',
                           'XuJL4pc5': str(n), 'HSRhkf70': '0', 'np4K1xtq': '', '8f4NYKxb': ''})
                 missions.append(m)
+        # Names and descriptions in English, not just the dictionary key (MST_DUNGEONS_...): the game
+        # shows the key itself when its own text files lack it (seen on the Metal Parade key dungeon).
+        texts = self.texts()
+        if texts:
+            for rows in (areas, dungeons, missions):
+                for r in rows:
+                    for k, v in r.items():
+                        if isinstance(v, str) and v.startswith('MST_DUNGEONS_') and v in texts:
+                            r[k] = texts[v]
         return areas, dungeons, missions
+
+    _TEXTS = None
+
+    def texts(self):
+        """MST_DUNGEONS_... -> English, from the game's own text files (cdn/content/sgtext)."""
+        if VortexEditor._TEXTS is None:
+            import base64, glob, re, zipfile
+            out, best = {}, {}
+            for f in glob.glob(os.path.join(self.S.CDN_DIR, 'content', 'sgtext', 'sgtext_*.zip')):
+                m = re.match(r'sgtext_(.+?)_(\d+)\.zip$', os.path.basename(f))
+                if not m or not re.search(r'dungeon', m.group(1), re.I):
+                    continue
+                try:
+                    z = zipfile.ZipFile(f)
+                    raw = z.read(z.namelist()[0]).decode('utf-8', 'replace')
+                    try:
+                        txt = base64.b64decode(''.join(raw.split())).decode('utf-8', 'replace')
+                    except Exception:
+                        txt = raw
+                except Exception:
+                    continue
+                ver = int(m.group(2))
+                for line in txt.splitlines():
+                    parts = line.split('^')
+                    if len(parts) > 1 and parts[0].startswith('MST_DUNGEONS_') and parts[1].strip() \
+                            and parts[1] != parts[0] and ver >= best.get(parts[0], -1):
+                        out[parts[0]] = parts[1].strip()
+                        best[parts[0]] = ver
+            VortexEditor._TEXTS = out
+            self.S.log.info('vortex: %d quest/dungeon names in English', len(out))
+        return VortexEditor._TEXTS
 
     def build(self):
         """Write the edited tables as a new version the game will download."""
