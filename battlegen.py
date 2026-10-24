@@ -54,13 +54,20 @@ UNIT_DROP = {'10021': 0.10,   # Beast Zegar
              # evolution Idols (rare drops - they came out of St. Lamia almost every run)
              '10132': 0.06, '20132': 0.06, '30132': 0.06, '40132': 0.06, '50122': 0.06, '60122': 0.06}
 
-# Vortex quests whose only reference is a sister quest: swap that quest's enemies for the right ones
-# (Garden of Nymphs / Spirits borrow Garden of Idols' fights). Stats follow the units' own stats.
-IDOLS = {'10132': '1', '20132': '2', '30132': '3', '40132': '4', '50122': '5', '60122': '6'}
-NYMPHS = {'1': '10130', '2': '20130', '3': '30130', '4': '40130', '5': '50120', '6': '60120'}
-SPIRITS = {'1': '10131', '2': '20131', '3': '30131', '4': '40131', '5': '50121', '6': '60121'}
-VORTEX_SWAP = {'100100': {i: NYMPHS[e] for i, e in IDOLS.items()},     # Garden of Nymphs
-               '100101': {i: SPIRITS[e] for i, e in IDOLS.items()}}    # Garden of Spirits
+# Garden of Nymphs / Spirits: no recording or datamine of the original fights, so they are built from
+# the wiki's description of them (Enchanted Paradise) and their stat range in data/battles.json.
+GARDENS = {
+    '100100': {  # Garden of Nymphs: a Nymph with same-element slimes, or mixed slimes; boss = Nymph + 2 King slimes
+        'main': {'1': '10130', '2': '20130', '3': '30130', '4': '40130', '5': '50120', '6': '60120'},
+        'mates': {'1': '10030', '2': '20030', '3': '30030', '4': '40030', '5': '50030', '6': '60030'},
+        'boss_mates': {'1': '10031', '2': '20031', '3': '30031', '4': '40031', '5': '50031', '6': '60031'},
+        'mixed': 0.4, 'act': [1, 1], 'boss_act': [1, 2]},
+    '100101': {  # Garden of Spirits: a Spirit with two same-element mages each round; boss = Spirit + 2 evolved
+        'main': {'1': '10131', '2': '20131', '3': '30131', '4': '40131', '5': '50121', '6': '60121'},
+        'mates': {'1': '10040', '2': '20040', '3': '30040', '4': '40040', '5': '50040', '6': '60040'},
+        'boss_mates': {'1': '10041', '2': '20041', '3': '30041', '4': '40041', '5': '50041', '6': '60041'},
+        'mixed': 0.0, 'act': [1, 2], 'boss_act': [2, 2]},
+}
 
 def unit_drop_override(u):
     custom = SETTINGS.get('unit_drop') or {}
@@ -248,6 +255,8 @@ class Battlegen:
     def plan(self, mid, rng=random):
         mid = str(mid)
         wiki = self.W.get(mid) or {}
+        if mid in GARDENS:
+            return self._garden(mid, wiki, rng)
         if self.category(mid) == 'vortex':
             alias = str(wiki.get('src', ''))
             if alias.startswith('same quest as '):       # a re-run of another quest: use that quest's profile
@@ -259,6 +268,37 @@ class Battlegen:
             if src:
                 return self._vortex(mid, src[0], wiki, rng)
         return self._story(mid, wiki, rng)
+
+    # ------------------------------------------------------------------ Garden of Nymphs / Spirits
+    def _garden(self, mid, wiki, rng):
+        g = GARDENS[mid]
+        hp, atk, df, bhp, batk, bdf = (list(wiki.get('curve') or []) + [3000, 500, 150, 16000, 600, 170])[:6]
+        n = max(2, _i((self.M.get(mid) or {}).get('battles')) or 5)
+
+        def mon(u, f_hp, f_atk, f_def, act, boss=False):
+            m = self.U.get(u) or {}
+            return {'u': u, 'name': m.get('utP1c0CD'), 'el': m.get('iNy0ZU5M'), 'ai': '1', 'act': list(act),
+                    'row': None, 'boss': boss, 'filler': False,
+                    'hp': max(1, int(f_hp * rng.uniform(.93, 1.07))), 'atk': max(1, int(f_atk * rng.uniform(.95, 1.05))),
+                    'def': max(0, int(f_def)), 'zel': 0, 'karma': 0}
+        battles = []
+        for bi in range(n):
+            el = rng.choice(list(g['main']))
+            if bi == n - 1:               # boss: the material, guaranteed, with two stronger mates
+                main = dict(mon(g['main'][el], bhp * .5, batk, bdf, g['boss_act'], True), force_drop=True)
+                mates = [mon(g['boss_mates'][el], bhp * .25, batk * .9, bdf, g['boss_act'], True) for _ in range(2)]
+                battles.append([mates[0], main, mates[1]])
+            elif rng.random() < g['mixed']:   # a round of mixed-element units
+                battles.append([mon(g['mates'][rng.choice(list(g['mates']))], hp, atk, df, g['act'])
+                                for _ in range(rng.randint(3, 4))])
+            else:
+                b = [mon(g['mates'][el], hp * .8, atk, df, g['act']) for _ in range(2)]
+                b.insert(1, mon(g['main'][el], hp * 1.3, atk * 1.1, df, g['act']))
+                battles.append(b)
+        w = dict(wiki, cap_notes=[], captures=list(g['main'].values()))
+        plan = self._finish(mid, w, battles, [], rng, story=False)
+        plan['label'] = 'garden (wiki description)'
+        return plan
 
     # ------------------------------------------------------------------ story
     def _story(self, mid, wiki, rng):
@@ -384,23 +424,6 @@ class Battlegen:
                 for m in b:
                     m['boss'] = True
             battles.append(b)
-        swap = VORTEX_SWAP.get(mid) if ref != mid else None
-        if swap:
-            for b in battles:
-                for i, m in enumerate(b):
-                    new = swap.get(str(m['u']))
-                    if not new:
-                        continue
-                    old_u, new_u = self.U.get(str(m['u'])) or {}, self.U.get(new) or {}
-                    r_hp = _i(new_u.get('UZ1Bj7w2'), 1) / max(1, _i(old_u.get('UZ1Bj7w2'), 1))
-                    r_atk = _i(new_u.get('i9Tn7kYr'), 1) / max(1, _i(old_u.get('i9Tn7kYr'), 1))
-                    row = dict(m['row']) if m.get('row') else None
-                    if row is not None:
-                        row.update({'pn16CNah': new, '3evIn0zZ': new_u.get('utP1c0CD', row.get('3evIn0zZ')),
-                                    'eyUo6a8c': new_u.get('eyUo6a8c', row.get('eyUo6a8c')),
-                                    '6Aou5M9r': new_u.get('6Aou5M9r', row.get('6Aou5M9r'))})
-                    b[i] = dict(m, u=new, name=new_u.get('utP1c0CD'), row=row, hp=max(1, int(m['hp'] * r_hp)),
-                                atk=max(1, int(m['atk'] * r_atk)), drop=None)
         chance = METAL_MIMIC_QUESTS.get(mid, 0)
         if chance and len(battles) > 1 and rng.random() < chance:
             # it turns up in one of the normal waves (never the boss) and is caught when beaten
