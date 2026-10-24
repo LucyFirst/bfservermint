@@ -476,9 +476,12 @@ class Battlegen:
             if pct.get(u):
                 return _med([p for _, p in pct[u]]) / 100
             if seen[u] and dropped[u]:
+                if seen[u] < 10:          # a handful of recorded kills: lean on the usual rate, not 1-of-1
+                    prior = min(0.6, self.capturable.get(u, 0.3 if self.kind(u) != '0' else 0.08))
+                    return min(0.95, (dropped[u] + 3 * prior) / (seen[u] + 3))
                 return min(0.95, dropped[u] / seen[u])
             if u in self.capturable:
-                return self.capturable[u]
+                return min(0.6, self.capturable[u])   # 100% ones are guaranteed boss captures elsewhere
             return 0.2 if self.kind(u) != '0' else 0.08
         items = [i for i in (wiki.get('qitems') or []) + (wiki.get('items') or [])]
         rare = wiki.get('rare') or []
@@ -491,6 +494,14 @@ class Battlegen:
                             dm_items[m['u']].append(it)
         present = {m['u'] for b in battles for m in b}
         extra_caps = [u for u in caps if u not in present and u != MIMIC]
+        # the recorded runs' last battle: was its material boss caught every time?
+        run_bosses_caught = bool(runs) and all(
+            run['drops'] is not None and run['battles'] and
+            all(run['drops'][-1].get(m['u']) for m in run['battles'][-1] if self.kind(m['u']) != '0')
+            for _, run in runs if run['battles'] and any(self.kind(m['u']) != '0' for m in run['battles'][-1]))
+        mats = [unit_rate(m['u']) for b in battles for m in b[:5]
+                if not m.get('boss') and self.kind(m['u']) != '0' and m['u'] != MIMIC]
+        mat_rate = _med(mats) if mats else 0.0
         out_b = []
         for bi, b in enumerate(battles):
             mons, unit_drops, chests = [], [], []
@@ -502,7 +513,15 @@ class Battlegen:
                     tgt = boss_as.get(m['u']) or (m['u'] if m['u'] in boss_ok else None)
                     if not tgt and m['u'] in caps:
                         tgt = m['u']
-                    if tgt and m['u'] not in boss_no and tgt in self.U and rng.random() < _chance(unit_rate(m['u']) if pct.get(m['u']) or fixed_rate(m['u']) is not None else 0.2, 'drop'):
+                    boss_rate = unit_rate(m['u']) if pct.get(m['u']) or fixed_rate(m['u']) is not None else 0.2
+                    if vortex and self.kind(m['u']) != '0' and (not tgt or tgt == m['u']):
+                        # a material boss in a Vortex material dungeon (e.g. the Totem in Ruins of Light /
+                        # Dark, the Imp in Garden of Imps): caught at least as often as the materials before it
+                        tgt = m['u']
+                        boss_rate = max(boss_rate, mat_rate, 0.3)
+                        if seen[m['u']] and dropped[m['u']] >= seen[m['u']] and run_bosses_caught:
+                            boss_rate = 1.0       # every recorded run caught it: guaranteed, as in the game
+                    if tgt and m['u'] not in boss_no and tgt in self.U and rng.random() < _chance(boss_rate, 'drop'):
                         drop = tgt
                 elif self.may_drop_self(m['u'], wiki) and rng.random() < _chance(unit_rate(m['u']), 'drop'):
                     drop = m['u']
