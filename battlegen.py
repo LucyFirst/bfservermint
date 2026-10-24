@@ -54,6 +54,14 @@ UNIT_DROP = {'10021': 0.10,   # Beast Zegar
              # evolution Idols (rare drops - they came out of St. Lamia almost every run)
              '10132': 0.06, '20132': 0.06, '30132': 0.06, '40132': 0.06, '50122': 0.06, '60122': 0.06}
 
+# Vortex quests whose only reference is a sister quest: swap that quest's enemies for the right ones
+# (Garden of Nymphs / Spirits borrow Garden of Idols' fights). Stats follow the units' own stats.
+IDOLS = {'10132': '1', '20132': '2', '30132': '3', '40132': '4', '50122': '5', '60122': '6'}
+NYMPHS = {'1': '10130', '2': '20130', '3': '30130', '4': '40130', '5': '50120', '6': '60120'}
+SPIRITS = {'1': '10131', '2': '20131', '3': '30131', '4': '40131', '5': '50121', '6': '60121'}
+VORTEX_SWAP = {'100100': {i: NYMPHS[e] for i, e in IDOLS.items()},     # Garden of Nymphs
+               '100101': {i: SPIRITS[e] for i, e in IDOLS.items()}}    # Garden of Spirits
+
 def unit_drop_override(u):
     custom = SETTINGS.get('unit_drop') or {}
     if str(u) in custom:
@@ -376,6 +384,23 @@ class Battlegen:
                 for m in b:
                     m['boss'] = True
             battles.append(b)
+        swap = VORTEX_SWAP.get(mid) if ref != mid else None
+        if swap:
+            for b in battles:
+                for i, m in enumerate(b):
+                    new = swap.get(str(m['u']))
+                    if not new:
+                        continue
+                    old_u, new_u = self.U.get(str(m['u'])) or {}, self.U.get(new) or {}
+                    r_hp = _i(new_u.get('UZ1Bj7w2'), 1) / max(1, _i(old_u.get('UZ1Bj7w2'), 1))
+                    r_atk = _i(new_u.get('i9Tn7kYr'), 1) / max(1, _i(old_u.get('i9Tn7kYr'), 1))
+                    row = dict(m['row']) if m.get('row') else None
+                    if row is not None:
+                        row.update({'pn16CNah': new, '3evIn0zZ': new_u.get('utP1c0CD', row.get('3evIn0zZ')),
+                                    'eyUo6a8c': new_u.get('eyUo6a8c', row.get('eyUo6a8c')),
+                                    '6Aou5M9r': new_u.get('6Aou5M9r', row.get('6Aou5M9r'))})
+                    b[i] = dict(m, u=new, name=new_u.get('utP1c0CD'), row=row, hp=max(1, int(m['hp'] * r_hp)),
+                                atk=max(1, int(m['atk'] * r_atk)), drop=None)
         chance = METAL_MIMIC_QUESTS.get(mid, 0)
         if chance and len(battles) > 1 and rng.random() < chance:
             # it turns up in one of the normal waves (never the boss) and is caught when beaten
