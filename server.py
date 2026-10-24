@@ -817,6 +817,28 @@ def fix_type_stats(pl):
         log.info('%d unit(s) of %s now have their unit type stats', len(change), pl['user_id'])
     pl['type_stats'] = 1
 
+# Crafting recipes the player may use (51yQrDBR: 4HqhTf3a recipe id, H6k1LIxC times made, VDKB0Y5h
+# limit). Replies always carry the player's own list, so a recorded reply never added recipes and new
+# accounts kept only the 29 starting (item) recipes - the Town's Sphere List stayed empty. Every
+# account gets the full list the recordings' longest list has (items and spheres alike).
+G_RECIPES = '51yQrDBR'
+_ALL_RECIPES = []
+
+def all_recipes():
+    if not _ALL_RECIPES:
+        _ALL_RECIPES.extend(max(([r for r in _rows(b.get(G_RECIPES)) if isinstance(r, dict) and r.get('4HqhTf3a')]
+                                 for b in BLOBS.values() if isinstance(b, dict) and G_RECIPES in b),
+                                key=len, default=[]))
+    return _ALL_RECIPES
+
+def ensure_recipes(pl):
+    mine = [r for r in _rows(pl['state'].get(G_RECIPES)) if isinstance(r, dict)]
+    have = {str(r.get('4HqhTf3a')) for r in mine}
+    add = [dict(r, H6k1LIxC='0') for r in all_recipes() if str(r['4HqhTf3a']) not in have]
+    if add:
+        pl['state'][G_RECIPES] = mine + add
+        log.info('%d crafting recipe(s) opened for %s', len(add), pl['user_id'])
+
 def new_unit_row(pl, template, unit_id, uuid, unit_type=None):
     m = unit_mst().get(unit_id, {})
     if is_material(unit_id):
@@ -3524,6 +3546,7 @@ def handle_action(rid, req):
         fix_progress(pl)
         materials_to_lord(pl)
         fix_type_stats(pl)
+        ensure_recipes(pl)
         if pl.get('selector_fix') != 1:
             fix_selector_overwrites(pl)
             pl['selector_fix'] = 1
