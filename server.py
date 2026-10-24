@@ -753,6 +753,70 @@ def materials_to_lord(pl):
         u['nBTx56W9'] = LORD
     log.info('%d material unit(s) of %s are now Lord', len(change), pl['user_id'])
 
+# What each unit type adds to a unit's stats at every level up (the game's unit type table,
+# F_UNIT_TYPE_MST: HP 76IHLVsz, ATK 2M4mQZgk, DEF Sj9zR38K, REC 6D3YN9rc, each "low,high"). The game
+# keeps these in the unit's own HP/ATK/DEF/REC (an Oracle at Lv 47 had about -46 DEF, +140 REC), so two
+# copies of a unit with different types end up with different stats. Each level's roll is fixed per
+# unit (seeded from the unit's own id), so the same unit always gets the same numbers.
+UNIT_TYPE_GROWTH = {'1': ((0, 0), (0, 0), (0, 0), (0, 0)),         # Lord
+                    '2': ((5, 10), (0, 0), (0, 0), (-3, -1)),      # Anima
+                    '3': ((0, 0), (1, 3), (-3, -1), (0, 0)),       # Breaker
+                    '4': ((0, 0), (0, 0), (1, 3), (-2, 0)),        # Guardian
+                    '5': ((0, 0), (0, 0), (-2, 0), (2, 4)),        # Oracle
+                    '6': ((10, 15), (1, 2), (1, 2), (1, 2))}       # Rex
+STAT_FIELDS = ('e7DK0FQT', '67CApcti', 'q08xLEsy', 'PWXu25cg')    # HP, ATK, DEF, REC
+
+def type_growth(row, lv):
+    """The type's stat change from level 1 up to lv for this unit: [hp, atk, def, rec]."""
+    g = UNIT_TYPE_GROWTH.get(str(row.get('nBTx56W9') or '1'), UNIT_TYPE_GROWTH['1'])
+    out = [0, 0, 0, 0]
+    if not any(lo or hi for lo, hi in g):
+        return out
+    rng = random.Random(f"{row.get('edy7fq3L')}:{row.get('pn16CNah')}:{row.get('nBTx56W9')}")
+    for _ in range(2, int(lv) + 1):
+        for i, (lo, hi) in enumerate(g):
+            out[i] += rng.randint(lo, hi)
+    return out
+
+def unit_row_stats(row, m, lv):
+    """HP/ATK/DEF/REC fields for this unit at level lv: the unit's own curve plus its type's growth."""
+    st = unit_stats(m, lv)
+    for f, add in zip(STAT_FIELDS, type_growth(row, lv)):
+        st[f] = str(max(1, int(st[f]) + add))
+    return st
+
+def fix_type_stats(pl):
+    """Once per save: units levelled here before unit types counted get their type's stats. Only
+    units whose stats are still the plain curve are changed. A copy of the save goes to
+    saves/backups/old first."""
+    if pl.get('type_stats') == 1:
+        return
+    um = unit_mst()
+    change = []
+    for u in pl['units'].values():
+        m = um.get(str(u.get('pn16CNah')))
+        lv = _num(u.get('D9wXQI2V')) or 1
+        if not m or lv <= 1 or str(u.get('nBTx56W9') or '1') == LORD or is_material(u.get('pn16CNah')):
+            continue
+        plain = unit_stats(m, lv)
+        if all(str(_num(u.get(f)) or 0) == plain[f] for f in STAT_FIELDS):
+            change.append((u, m, lv))
+    if change:
+        try:
+            import shutil
+            d = os.path.join(SAVE_DIR, 'backups', 'old')
+            os.makedirs(d, exist_ok=True)
+            dst = os.path.join(d, f"player_{pl['user_id']}_before_type_stats.json")
+            if os.path.exists(player_path(pl['user_id'])) and not os.path.exists(dst):
+                shutil.copy2(player_path(pl['user_id']), dst)
+        except Exception:
+            log.exception('could not back up %s before adding unit type stats', pl['user_id'])
+            return
+        for u, m, lv in change:
+            u.update(unit_row_stats(u, m, lv))
+        log.info('%d unit(s) of %s now have their unit type stats', len(change), pl['user_id'])
+    pl['type_stats'] = 1
+
 def new_unit_row(pl, template, unit_id, uuid, unit_type=None):
     m = unit_mst().get(unit_id, {})
     if is_material(unit_id):
@@ -3048,7 +3112,7 @@ def do_fusion(pl, req, resp):
     if frog and not base.get('5gXxT7LZ'):
         base = dict(base, **{'5gXxT7LZ': 1, 'RXfC31FA': '0' if str(base.get('RXfC31FA')) in ('-1', '') else base['RXfC31FA']})
         log.info('sphere frog: second sphere slot opened')
-    base = dict(base, **{'D9wXQI2V': str(lv), 'gQInj3H6': str(total), 'd96tuT2E': str(in_lv)}, **unit_stats(bm, lv))
+    base = dict(base, **{'D9wXQI2V': str(lv), 'gQInj3H6': str(total), 'd96tuT2E': str(in_lv)}, **unit_row_stats(base, bm, lv))
     if sp1 != sp0:
         base['bFQbZh3x'] = str(sp1)
         log.info('fusion: SP %s -> %s', sp0, sp1)
@@ -3062,7 +3126,7 @@ def do_fusion(pl, req, resp):
     stat_keys = ('e7DK0FQT', '67CApcti', 'q08xLEsy', 'PWXu25cg')
     add_keys = ('cuIWp89g', 'RT4CtH5d', 'GcMD0hy6', 'C1HZr3pb')
     def shown(L, row):
-        st = unit_stats(bm, L)
+        st = unit_row_stats(row, bm, L)
         return ':'.join(str(int(st[k]) + (_num(row.get(a)) or 0) + (_num(row.get(e)) or 0))
                         for k, a, e in zip(stat_keys, add_keys, IMP_FIELDS))
     before_row = dict(base, **{f: str((_num(base.get(f)) or 0) - g) for f, g in zip(IMP_FIELDS, imp)})
@@ -3459,6 +3523,7 @@ def handle_action(rid, req):
         fix_squad(pl)
         fix_progress(pl)
         materials_to_lord(pl)
+        fix_type_stats(pl)
         if pl.get('selector_fix') != 1:
             fix_selector_overwrites(pl)
             pl['selector_fix'] = 1

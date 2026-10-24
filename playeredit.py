@@ -392,7 +392,7 @@ class PlayerEditor:
             if lv != (S._num(u.get('D9wXQI2V')) or 1) or level == 'max':
                 pattern = m.get('5UvTp7q1', '10')
                 u.update({'D9wXQI2V': str(lv), 'gQInj3H6': str(S._cum_exp(pattern, lv)), 'd96tuT2E': '0'},
-                         **S.unit_stats(m, lv))
+                         **S.unit_row_stats(u, m, lv))
                 out.append(f'level {lv}')
         for val, sid, field, lab, low in ((bb, u.get('nj9Lw7mV'), '3NbeC8AB', 'BB', 1),
                                           (sbb, u.get('iEFZ6H19'), 'RQ5GnFE2', 'SBB', 0)):
