@@ -493,10 +493,119 @@ def pay_town_upgrade(pl, req):
         pl['wallet']['karma'] = max(0, have - spent)
         log.info('town upgrade: -%s karma (%s -> %s)', spent, have, pl['wallet']['karma'])
 
+# Town harvest spots (Mountain 1, River 2, Farm 3, Forest 4). Each spot's row in s8TCo2MS has the
+# time it was filled (qA7M9EjP), the taps left (mDaE3t6A) and what each tap gives (eip3MS5L,
+# "item:zel:karma,..."). The real server filled a spot once its quest was cleared (Farm: quest 11,
+# Mountain: quest 12 - town location table 1y2JDv79) and refilled every spot after a while; the
+# game reports taps with TownUpdateRequest ("spot:taps,...") and the server hands out what they gave.
+# What a spot gives comes from the game's level table (9ekQ4tZq): taps Q43bK0zN..dDYX75JR, items
+# from 8fjZN6Mx (item:chance%, every level up to the spot's level), zel NC1Lq7b4% of taps
+# (U0Y8phRm..TV7SB9rh), karma PKa13dH7% of taps (u8tsAe9F..GRFYaC71).
+G_TOWN_SPOTS = 's8TCo2MS'
+TOWN_REFRESH_HOURS = float(CFG.get('town_refresh_hours', 4))
+_TOWN_MST = {}
+
+def _town_mst(g):
+    if g not in _TOWN_MST:
+        _TOWN_MST[g] = next((b[g] for b in BLOBS.values() if isinstance(b, dict) and b.get(g)), [])
+    return _TOWN_MST[g]
+
+def town_spot_open(pl, loc):
+    need = next((str(r.get('HSRhkf70') or '0') for r in _town_mst('1y2JDv79') if str(r.get('un80kW9Y')) == loc), '0')
+    return need in ('', '0') or cleared_before(pl, need)
+
+def town_spot_level(pl, loc):
+    row = next((r for r in _rows(pl['state'].get('yj46Q2xw')) if isinstance(r, dict) and str(r.get('un80kW9Y')) == loc), {})
+    return _num(row.get('D9wXQI2V')) or 1
+
+def town_fill(loc, lv):
+    rows = sorted((r for r in _town_mst('9ekQ4tZq') if str(r.get('un80kW9Y')) == loc and (_num(r.get('D9wXQI2V')) or 0) <= lv),
+                  key=lambda r: _num(r.get('D9wXQI2V')) or 0)
+    if not rows:
+        return []
+    top = rows[-1]
+    items = {}
+    for r in rows:                        # each level adds new items (an item listed with 0 is only a label)
+        for part in str(r.get('8fjZN6Mx') or '').split(','):
+            it, _, w = part.partition(':')
+            if it and (_num(w) or 0) > 0:
+                items[it] = _num(w)
+    total = max(100, sum(items.values()))
+    rng = lambda lo, hi: random.randint(min(_num(top.get(lo)) or 0, _num(top.get(hi)) or 0),
+                                        max(_num(top.get(lo)) or 0, _num(top.get(hi)) or 0))
+    out = []
+    for _ in range(rng('Q43bK0zN', 'dDYX75JR')):
+        pick, roll = '0', random.uniform(0, total)
+        for it, w in items.items():
+            if roll < w:
+                pick = it
+                break
+            roll -= w
+        zel = rng('U0Y8phRm', 'TV7SB9rh') if random.uniform(0, 100) < (_num(top.get('NC1Lq7b4')) or 0) else 0
+        karma = rng('u8tsAe9F', 'GRFYaC71') if random.uniform(0, 100) < (_num(top.get('PKa13dH7')) or 0) else 0
+        out.append(f'{pick}:{zel}:{karma}')
+    return out
+
+def town_refresh(pl):
+    """Fill spots that just opened, and refill spots after TOWN_REFRESH_HOURS."""
+    now = time.time()
+    filled = pl.setdefault('town_filled', {})
+    rows = {str(r.get('un80kW9Y')): r for r in _rows(pl['state'].get(G_TOWN_SPOTS)) if isinstance(r, dict)}
+    changed = []
+    for m in _town_mst('1y2JDv79'):
+        loc = str(m.get('un80kW9Y'))
+        row = rows.get(loc) or {F_USERID: pl['user_id'], 'un80kW9Y': loc, 'qA7M9EjP': '1970-01-01 00:00:00',
+                                'mDaE3t6A': '0', 'eip3MS5L': ''}
+        rows[loc] = row
+        if not town_spot_open(pl, loc):
+            continue
+        if loc in filled and now - filled[loc] < TOWN_REFRESH_HOURS * 3600:
+            continue
+        e = town_fill(loc, town_spot_level(pl, loc))
+        row.update({'qA7M9EjP': datetime.datetime.fromtimestamp(now, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S'),
+                    'mDaE3t6A': str(len(e)), 'eip3MS5L': ','.join(e)})
+        filled[loc] = now
+        changed.append(f'{m.get("6ntp4rMV", loc)} {len(e)}')
+    pl['state'][G_TOWN_SPOTS] = [rows[k] for k in sorted(rows, key=lambda k: _num(k) or 0)]
+    if changed:
+        log.info('town spots filled: %s', ', '.join(changed))
+
+def town_harvest(pl, req):
+    """TownUpdateRequest: the taps made on each spot. Take them off the spot and hand out what they gave."""
+    rows = {str(r.get('un80kW9Y')): r for r in _rows(pl['state'].get(G_TOWN_SPOTS)) if isinstance(r, dict)}
+    zel = karma = 0
+    items = collections.Counter()
+    for r in _rows(req.get('EuY6L7AX')):
+        for part in str((r or {}).get('0mRaAo39') or '').split(','):
+            loc, _, n = part.partition(':')
+            row = rows.get(loc.strip())
+            n = _num(n) or 0
+            if row is None or n <= 0:
+                continue
+            e = [x for x in str(row.get('eip3MS5L') or '').split(',') if x]
+            left = min(_num(row.get('mDaE3t6A')) or 0, len(e))
+            n = min(n, left)                       # can't take more than the spot has
+            start = len(e) - left
+            for x in e[start:start + n]:
+                it, z, k = (x.split(':') + ['0', '0', '0'])[:3]
+                zel += _num(z) or 0
+                karma += _num(k) or 0
+                if it not in ('', '0'):
+                    items[it] += 1
+            row['mDaE3t6A'] = str(left - n)
+    for it, n in items.items():
+        add_item(pl, it, n)
+    if zel or karma:
+        pl['wallet']['zel'] = int(pl['wallet'].get('zel', 0)) + zel
+        pl['wallet']['karma'] = int(pl['wallet'].get('karma', 0)) + karma
+    log.info('town harvest: +%s zel, +%s karma, items %s', zel, karma, dict(items))
+
 def apply_request(pl, cls, req):
     """Requests that carry the player's own choices."""
     if cls == 'TownFacilityUpdateRequest':
         pay_town_upgrade(pl, req)        # before the new levels are saved over the old ones
+    if cls == 'TownUpdateRequest':
+        town_harvest(pl, req)
     if cls == 'DeckEditRequest' and 'UserPartyDeckInfo' in req:
         pass
     # Generic: groups the client sends that are also user state (deck, equipment...)
@@ -2910,6 +3019,11 @@ def merge_replay(pl, cls, cap, resp):
 
 def show_player(pl, resp):
     """Put the player's own data in place of the recording's in an outgoing response."""
+    if G_TOWN_SPOTS in resp:
+        try:
+            town_refresh(pl)          # a spot whose quest was just cleared opens in this reply
+        except Exception:
+            log.exception('town spots')
     if G_PERMIT in resp and UNLOCK:
         pl['state'][G_PERMIT] = story_permits(pl)
         resp[G_PERMIT] = pl['state'][G_PERMIT]
@@ -3567,7 +3681,11 @@ def handle_action(rid, req):
             pl['selector_fix'] = 1
         regen_energy(pl)
         try:
-            arena_engine().regen_orbs(pl)     # every reply that carries the team row has the right orbs/timer
+            town_refresh(pl)
+        except Exception:
+            log.exception('town spots')
+        try:
+            arena_engine().regen_orbs(pl)    # every reply that carries the team row has the right orbs/timer
         except Exception:
             log.exception('arena orbs')
         if pl.get('user_id') == '5tX43IlP' and not pl.get('arena_cutscene_fix'):
