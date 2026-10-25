@@ -3878,12 +3878,22 @@ class Handler(BaseHTTPRequestHandler):
         if self.command == 'HEAD':
             return
         log.info('app download started by %s: %s', self.client_address[0], os.path.basename(fp))
-        with open(fp, 'rb') as f:
-            while True:
-                chunk = f.read(1 << 20)
-                if not chunk:
-                    break
-                self.wfile.write(chunk)
+        sent = 0
+        try:
+            with open(fp, 'rb') as f:
+                while True:
+                    chunk = f.read(1 << 20)
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    sent += len(chunk)
+        except (TimeoutError, ConnectionError, OSError) as e:
+            # the phone went away mid-download (lost signal, closed the browser): nothing to fix here
+            log.info('app download by %s stopped after %d of %d MB (%s)', self.client_address[0],
+                     sent >> 20, size >> 20, e.__class__.__name__)
+            self.close_connection = True
+            return
+        log.info('app download finished by %s (%d MB)', self.client_address[0], size >> 20)
 
     def do_HEAD(self):
         self.do_GET()
