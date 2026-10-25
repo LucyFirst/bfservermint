@@ -69,6 +69,14 @@ GARDENS = {
         'mixed': 0.0, 'act': [1, 2], 'boss_act': [2, 2]},
 }
 
+# Quests played exactly as the original game's own battle list (data/battles.json, datamine): the same
+# enemies in the same order every run, each Idol at its own drop rate for that battle. 'boss_pick' swaps
+# the boss slot's unit between these, evenly (Garden of Idols: the Light Idol or the Thunder Idol,
+# the boss caught every time).
+FIXED_LINEUPS = {
+    '100102': {'boss_pick': [('50122', 'Light Idol', '5'), ('40132', 'Thunder Idol', '4')]},   # Garden of Idols
+}
+
 def unit_drop_override(u):
     custom = SETTINGS.get('unit_drop') or {}
     if str(u) in custom:
@@ -257,6 +265,8 @@ class Battlegen:
         wiki = self.W.get(mid) or {}
         if mid in GARDENS:
             return self._garden(mid, wiki, rng)
+        if mid in FIXED_LINEUPS and any(r['src'] == 'datamine' for r in self.refs.get(mid, [])):
+            return self._fixed(mid, wiki, rng)
         if self.category(mid) == 'vortex':
             alias = str(wiki.get('src', ''))
             if alias.startswith('same quest as '):       # a re-run of another quest: use that quest's profile
@@ -298,6 +308,33 @@ class Battlegen:
         w = dict(wiki, cap_notes=[], captures=list(g['main'].values()))
         plan = self._finish(mid, w, battles, [], rng, story=False)
         plan['label'] = 'garden (wiki description)'
+        return plan
+
+    # ------------------------------------------------------------------ fixed (original) lineups
+    def _fixed(self, mid, wiki, rng):
+        cfg = FIXED_LINEUPS[mid]
+        run = next(r for r in self.refs[mid] if r['src'] == 'datamine')
+        n = len(run['battles'])
+        battles = []
+        for bi, b in enumerate(run['battles']):
+            out = []
+            for m in b:
+                e = dict(m, hp=max(1, int(m['hp'] * rng.uniform(.95, 1.05))),
+                         atk=max(1, int(m['atk'] * rng.uniform(.95, 1.05))), filler=False)
+                pct = (m.get('drop') or {}).get('pct')
+                if (m.get('drop') or {}).get('u') == m['u'] and pct:
+                    e['drop_pct'] = float(pct) / 100      # this battle's own rate (Dark Idol 60% / 40%)
+                if bi == n - 1:
+                    e['boss'] = True
+                    picks = cfg.get('boss_pick') or []
+                    if any(m['u'] == u for u, _, _ in picks):
+                        u, name, el = rng.choice(picks)
+                        e.update(u=u, name=name, el=el, force_drop=True)
+                        e.pop('drop_pct', None)
+                out.append(e)
+            battles.append(out)
+        plan = self._finish(mid, wiki, battles, [(mid, run)], rng, story=False)
+        plan['label'] = 'fixed lineup (original game data)'
         return plan
 
     # ------------------------------------------------------------------ story
@@ -523,6 +560,9 @@ class Battlegen:
                             boss_rate = 1.0       # every recorded run caught it: guaranteed, as in the game
                     if tgt and m['u'] not in boss_no and tgt in self.U and rng.random() < _chance(boss_rate, 'drop'):
                         drop = tgt
+                elif m.get('drop_pct') is not None:
+                    if rng.random() < _chance(m['drop_pct'], 'drop'):
+                        drop = m['u']
                 elif self.may_drop_self(m['u'], wiki) and rng.random() < _chance(unit_rate(m['u']), 'drop'):
                     drop = m['u']
                 elif extra_caps and story and rng.random() < _chance(0.01, 'drop'):
