@@ -77,6 +77,13 @@ FIXED_LINEUPS = {
     '100102': {'boss_pick': [('50122', 'Light Idol', '5'), ('40132', 'Thunder Idol', '4')]},   # Garden of Idols
 }
 
+# Ruins of Fire/Water/Earth/Thunder/Light/Dark Lv. 3: built on the Ruins of Miracles' original battle
+# list (the only one known), but the boss is that ruin's own totem - the Lv. 3 totem fight the Miracles
+# run has as its middle battle (150,000 HP) - and no other totem turns up.
+RUINS_TOTEMS = {'100300': '10133', '100301': '20133', '100302': '30133', '100303': '40133',
+                '100305': '50123', '100306': '60123'}
+RUINS_REF, RUINS_BOSS_LIKE = '100304', '50123'
+
 # Monster-only bosses no recording has: built on a recorded monster of the same era (its size,
 # placement and timings) with the game's own sprite for that boss (content/monster, numbered).
 # Plain attacks (no special moves) until a recording of the real fight exists.
@@ -325,6 +332,9 @@ class Battlegen:
                     return self._vortex(mid, other, self.W.get(other) or wiki, rng)
             src = [mid] if self.refs.get(mid) else [m for m in sorted(self.family.get(mid, []), key=lambda x: abs(int(x) - int(mid)))
                                                       if self.refs.get(m)][:1]
+            if mid in RUINS_TOTEMS and self.refs.get(RUINS_REF):
+                src = [RUINS_REF]
+                wiki = dict(wiki, captures=[RUINS_TOTEMS[mid]], cap_notes=[], bosses=[{'u': RUINS_TOTEMS[mid]}])
             if src:
                 return self._vortex(mid, src[0], wiki, rng)
         return self._story(mid, wiki, rng)
@@ -517,6 +527,8 @@ class Battlegen:
                 for m in b:
                     m['boss'] = True
             battles.append(b)
+        if mid in RUINS_TOTEMS:
+            battles = self._ruins(mid, battles, per_run, rng)
         chance = METAL_MIMIC_QUESTS.get(mid, 0)
         if chance and len(battles) > 1 and rng.random() < chance:
             # it turns up in one of the normal waves (never the boss) and is caught when beaten
@@ -529,6 +541,28 @@ class Battlegen:
                 b[rng.randrange(len(b))] = mm
         plan = self._finish(mid, wiki, battles, runs, rng, story=False)
         return plan
+
+    def _ruins(self, mid, battles, per_run, rng):
+        totem = RUINS_TOTEMS[mid]
+        is_totem = lambda m: 'totem' in str(m.get('name') or (self.U.get(m['u']) or {}).get('utP1c0CD', '')).lower()
+        like = next((p for (u, _), p in per_run.items() if u == RUINS_BOSS_LIKE), None)
+        normals = [p for p in per_run.values() if not is_totem(p)]
+        out = []
+        for b in battles[:-1]:
+            keep = [m for m in b if not is_totem(m)]
+            if not keep:              # the totem's own wave: a wave of the ruin's ordinary enemies instead
+                keep = [dict(rng.choice(normals)) for _ in range(rng.randint(2, 4))]
+            out.append(keep)
+        m = self.U.get(totem) or {}
+        boss = dict(like or battles[-1][0], u=totem, name=m.get('utP1c0CD'), el=_i(m.get('iNy0ZU5M')) or 1,
+                    boss=True, force_drop=True, drop={'u': totem, 'pct': 100, 'lv': 1})
+        raw = next((x for run in self.refs.get(RUINS_REF, []) for b in run['battles'] for x in b
+                    if x['u'] == RUINS_BOSS_LIKE), None)
+        if raw:                       # the Lv. 3 totem's own strength, not scaled down like the waves
+            boss.update(hp=int(raw['hp'] * rng.uniform(.95, 1.05)), atk=int(raw['atk'] * rng.uniform(.95, 1.05)),
+                        **{'def': raw['def']})
+        out.append([boss])
+        return out
 
     # ------------------------------------------------------------------ drops, chests, skills
     def _finish(self, mid, wiki, battles, runs, rng, story):
