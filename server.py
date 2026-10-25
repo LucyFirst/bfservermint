@@ -4050,7 +4050,13 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Content-Length', str(len(data)))
             self.end_headers()
             if self.command != 'HEAD':
-                self.wfile.write(data)
+                try:
+                    self.wfile.write(data)
+                except (TimeoutError, ConnectionError, ssl.SSLError, OSError) as e:
+                    # the game closed the connection while a file was on its way (app closed, lost
+                    # signal, a download it no longer needed): it asks again when it needs the file
+                    log.info('content download cut off by the game: %s (%s)', p, e.__class__.__name__)
+                    self.close_connection = True
             return
         if CFG.get('fetch_missing_content') and p.startswith('/content/'):
             data = fetch_upstream(p)
