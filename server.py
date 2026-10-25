@@ -3133,6 +3133,12 @@ def do_fusion(pl, req, resp):
     sp_top = _num(base.get('GIO9DTif')) or 100
     sp1 = min(sp_top, sp0 + sp_from(base, [pl['units'][m] for m in mat_ids if m in pl['units']])) if sp0 < sp_top else sp0
     base = dict(base)
+    def sphere_slots(u):
+        # result screen: slot 1 sphere, slot 2 sphere (-1 = second slot still locked). The game says
+        # "Sphere upgraded!" only when these differ before and after the fusion (a Sphere Frog).
+        two = '-1' if str(u.get('RXfC31FA')) in ('-1', '') and not u.get('5gXxT7LZ') else str(u.get('mZA7fH2v') or '0')
+        return str(u.get('Ge8Yo32T') or '0'), two
+    slots0 = sphere_slots(base)
     imp = apply_imps(base, [pl['units'][m] for m in mat_ids if m in pl['units']])
     if any(imp):
         log.info('fusion: imps +%s HP +%s ATK +%s DEF +%s REC (now %s)', *imp, '/'.join(base[f] for f in IMP_FIELDS))
@@ -3171,6 +3177,8 @@ def do_fusion(pl, req, resp):
                  '0xhLsnDv': str(sp0), '3YVEeL2a': str(sp1),    # SP before / after
                  'kuHWF7yc': str(sp_top), 'ksED59z9': str(sp_top),
                  '5Hi7MVQe': steps, 'Xoq6z0VI': final})
+    slots1 = sphere_slots(base)
+    tmpl.update({'WT2X78J1': slots0[0], 'N2Iiemv4': slots1[0], '1wme6kJz': slots0[1], 'm0fq76GY': slots1[1]})
     resp[G_MIX_RESULT] = [tmpl]
     resp[G_UNITS_ADD] = []
     daily_engine().event(pl, 'fuse', len([m for m in mat_ids if m]))
