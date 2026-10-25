@@ -125,6 +125,16 @@ class Battlegen:
                         for u, c in run['drops'][bi].items():
                             if u in here:
                                 got[u] += c
+        # every recorded enemy by its name: bosses the wiki names (and maps to a wrong unit id, e.g.
+        # Demon Abaddon -> a Vocaloid unit) are fought with the real recorded enemy and its look
+        self.by_name = {}
+        for _, runs in sorted(self.refs.items(), key=lambda kv: _i(kv[0])):    # earliest quest's version first
+            for run in runs:
+                if run['src'] != 'recording':
+                    continue
+                for m in [m for b in run['battles'] for m in b] + run.get('named', []):
+                    if m.get('name') and not m.get('filler') and m.get('row'):
+                        self.by_name.setdefault(m['name'].strip().lower(), m)
         self.capturable = {u: _med(ps) / 100 for u, ps in rates.items()}
         for u, c in got.items():
             if u not in self.capturable and seen[u]:
@@ -151,6 +161,11 @@ class Battlegen:
                 'zel': _i(m.get('Najhr8m6')), 'karma': _i(m.get('HTVh8a65')), 'row': m,
                 'filler': (m.get('e7DK0FQT'), m.get('67CApcti'), m.get('q08xLEsy')) == FILLER}))
         battles = [[m for _, m in sorted(b, key=lambda x: x[0])] for b in battles]
+        # every enemy the reply defines (also later forms / summons not placed in a battle), by name
+        named = [{'u': m['pn16CNah'], 'name': m.get('3evIn0zZ'), 'el': m.get('iNy0ZU5M'), 'ai': m.get('i74vGUFa', '1'),
+                  'act': [_i(m.get('m4EK7Gt6'), 1), _i(m.get('oMGC3hW0'), 1)], 'row': m}
+                 for m in mons.values() if m.get('3evIn0zZ') and m.get('pn16CNah') != MIMIC
+                 and (m.get('e7DK0FQT'), m.get('67CApcti'), m.get('q08xLEsy')) != FILLER]
         # what this run dropped: unit drops per position and chests per battle
         drops, chests = [Counter() for _ in range(n)], [[] for _ in range(n)]
         for seg in ((r.get('Kz7qfSs5') or [{}])[0].get('LE6JkUp7') or '').split('@'):
@@ -168,7 +183,7 @@ class Battlegen:
                 c = c.strip()
                 if c and '/' in c:
                     chests[bi].append(c.split('/', 1)[1])        # keep "box/type:..." and drop the position
-        return {'src': 'recording', 'battles': battles, 'drops': drops, 'chests': chests,
+        return {'src': 'recording', 'battles': battles, 'drops': drops, 'chests': chests, 'named': named,
                 'skills': r.get('8aiBoHg5') or [], 'ai': r.get('89ausgc4') or []}
 
     def _from_datamine(self, spec):
@@ -227,6 +242,27 @@ class Battlegen:
             if str(x) not in out:
                 out.append(str(x))
         return out[:k]
+
+    def boss_ref(self, b):
+        """What a wiki boss is fought as: a recorded enemy of that name (dict), else the wiki's unit id
+        when that unit really is the named enemy (True), else nothing (the wiki's id is wrong)."""
+        import re
+        name = str(b.get('name') or '').strip().lower()
+        if name and name in self.by_name:
+            return self.by_name[name]
+        base = re.sub(r'\s*lv\s*\d+$', '', name)       # Cursed Estia Lv3 -> any recorded Cursed Estia
+        if base != name:
+            for k, m in self.by_name.items():
+                if re.sub(r'\s*lv\s*\d+$', '', k) == base:
+                    return m
+        u = self.U.get(str(b.get('u')))
+        if not u:
+            return None
+        if not name:
+            return True
+        norm = lambda t: {w for w in re.findall(r'[a-z0-9]+', t.lower().replace("'s ", ' ')) if len(w) > 2}
+        words, have = norm(name), norm(str(u.get('utP1c0CD', '')))
+        return True if words & have else None
 
     def scale(self, mid, ref, power=STORY_EXP_POWER):
         if mid == ref:
@@ -410,12 +446,18 @@ class Battlegen:
                 out.append(dict(m, hp=max(1, int(m['hp'] * rng.uniform(.95, 1.05))),
                                 atk=max(1, int(m['atk'] * rng.uniform(.95, 1.05))), boss=True, filler=False))
             return out
-        bosses = [b for b in wiki.get('bosses') or [] if b.get('u') in self.U][:3]
+        bosses = [b for b in wiki.get('bosses') or [] if self.boss_ref(b)][:3]
         if bosses:
-            out = [dict(u=b['u'], name=b.get('name'), el=b.get('el'), ai='1', act=[1, 2], row=None, boss=True,
-                        hp=int((b.get('hp') or blvl['hp'] / (1 if len(bosses) == 1 else 1.6)) * rng.uniform(.95, 1.05)),
-                        atk=int(blvl['atk'] * rng.uniform(.95, 1.05)), **{'def': int(blvl['def'])},
-                        zel=int(blvl['hp'] * 0.03), karma=int(blvl['hp'] * 0.02)) for b in bosses]
+            out = []
+            for b in bosses:
+                ref = self.boss_ref(b)
+                hp = int((b.get('hp') or blvl['hp'] / (1 if len(bosses) == 1 else 1.6)) * rng.uniform(.95, 1.05))
+                e = dict(u=b['u'], name=b.get('name'), el=b.get('el'), ai='1', act=[1, 2], row=None)
+                if isinstance(ref, dict):     # the real recorded enemy: its unit/monster, look, AI and moves
+                    e.update(u=ref['u'], name=ref.get('name'), el=ref.get('el'), ai=ref.get('ai', '1'),
+                             act=list(ref.get('act') or [1, 2]), row=ref.get('row'))
+                out.append(dict(e, boss=True, hp=hp, atk=int(blvl['atk'] * rng.uniform(.95, 1.05)),
+                                **{'def': int(blvl['def'])}, zel=int(blvl['hp'] * 0.03), karma=int(blvl['hp'] * 0.02)))
             return out
         # an ordinary quest ends with a stronger leader and a couple of normal enemies
         leader = max(pool, key=lambda u: _i((self.U.get(u) or {}).get('7ofj5xa1')))
