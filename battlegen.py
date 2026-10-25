@@ -77,6 +77,13 @@ FIXED_LINEUPS = {
     '100102': {'boss_pick': [('50122', 'Light Idol', '5'), ('40132', 'Thunder Idol', '4')]},   # Garden of Idols
 }
 
+# Monster-only bosses no recording has: built on a recorded monster of the same era (its size,
+# placement and timings) with the game's own sprite for that boss (content/monster, numbered).
+# Plain attacks (no special moves) until a recording of the real fight exists.
+EXTRA_MONSTERS = {
+    'grand jelly': {'like': 'grantos', 'anime': '0025', 'el': '3', 'name': 'Grand Jelly'},   # The Amorphus Being
+}
+
 def unit_drop_override(u):
     custom = SETTINGS.get('unit_drop') or {}
     if str(u) in custom:
@@ -135,6 +142,13 @@ class Battlegen:
                 for m in [m for b in run['battles'] for m in b] + run.get('named', []):
                     if m.get('name') and not m.get('filler') and m.get('row'):
                         self.by_name.setdefault(m['name'].strip().lower(), m)
+        for key, x in EXTRA_MONSTERS.items():
+            base = self.by_name.get(x['like'])
+            if base and key not in self.by_name:
+                row = dict(base['row'], **{'3evIn0zZ': x['name'], 'iNy0ZU5M': x['el'], 'F4bQ7r8C': '', 'i74vGUFa': '1',
+                                           'QqfI9mM4': f"monster_cgg_{x['anime']}.csv",
+                                           '2EF0d6ue': f"monster_anime_{x['anime']}.png"})
+                self.by_name[key] = dict(base, name=x['name'], el=x['el'], ai='1', row=row)
         self.capturable = {u: _med(ps) / 100 for u, ps in rates.items()}
         for u, c in got.items():
             if u not in self.capturable and seen[u]:

@@ -2419,7 +2419,14 @@ def generate_mission_start(pl, mid, req, base):
                 skills[sid] = SKILL_ROWS[sid]
     cgs = []
     for r in mons:             # animation lists for monster-only enemies, under this quest's monster ids
-        for c in MON_CGS.get(r.get('QqfI9mM4') or r.get('2EF0d6ue')) or []:
+        key = r.get('QqfI9mM4') or r.get('2EF0d6ue')
+        num = re.fullmatch(r'monster_cgg_(\w+)\.csv', str(r.get('QqfI9mM4') or ''))
+        if key not in MON_CGS and num and str(r.get('pn16CNah')) == '0':
+            # no recording of this monster: the game's usual set (idle, idle, attack, attack)
+            n = num.group(1)
+            MON_CGS[key] = [{'fpc3rbs7': str(i), '0QxL2is7': f"monster_{'idle' if i < 3 else 'atk'}_cgs_{n}.csv"}
+                            for i in range(1, 5)]
+        for c in MON_CGS.get(key) or []:
             cgs.append({'o49dYfpH': r['o49dYfpH'], **c})
     if cgs:
         resp['8hoyIF9Q'] = cgs
