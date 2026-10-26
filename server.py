@@ -940,10 +940,29 @@ def all_recipes():
                                 key=len, default=[]))
     return _ALL_RECIPES
 
+# Upgrading a Town facility opens more recipes: the facility level table (d0EkJ4TB) lists the recipes
+# each level opens (rGoJ6Ty9) - Spheres Lv 2 opens recipe 2025, Lv 3 2054/2056/2058... Only the
+# recipes that are in the game's recipe table (8f0bCciN) are added.
+_RECIPE_IDS = set()
+
+def facility_recipes(pl):
+    if not _RECIPE_IDS:
+        _RECIPE_IDS.update(str(r.get('4HqhTf3a')) for r in _town_mst('8f0bCciN') if isinstance(r, dict))
+    lv = {str(r.get('y9ET7Aub')): _num(r.get('D9wXQI2V')) or 0
+          for r in _rows(pl['state'].get('YRgx49WG')) if isinstance(r, dict)}
+    out = []
+    for r in _town_mst('d0EkJ4TB'):
+        n = _num(r.get('D9wXQI2V')) or 0
+        if 1 <= n <= lv.get(str(r.get('y9ET7Aub')), 0):
+            out += [x for x in str(r.get('rGoJ6Ty9') or '').split(',') if x in _RECIPE_IDS]
+    return list(dict.fromkeys(out))
+
 def ensure_recipes(pl):
     mine = [r for r in _rows(pl['state'].get(G_RECIPES)) if isinstance(r, dict)]
     have = {str(r.get('4HqhTf3a')) for r in mine}
     add = [dict(r, H6k1LIxC='0') for r in all_recipes() if str(r['4HqhTf3a']) not in have]
+    have |= {str(r['4HqhTf3a']) for r in add}
+    add += [{'4HqhTf3a': x, 'H6k1LIxC': '0', 'VDKB0Y5h': '-1'} for x in facility_recipes(pl) if x not in have]
     if add:
         pl['state'][G_RECIPES] = mine + add
         log.info('%d crafting recipe(s) opened for %s', len(add), pl['user_id'])
@@ -3701,6 +3720,8 @@ def handle_action(rid, req):
         except Exception:
             log.exception('could not check the Level Up Campaign')
         apply_request(pl, cls, req)
+        if cls == 'TownFacilityUpdateRequest':
+            ensure_recipes(pl)          # the new facility level's recipes show in this reply
         achievement_engine().count(pl, cls)
         if cls == 'ItemMixRequest':
             n = sum(_num(str(r.get('4HqhTf3a', '')).partition(':')[2]) or 1
