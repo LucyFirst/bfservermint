@@ -1372,17 +1372,217 @@ def unit_template(pl):
     gacha = next((a for a in T['action'] if a['cls'] == 'GachaActionRequest' and G_UNITS_ADD in BLOBS[a['resp']]), None)
     return personalise(pl, BLOBS[gacha['resp']])[G_UNITS_ADD][0] if gacha else next(iter(pl['units'].values()), {})
 
+# Item storage (9wjrh74P rows: n6E8iMf3 the row's own id, kixHbe54 item, wgV86x1q how many). Items stack
+# up to their limit (data/item_info.json: [max stack, sell price], from the game's item table) - spheres,
+# LS spheres and some evolution items have a limit of 1, so each one is its own row. The game equips a
+# sphere by its row id (units: 0R3qTPK9 / RXfC31FA) and lists one row per sphere on the equip screen, so
+# 7 Sacred Jewels in one row could only ever be equipped once.
+_ITEM_INFO = {}
+
+def item_info(item):
+    if not _ITEM_INFO:
+        p = os.path.join(HERE, 'data', 'item_info.json')
+        _ITEM_INFO.update(json.load(open(p, encoding='utf-8')) if os.path.exists(p) else {'': [999, 0]})
+    return _ITEM_INFO.get(str(item)) or [999, 0]
+
+def stack_limit(item):
+    return max(1, int(item_info(item)[0] or 999))
+
+def _wh(pl):
+    return [r for r in _rows(pl['state'].get(G_WAREHOUSE)) if isinstance(r, dict)]
+
+def _new_row_id(rows):
+    used = {str(r.get('n6E8iMf3')) for r in rows}
+    rid = str(random.randint(100000, 999999))
+    while rid in used:
+        rid = str(random.randint(100000, 999999))
+    return rid
+
+def equipped_rows(pl):
+    """Storage rows of the spheres units have on."""
+    out = set()
+    for u in pl['units'].values():
+        for f in ('0R3qTPK9', 'RXfC31FA'):
+            v = str(u.get(f) or '')
+            if v not in ('', '0', '-1'):
+                out.add(v)
+    return out
+
+def warehouse_add(pl, item, n):
+    """Add n of an item; returns the rows that changed."""
+    item, n = str(item), int(n)
+    wh, touched = _wh(pl), []
+    if n <= 0:
+        return touched
+    if stack_limit(item) == 1:
+        for _ in range(n):
+            row = {'n6E8iMf3': _new_row_id(wh), 'kixHbe54': item, 'wgV86x1q': '1', 'dJNpLc81': '1', 'DbMVG16I': '0'}
+            wh.append(row)
+            touched.append(row)
+    else:
+        row = next((r for r in wh if str(r.get('kixHbe54')) == item), None)
+        if row is None:
+            row = {'n6E8iMf3': _new_row_id(wh), 'kixHbe54': item, 'wgV86x1q': '0', 'dJNpLc81': '1', 'DbMVG16I': '0'}
+            wh.append(row)
+        row['wgV86x1q'] = str((_num(row.get('wgV86x1q')) or 0) + n)
+        touched.append(row)
+    pl['state'][G_WAREHOUSE] = wh
+    d = pl['state'].setdefault('bd5Rj6pN', [])
+    if not any(str(r.get('kixHbe54')) == item for r in d if isinstance(r, dict)):
+        d.append({'kixHbe54': item})
+    return touched
+
+def item_count(pl, item, free_only=False):
+    eq = equipped_rows(pl) if free_only else set()
+    return sum(_num(r.get('wgV86x1q')) or 0 for r in _wh(pl)
+               if str(r.get('kixHbe54')) == str(item) and str(r.get('n6E8iMf3')) not in eq)
+
+def warehouse_take(pl, item, n):
+    """Take n of an item, never a sphere a unit has on. False (nothing taken) if there aren't enough."""
+    item, n = str(item), int(n)
+    if item_count(pl, item, free_only=True) < n:
+        return False
+    eq = equipped_rows(pl)
+    wh = _wh(pl)
+    for r in wh:
+        if n <= 0:
+            break
+        if str(r.get('kixHbe54')) == item and str(r.get('n6E8iMf3')) not in eq:
+            have = _num(r.get('wgV86x1q')) or 0
+            k = min(have, n)
+            r['wgV86x1q'] = str(have - k)
+            n -= k
+    pl['state'][G_WAREHOUSE] = [r for r in wh if (_num(r.get('wgV86x1q')) or 0) > 0]
+    return True
+
+def warehouse_set(pl, item, count):
+    """Admin page: make the total of an item this many."""
+    have = item_count(pl, item)
+    if count > have:
+        warehouse_add(pl, item, count - have)
+    elif count < have:
+        if not warehouse_take(pl, item, have - count):      # the rest are on units: take those off too
+            free = item_count(pl, item, free_only=True)
+            warehouse_take(pl, item, free)
+            extra = have - count - free
+            wh = _wh(pl)
+            for r in wh:
+                if extra > 0 and str(r.get('kixHbe54')) == str(item):
+                    k = min(extra, _num(r.get('wgV86x1q')) or 0)
+                    r['wgV86x1q'] = str((_num(r.get('wgV86x1q')) or 0) - k)
+                    extra -= k
+            gone = {str(r.get('n6E8iMf3')) for r in wh if (_num(r.get('wgV86x1q')) or 0) <= 0}
+            for u in pl['units'].values():
+                if str(u.get('0R3qTPK9')) in gone:
+                    u['0R3qTPK9'], u['Ge8Yo32T'] = '0', '0'
+                if str(u.get('RXfC31FA')) in gone:
+                    u['RXfC31FA'], u['mZA7fH2v'] = '0', '0'
+            pl['state'][G_WAREHOUSE] = [r for r in wh if (_num(r.get('wgV86x1q')) or 0) > 0]
+
+def split_stacks(pl):
+    """One time: saves from before kept spheres in one row with a count. The row a unit has on stays
+    (as one sphere); every other sphere gets its own row. A copy of the save goes to backups/old first."""
+    if pl.get('stacks_split'):
+        return
+    wh = _wh(pl)
+    if any(stack_limit(r.get('kixHbe54')) == 1 and (_num(r.get('wgV86x1q')) or 0) > 1 for r in wh):
+        try:
+            import shutil
+            d = os.path.join(SAVE_DIR, 'backups', 'old')
+            os.makedirs(d, exist_ok=True)
+            dst = os.path.join(d, f"player_{pl['user_id']}_before_sphere_rows.json")
+            if os.path.exists(player_path(pl['user_id'])) and not os.path.exists(dst):
+                shutil.copy2(player_path(pl['user_id']), dst)
+        except Exception:
+            log.exception('could not back up %s before giving spheres their own rows', pl['user_id'])
+            return
+        out, n_new = [], 0
+        for r in wh:
+            have = _num(r.get('wgV86x1q')) or 0
+            if stack_limit(r.get('kixHbe54')) == 1 and have > 1:
+                r['wgV86x1q'] = '1'
+                out.append(r)
+                for _ in range(have - 1):
+                    out.append({'n6E8iMf3': _new_row_id(out + wh), 'kixHbe54': r['kixHbe54'], 'wgV86x1q': '1',
+                                'dJNpLc81': r.get('dJNpLc81', '1'), 'DbMVG16I': '0'})
+                    n_new += 1
+            else:
+                out.append(r)
+        pl['state'][G_WAREHOUSE] = out
+        log.info('%s: %d sphere(s) moved to their own storage rows', pl['user_id'], n_new)
+    pl['stacks_split'] = 1
+
 def add_item(pl, item, n):
     """Put n of an item in the item storage (and the item collection)."""
-    wh = {r.get('kixHbe54'): r for r in _rows(pl['state'].get(G_WAREHOUSE)) if isinstance(r, dict)}
-    row = wh.get(item) or {'n6E8iMf3': str(random.randint(100000, 999999)), 'kixHbe54': item, 'wgV86x1q': '0',
-                           'dJNpLc81': '1', 'DbMVG16I': '0'}
-    row['wgV86x1q'] = str((_num(row.get('wgV86x1q')) or 0) + n)
-    wh[item] = row
-    pl['state'][G_WAREHOUSE] = list(wh.values())
-    d = pl['state'].setdefault('bd5Rj6pN', [])
-    if not any(r.get('kixHbe54') == item for r in d if isinstance(r, dict)):
-        d.append({'kixHbe54': item})
+    warehouse_add(pl, item, n)
+
+# Crafting (ItemMixRequest JTf2jY5o: 4HqhTf3a "recipe:times") and selling (ItemSellRequest M73i1c5U:
+# n6E8iMf3 row, wgV86x1q how many). The real server answers both with nothing (the game changes its own
+# copy), so the storage, karma and zel are kept here: recipes from the game's recipe table (8f0bCciN:
+# kixHbe54 makes, wgV86x1q how many, HTVh8a65 karma, 75YV2q1i "item:count,..." materials), sell prices
+# from the item table.
+def item_mix(pl, req):
+    recipes = {str(r.get('4HqhTf3a')): r for r in _town_mst('8f0bCciN') if isinstance(r, dict)}
+    mine = {str(r.get('4HqhTf3a')): r for r in _rows(pl['state'].get(G_RECIPES)) if isinstance(r, dict)}
+    jobs = []
+    for r in _rows(req.get('JTf2jY5o')):
+        rid, _, n = str((r or {}).get('4HqhTf3a') or '').partition(':')
+        n = _num(n) or 1
+        rec = recipes.get(rid)
+        if not rec or rid not in mine:
+            return 'That recipe is not open yet.'
+        lim = _num(mine[rid].get('VDKB0Y5h'))
+        if lim is not None and lim >= 0 and (_num(mine[rid].get('H6k1LIxC')) or 0) + n > lim:
+            return 'That recipe cannot be made again.'
+        jobs.append((rid, rec, n))
+    karma = sum((_num(rec.get('HTVh8a65')) or 0) * n for _, rec, n in jobs)
+    if karma > int(pl['wallet'].get('karma', 0)):
+        return 'Not enough karma.'
+    need = collections.Counter()
+    for _, rec, n in jobs:
+        for part in str(rec.get('75YV2q1i') or '').split(','):
+            it, _, c = part.partition(':')
+            if it:
+                need[it] += (_num(c) or 1) * n
+    for it, c in need.items():
+        if item_count(pl, it, free_only=True) < c:
+            return 'You do not have the materials for this.'
+    for it, c in need.items():
+        warehouse_take(pl, it, c)
+    pl['wallet']['karma'] = int(pl['wallet'].get('karma', 0)) - karma
+    for rid, rec, n in jobs:
+        warehouse_add(pl, rec.get('kixHbe54'), (_num(rec.get('wgV86x1q')) or 1) * n)
+        mine[rid]['H6k1LIxC'] = str((_num(mine[rid].get('H6k1LIxC')) or 0) + n)
+        log.info('crafted %s x%s (recipe %s, %s karma)', item_names_get(rec.get('kixHbe54')), n, rid,
+                 (_num(rec.get('HTVh8a65')) or 0) * n)
+    return None
+
+def item_sell(pl, req):
+    wh = {str(r.get('n6E8iMf3')): r for r in _wh(pl)}
+    eq = equipped_rows(pl)
+    zel = 0
+    for r in _rows(req.get('M73i1c5U')):
+        rid, n = str((r or {}).get('n6E8iMf3')), _num((r or {}).get('wgV86x1q')) or 1
+        row = wh.get(rid)
+        if row is None or (_num(row.get('wgV86x1q')) or 0) < n:
+            return 'That item is no longer in your storage.'
+        if rid in eq:
+            return 'That sphere is on a unit - take it off first.'
+    for r in _rows(req.get('M73i1c5U')):
+        rid, n = str(r.get('n6E8iMf3')), _num(r.get('wgV86x1q')) or 1
+        row = wh[rid]
+        row['wgV86x1q'] = str((_num(row.get('wgV86x1q')) or 0) - n)
+        zel += int(item_info(row.get('kixHbe54'))[1] or 0) * n
+    pl['state'][G_WAREHOUSE] = [r for r in wh.values() if (_num(r.get('wgV86x1q')) or 0) > 0]
+    pl['wallet']['zel'] = int(pl['wallet'].get('zel', 0)) + zel
+    log.info('sold items for %s zel', zel)
+    return None
+
+def item_names_get(item):
+    try:
+        return admin_page().item_name(str(item))
+    except Exception:
+        return str(item)
 
 def grant(pl, ptype, target, count, out, unit_type=None):
     """Give one reward; out collects what the reply must show (new units, item change)."""
@@ -2604,19 +2804,10 @@ def mission_drops(pl, req, resp):
                 new.append(u)
                 pl.setdefault('_drops', []).append(f"{uid}:{u[F_UNIT_ID]}:{1 if first else 0}:1")
     resp[G_UNITS_ADD] = new
-    wh = {r.get('kixHbe54'): r for r in _rows(pl['state'].get(G_WAREHOUSE)) if isinstance(r, dict)}
     shown = []
     for item, n in _pairs(res.get('47cJBUxz')):
-        row = wh.get(item) or {'n6E8iMf3': str(random.randint(100000, 999999)), 'kixHbe54': item, 'wgV86x1q': '0',
-                               'dJNpLc81': '1', 'DbMVG16I': '0'}
-        row['wgV86x1q'] = str((_num(row.get('wgV86x1q')) or 0) + n)
-        wh[item] = row
-        shown.append(row)
-        d = pl['state'].setdefault('bd5Rj6pN', [])
-        if not any(r.get('kixHbe54') == item for r in d):
-            d.append({'kixHbe54': item})
-    pl['state'][G_WAREHOUSE] = list(wh.values())
-    resp[G_WAREHOUSE] = list(wh.values())             # full list, like the real server
+        shown += warehouse_add(pl, item, n)
+    resp[G_WAREHOUSE] = _wh(pl)                       # full list, like the real server
     if new and not trial_replay(pl, pl.get('current_mission')):
         highlight('drops', pl, [u['pn16CNah'] for u in new], pl.get('current_mission'))
     if new or shown:
@@ -3495,7 +3686,7 @@ def evo_plan(pl, req):
     for w in items:
         row = wh.get(str(w)) or next((r for r in wh.values() if str(r.get('kixHbe54')) == str(w)), None)
         if row:
-            have[row['kixHbe54']] = (_num(row.get('wgV86x1q')) or 0)
+            have[row['kixHbe54']] = item_count(pl, row['kixHbe54'], free_only=True)
     if any(have.get(it, 0) < n for it, n in need.items()):
         return None, 'You do not have the items this evolution needs.'
     return {'base': base_id, 'mats': units, 'items': need, 'to': rec['to'], 'zel': rec['zel'],
@@ -3509,13 +3700,9 @@ def do_evo(pl, plan, resp):
     for x in plan['mats']:
         pl['units'].pop(x, None)
     if plan.get('items'):
-        wh = [r for r in _rows(pl['state'].get(G_WAREHOUSE)) if isinstance(r, dict)]
-        for r in wh:
-            n = plan['items'].get(r.get('kixHbe54'), 0)
-            if n:
-                r['wgV86x1q'] = str(max(0, (_num(r.get('wgV86x1q')) or 0) - n))
-        pl['state'][G_WAREHOUSE] = [r for r in wh if (_num(r.get('wgV86x1q')) or 0) > 0]
-        resp[G_WAREHOUSE] = pl['state'][G_WAREHOUSE]
+        for it, n in plan['items'].items():
+            warehouse_take(pl, it, n)
+        resp[G_WAREHOUSE] = _wh(pl)
     sk, ex = m.get('nj9Lw7mV', '0'), m.get('iEFZ6H19', '0')
     row = dict(base)
     row.update({'pn16CNah': new, 'D9wXQI2V': '1', 'd96tuT2E': '0', 'gQInj3H6': '0',
@@ -3695,6 +3882,7 @@ def handle_action(rid, req):
         materials_to_lord(pl)
         fix_type_stats(pl)
         ensure_recipes(pl)
+        split_stacks(pl)
         if pl.get('selector_fix') != 1:
             fix_selector_overwrites(pl)
             pl['selector_fix'] = 1
@@ -3723,10 +3911,6 @@ def handle_action(rid, req):
         if cls == 'TownFacilityUpdateRequest':
             ensure_recipes(pl)          # the new facility level's recipes show in this reply
         achievement_engine().count(pl, cls)
-        if cls == 'ItemMixRequest':
-            n = sum(_num(str(r.get('4HqhTf3a', '')).partition(':')[2]) or 1
-                    for r in _rows(req.get('JTf2jY5o')) if isinstance(r, dict)) or 1
-            daily_engine().event(pl, 'craft', n)
         daily_engine().sync_team(pl)
         # shop use type 1 = refill button, 10 = the automatic refill between repeat-quest runs
         if cls == 'ShopUseRequest' and str(((req.get('32ibWjFG') or [{}])[0]).get('60IsqxDt')) in ('1', '10'):
@@ -3837,6 +4021,22 @@ def handle_action(rid, req):
                 log.info('SP enhancement refused: %s', err)
                 return error_response(err)
             return show_player(pl, {G_UNITS: [], G_TEAM: []})
+        if cls in ('ItemMixRequest', 'ItemSellRequest'):
+            err = (item_mix if cls == 'ItemMixRequest' else item_sell)(pl, req)
+            save_player(pl)
+            if err:
+                log.info('%s refused: %s', 'crafting' if cls == 'ItemMixRequest' else 'selling', err)
+                return error_response(err)
+            resp = {G_WAREHOUSE: _wh(pl), G_TEAM: [dict(team_row(pl['state']) or {})]}
+            if cls == 'ItemMixRequest':
+                daily_engine().event(pl, 'craft', sum(_num(str(r.get('4HqhTf3a', '')).partition(':')[2]) or 1
+                                                      for r in _rows(req.get('JTf2jY5o')) if isinstance(r, dict)) or 1)
+                save_player(pl)
+                resp[G_RECIPES] = list(_rows(pl['state'].get(G_RECIPES)))
+                resp['bd5Rj6pN'] = list(_rows(pl['state'].get('bd5Rj6pN')))
+            apply_wallet(pl, resp)
+            apply_overrides(pl, resp)
+            return resp
         if cls == 'ItemSphereEqpRequest':
             err = equip_spheres(pl, req)
             save_player(pl)

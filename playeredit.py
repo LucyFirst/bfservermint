@@ -183,11 +183,12 @@ class PlayerEditor:
                           'sp': S._num(u.get('bFQbZh3x')) or 0, 'sp_used': S._num(u.get('3RgneFpP')) or 0,
                           'sp_max': S._num(u.get('GIO9DTif')) or 100})
         units.sort(key=lambda x: (-x['rarity'], x['name'], x['uuid']))
-        items = []
+        tot = {}
         for r in S._rows(pl['state'].get(S.G_WAREHOUSE)):
-            if isinstance(r, dict):
+            if isinstance(r, dict):          # spheres have a row each: show one line per item
                 iid = str(r.get('kixHbe54'))
-                items.append({'id': iid, 'name': self.A.item_name(iid), 'count': S._num(r.get('wgV86x1q')) or 0})
+                tot[iid] = tot.get(iid, 0) + (S._num(r.get('wgV86x1q')) or 0)
+        items = [{'id': iid, 'name': self.A.item_name(iid), 'count': n} for iid, n in tot.items()]
         items.sort(key=lambda x: x['name'])
         flags = []
         for k in sorted(pl):
@@ -427,22 +428,7 @@ class PlayerEditor:
             raise ValueError('Pick an item from the list.')
         if count < 0:
             raise ValueError('The amount cannot be below 0.')
-        wh = [r for r in S._rows(pl['state'].get(S.G_WAREHOUSE)) if isinstance(r, dict)]
-        row = next((r for r in wh if str(r.get('kixHbe54')) == iid), None)
-        if row is None and count > 0:
-            used = {str(r.get('n6E8iMf3')) for r in wh}
-            rid = str(random.randint(100000, 999999))
-            while rid in used:
-                rid = str(random.randint(100000, 999999))
-            row = {'n6E8iMf3': rid, 'kixHbe54': iid, 'wgV86x1q': '0', 'dJNpLc81': '1', 'DbMVG16I': '0'}
-            wh.append(row)
-            seen = [r for r in S._rows(pl['state'].get('bd5Rj6pN')) if isinstance(r, dict)]
-            if not any(str(r.get('kixHbe54')) == iid for r in seen):
-                seen.append({'kixHbe54': iid})
-                pl['state']['bd5Rj6pN'] = seen
-        if row is not None:
-            row['wgV86x1q'] = str(count)
-        pl['state'][S.G_WAREHOUSE] = [r for r in wh if (S._num(r.get('wgV86x1q')) or 0) > 0]
+        S.warehouse_set(pl, iid, count)          # spheres: one storage row each
         return f'item {self.A.item_name(iid)} set to {count}'
 
     def set_flag(self, pl, key, value, delete=False):
