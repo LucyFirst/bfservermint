@@ -189,13 +189,21 @@ class Arena:
                 'P_UNIT_TYPE_ID': str(random.randint(1, 5)), 'P_USER_UNIT_ID': str(n)}
 
     def from_unit_row(self, u, n):
-        """A real player's unit as the arena shows it."""
-        return {'P_ADD_ATK': '0', 'P_ADD_DEF': '0', 'P_ADD_HEL': '0', 'P_ADD_HP': '0',
+        """A real player's unit as the arena shows it - with its unit-type extra stats (P_ADD_*), imps
+        (P_EXT_*, as the real server sends them), both spheres, SBB and its level, and SP enhancements. The game adds the sphere effects
+        itself from the sphere ids."""
+        z = lambda v: '0' if str(v or '').strip() in ('', '-1') else str(v)
+        slot2_open = str(u.get('RXfC31FA')) not in ('-1', '') or u.get('5gXxT7LZ')
+        return {'P_ADD_ATK': z(u.get('RT4CtH5d')), 'P_ADD_DEF': z(u.get('GcMD0hy6')),
+                'P_ADD_HEL': z(u.get('C1HZr3pb')), 'P_ADD_HP': z(u.get('cuIWp89g')),
                 'P_ATK': str(u.get('67CApcti', '0')), 'P_DEF': str(u.get('q08xLEsy', '0')),
-                'P_EQP_ITEM_ID': str(u.get('iEFZ6H19') or '0'), 'P_EQP_ITEM_ID2': '0',
-                'P_EXTRA_PASSIVE_SKILL_ID': '0', 'P_EXTRA_PASSIVE_SKILL_ID2': '0', 'P_EXTRA_SKILL_ID': '0',
-                'P_EXTRA_SKILL_LV': '0', 'P_EXT_ATK': '0', 'P_EXT_DEF': '0', 'P_EXT_HEL': '0', 'P_EXT_HP': '0',
-                'P_FE_INFO': '', 'P_HEL': str(u.get('PWXu25cg', '0')), 'P_HP': str(u.get('e7DK0FQT', '0')),
+                'P_EQP_ITEM_ID': z(u.get('Ge8Yo32T')), 'P_EQP_ITEM_ID2': z(u.get('mZA7fH2v')) if slot2_open else '0',
+                'P_EXTRA_PASSIVE_SKILL_ID': '0', 'P_EXTRA_PASSIVE_SKILL_ID2': '0',
+                'P_EXTRA_SKILL_ID': z(u.get('iEFZ6H19')), 'P_EXTRA_SKILL_LV': z(u.get('RQ5GnFE2')),
+                'P_EXT_ATK': z(u.get('t4m1RH6Y')), 'P_EXT_DEF': z(u.get('e6mY8Z0k')),
+                'P_EXT_HEL': z(u.get('X6jf8DUw')), 'P_EXT_HP': z(u.get('TokWs1B3')),
+                'P_FE_INFO': str(u.get('Fnxab5CN') or ''), 'P_HEL': str(u.get('PWXu25cg', '0')),
+                'P_HP': str(u.get('e7DK0FQT', '0')),
                 'P_IMG_TYPE': '0', 'P_LV': str(u.get('D9wXQI2V', '1')), 'P_OMNI_LV': '0',
                 'P_SKILL_ID': str(u.get('nj9Lw7mV') or '0'), 'P_SKILL_LV': str(u.get('3NbeC8AB') or '1'),
                 'P_UNIT_ID': str(u.get('pn16CNah')), 'P_UNIT_TYPE_ID': str(u.get('nBTx56W9') or '1'),
