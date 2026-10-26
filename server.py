@@ -2200,7 +2200,7 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'sell': {},
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
                                'super': {'on': 0, 'chance': 3.0, 'mult': 2.0}, 'label': 'none'},
-                    'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0},
+                    'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0, 'colosseum_enable': 0},
                     'on_extra': []}         # off-by-default extras switched on (JP trials, Brave Dances)
 
 # Game areas the admin page can switch off (the game's own featureCheck switches). What the game does
@@ -2212,6 +2212,8 @@ GAME_FEATURES = [
      'Stays in the home screen list with its locked picture, and cannot be tapped.'),
     ('raid', 'Raid Battle', 'Home screen',
      'Stays in the home screen list with its closed picture, and cannot be tapped.'),
+    ('colosseum_enable', 'Colosseum', 'Arena',
+     'Not open: its banner cannot be entered and the Colosseum shortcut in the Arena is not drawn.'),
 ]
 
 def admin_page():
