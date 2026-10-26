@@ -4418,8 +4418,8 @@ class Handler(BaseHTTPRequestHandler):
         from urllib.parse import unquote
         p = unquote(p)        # the game sometimes asks for sgtext%5f...: the same file as sgtext_...
         rel = os.path.normpath(p.lstrip('/')).replace('\\', '/')
-        if rel.startswith('..'):
-            return self._send(403, '')
+        if rel.startswith('..') or any(seg.startswith('.') for seg in rel.split('/')):
+            return self._send(403, '')       # hidden files (.env, .git...): what scanners look for
         fp = os.path.join(CDN_DIR, rel)
         if os.path.isfile(fp):
             ext = os.path.splitext(fp)[1].lower()
@@ -4441,7 +4441,8 @@ class Handler(BaseHTTPRequestHandler):
                     log.info('content download cut off by the game: %s (%s)', p, e.__class__.__name__)
                     self.close_connection = True
             return
-        if CFG.get('fetch_missing_content') and p.startswith('/content/'):
+        if CFG.get('fetch_missing_content') and p.startswith('/content/') \
+                and os.path.splitext(rel)[1].lower() in CONTENT_EXTS:
             data = fetch_upstream(p)
             if data is not None:
                 os.makedirs(os.path.dirname(fp), exist_ok=True)
@@ -4452,6 +4453,10 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(404, '', 'text/plain')
 
 # --------------------------------------------------------------------------- upstream content
+# Only the kinds of file the game downloads are fetched from bfrevive (and kept here) - not whatever
+# a scanner asks for.
+CONTENT_EXTS = {'.png', '.jpg', '.gif', '.sam', '.csv', '.plist', '.mp3', '.ogg', '.txt', '.zip', '.cgs',
+                '.cgg', '.dat', '.fnt', '.json', '.ini', '.css'}
 UPSTREAM = CFG.get('content_source', 'https://cdn.bfrevive.net')
 _UP_CTX = ssl.create_default_context()
 if os.path.exists(os.path.join(HERE, 'certs', 'bfrevive_ca.crt')):
