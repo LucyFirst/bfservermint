@@ -2806,15 +2806,42 @@ def mission_drops(pl, req, resp):
                 new.append(u)
                 pl.setdefault('_drops', []).append(f"{uid}:{u[F_UNIT_ID]}:{1 if first else 0}:1")
     resp[G_UNITS_ADD] = new
+    # Items: the game doesn't report the treasure it picked up - the real server hands out every item
+    # chest of the run it sent (MissionStart LE6JkUp7 "battle|unit drops|chests", a chest
+    # "pos/box/4:rate:item:count") when the quest is cleared. 47cJBUxz is the items the player USED
+    # from the item bag (the tutorial's one Cure; 10 Cures in a hard quest) - those come off storage.
     shown = []
+    if not mission_failed(req) and not trial_replay(pl, pl.get('current_mission')):
+        for item, n in chest_items(pl.pop('last_battle', '') or ''):     # once per run
+            shown += warehouse_add(pl, item, n)
+    used = []
     for item, n in _pairs(res.get('47cJBUxz')):
-        shown += warehouse_add(pl, item, n)
+        k = min(n, item_count(pl, item, free_only=True))
+        if k > 0:
+            warehouse_take(pl, item, k)
+            used.append(f'{item}:{k}')
     resp[G_WAREHOUSE] = _wh(pl)                       # full list, like the real server
     if new and not trial_replay(pl, pl.get('current_mission')):
         highlight('drops', pl, [u['pn16CNah'] for u in new], pl.get('current_mission'))
-    if new or shown:
-        log.info('battle drops: units %s, items %s', [unit_mst()[u['pn16CNah']].get('utP1c0CD') for u in new],
-                 res.get('47cJBUxz') or '-')
+    if new or shown or used:
+        log.info('battle drops: units %s, items %s, items used %s',
+                 [unit_mst()[u['pn16CNah']].get('utP1c0CD') for u in new],
+                 ','.join(f"{r['kixHbe54']}" for r in shown) or '-', ','.join(used) or '-')
+
+def chest_items(battle):
+    """The item chests in a MissionStart drop list."""
+    out = []
+    for seg in str(battle).split('@'):
+        f = seg.split('|')
+        if len(f) < 3:
+            continue
+        for c in f[2].split('-'):
+            p = c.strip().split('/')
+            if len(p) >= 3:
+                spec = p[2].split(':')
+                if len(spec) >= 4 and spec[0] == '4' and spec[2].isdigit():
+                    out.append((spec[2], _num(spec[3]) or 1))
+    return out
 
 # --------------------------------------------------------------------------- story unlocks
 UNLOCK = json.load(open(os.path.join(HERE, 'data', 'unlock_mst.json'))) if os.path.exists(
