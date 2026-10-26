@@ -239,6 +239,10 @@ class Arena:
                    'leader': random.randrange(5), 'real': False}
         pl['arena_seq'] = seq + 10
         pl['arena_opp'] = opp
+        # the game asks for opponents twice in a row and then fights the one the player picked
+        # (ArenaBattleStart names it) - keep the last few, so the fight is against that one
+        recent = [o for o in (pl.get('arena_opps') or []) if isinstance(o, dict) and o.get('id') != opp['id']]
+        pl['arena_opps'] = (recent + [opp])[-6:]
         return opp
 
     # ------------------------------------------------------------------ requests
@@ -255,6 +259,11 @@ class Arena:
 
     def start(self, pl, req):
         o = pl.get('arena_opp')
+        want = next((str(r.get(self.S.F_USERID)) for r in self.S._rows(req.get('9NX83YVe'))
+                     if isinstance(r, dict) and r.get(self.S.F_USERID)), None)
+        if want:
+            o = next((x for x in reversed(pl.get('arena_opps') or []) if str(x.get('id')) == want), o)
+            pl['arena_opp'] = o
         if not o:
             return None, 'No opponent - go back and search again.'
         self.regen_orbs(pl)
