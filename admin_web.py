@@ -345,6 +345,23 @@ class Admin:
             v = S.news_engine().admin_save(data)
             return dict(v, ok='Saved. Players see it the next time they open the News (Home > Info, '
                               'Menu > News, or News on the title screen).')
+        if action == 'sphere_recipes':
+            on = set(self.settings().get('sphere_on') or [])
+            out = [dict(v, id=rid, on=(v.get('cat') == S.SPHERE_ALWAYS or rid in on),
+                        always=v.get('cat') == S.SPHERE_ALWAYS)
+                   for rid, v in S.SPHERE_SOURCES.items()]
+            return {'recipes': out}
+        if action == 'sphere_recipes_save':
+            ids = {str(x) for x in (data.get('on') or [])}
+            bad = ids - set(S.SPHERE_SOURCES)
+            if bad:
+                raise ValueError('Unknown recipe: ' + ', '.join(sorted(bad)[:5]))
+            s = self.settings()
+            s['sphere_on'] = sorted(i for i in ids if S.SPHERE_SOURCES[i].get('cat') != S.SPHERE_ALWAYS)
+            self.save_settings(s)
+            S.log.info('admin page: %d event spheres switched on in the Sphere House', len(s['sphere_on']))
+            return {'ok': f"Saved. {len(s['sphere_on'])} event sphere recipe(s) are on. Players see the change the "
+                          'next time the game talks to the server (reopen the Town if it is open).'}
         if action == 'unitbox':
             return {'base': self.settings().get('unitbox', S.UNITBOX_START), 'start': S.UNITBOX_START,
                     'max': S.UNITBOX_MAX}

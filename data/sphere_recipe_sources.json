@@ -1,0 +1,4081 @@
+{
+"2005": {
+"sphere": "Famous Blade",
+"cat": "Town & story",
+"event": "Harvesting in Town 's Mountain",
+"key": "",
+"detail": [
+"Green Claw: Harvesting in Town 's Mountain · Mistral - Cave of Flames - Wielder of the Fire: Goblin (9) · Mistral - Monster's Nest - Manipulator of the Dark: Skeleton (13) · Neo New York (Special Event) - Flame of Virtue - Lv 1 (approx 10)"
+],
+"ready": true
+},
+"2010": {
+"sphere": "Giant Shield",
+"cat": "Town & story",
+"event": "Harvesting in Town 's Mountain",
+"key": "",
+"detail": [
+"Green Pelt: Harvesting in Town 's Mountain · Mistral - Egor Snowfield - Manipulator of the Water: Merman (up to 12) · Hostile Relics: The Wandering Spirit Lv. 1"
+],
+"ready": true
+},
+"2015": {
+"sphere": "White Cane",
+"cat": "Town & story",
+"event": "Harvesting in Town 's Farm",
+"key": "",
+"detail": [
+"Green Bug: Harvesting in Town 's Farm · Mistral - Forest of Beasts - Puppeteer of the Trees: Mandragora · Vortex (Friday) - Hostile Relics - The Wandering Spirit Lv. 1"
+],
+"ready": true
+},
+"2020": {
+"sphere": "Spirit Armor",
+"cat": "Town & story",
+"event": "Mistral - Magutagal Wetlands - Commander of the Thunder: Harpy",
+"key": "",
+"detail": [
+"Green Bone: Mistral - Magutagal Wetlands - Commander of the Thunder: Harpy · Mistral - Remains of Mirza - Wielder of the Light: Angel"
+],
+"ready": true
+},
+"10000": {
+"sphere": "Bahamut Rage",
+"cat": "Raid",
+"event": "Raid Battle - Edelma",
+"key": "",
+"detail": [
+"Holy Robe: not on the wiki",
+"Beast Blade: not on the wiki",
+"Solid Pelt: Raid Battle - Edelma · Colosseum - Stage 11, Blue Chest, 200 CBP (5 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow"
+],
+"ready": false
+},
+"10001": {
+"sphere": "Tree Shield",
+"cat": "Raid",
+"event": "Slots in Akras Summoners' Hall / Raid Battle - Dalmogia",
+"key": "",
+"detail": [
+"Goddess Seal: Slots in Akras Summoners' Hall",
+"Holy Cane: not on the wiki",
+"Frozen Pelt: Raid Battle - Dalmogia · Colosseum - Stage 11, Red Chest, 200 CBP (5 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt"
+],
+"ready": false
+},
+"10002": {
+"sphere": "Death Jewel",
+"cat": "Raid",
+"event": "Raid Battle - Edelma / Raid Battle - Dalmogia",
+"key": "Solid Pelt",
+"detail": [
+"Solid Pelt: Raid Battle - Edelma · Colosseum - Stage 11, Blue Chest, 200 CBP (5 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Solid Pelt: Raid Battle - Edelma · Colosseum - Stage 11, Blue Chest, 200 CBP (5 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Frozen Pelt: Raid Battle - Dalmogia · Colosseum - Stage 11, Red Chest, 200 CBP (5 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt",
+"Meru Nut: Raid Battle - Meru-Meru · Colosseum - Stage 12, Blue Chest, 200 CBP (10 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt"
+],
+"ready": false
+},
+"10003": {
+"sphere": "Old Dagger",
+"cat": "Raid",
+"event": "Raid Battle - Meru-Meru / Raid Battle - Dalmogia",
+"key": "Meru Nut",
+"detail": [
+"Meru Nut: Raid Battle - Meru-Meru · Colosseum - Stage 12, Blue Chest, 200 CBP (10 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt",
+"Poison Shiv: not on the wiki",
+"Vine Lance: not on the wiki",
+"Cursed Sabre: not on the wiki"
+],
+"ready": false
+},
+"10004": {
+"sphere": "Soul Gun",
+"cat": "Raid",
+"event": "Raid Battle - Meru-Meru / Raid Battle - Edelma",
+"key": "Meru Nut",
+"detail": [
+"Meru Nut: Raid Battle - Meru-Meru · Colosseum - Stage 12, Blue Chest, 200 CBP (10 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt",
+"Demon Rifle: not on the wiki",
+"Beast Spear: not on the wiki",
+"Thunder Bow: not on the wiki"
+],
+"ready": false
+},
+"10005": {
+"sphere": "White Bangle",
+"cat": "Raid",
+"event": "Raid Battle - Dalmogia / Raid Battle - Granomos (RC1 - M4 / RC2 - M4 / RC3 - M3 / RC4 - M4)",
+"key": "",
+"detail": [
+"Cure Bracer: not on the wiki",
+"Frozen Pelt: Raid Battle - Dalmogia · Colosseum - Stage 11, Red Chest, 200 CBP (5 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt",
+"Verdant Pelt: Raid Battle - Granomos (RC1 - M4 / RC2 - M4 / RC3 - M3 / RC4 - M4) · Colosseum - Stage 11, Green Chest, 200 CBP (5 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt"
+],
+"ready": false
+},
+"10006": {
+"sphere": "Miroku Pearl",
+"cat": "Raid",
+"event": "Raid Battle - Edelma / Raid Battle - Granomos (RC1 - M4 / RC2 - M4 / RC3 - M3 / RC4 - M4)",
+"key": "",
+"detail": [
+"Skill Bracer: not on the wiki",
+"Solid Pelt: Raid Battle - Edelma · Colosseum - Stage 11, Blue Chest, 200 CBP (5 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Verdant Pelt: Raid Battle - Granomos (RC1 - M4 / RC2 - M4 / RC3 - M3 / RC4 - M4) · Colosseum - Stage 11, Green Chest, 200 CBP (5 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt"
+],
+"ready": false
+},
+"10007": {
+"sphere": "Sacred Jewel",
+"cat": "Raid",
+"event": "Raid Battle - Meru-Meru",
+"key": "",
+"detail": [
+"Meru Nut: Raid Battle - Meru-Meru · Colosseum - Stage 12, Blue Chest, 200 CBP (10 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt"
+],
+"ready": false
+},
+"10008": {
+"sphere": "Godly Statue",
+"cat": "Raid",
+"event": "Raid Battle - Edelma / Raid Battle - Raid Class 3 - Mission 3 \"Please Save Him!\" - Medronomus",
+"key": "Blaze Fang",
+"detail": [
+"Blaze Fang: Raid Battle - Edelma · RC4 - Battle Born",
+"Blaze Fang: Raid Battle - Edelma · RC4 - Battle Born",
+"Frozen Claw: not on the wiki",
+"Fairy Fruit: not on the wiki"
+],
+"ready": false
+},
+"10009": {
+"sphere": "Blue Dragon",
+"cat": "Raid",
+"event": "Raid Battle - Reduhark / Raid Battle - Edelma",
+"key": "Dark Stone",
+"detail": [
+"Dark Stone: Raid Battle - Reduhark · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Shiny Armor: not on the wiki",
+"Dragon Blade: not on the wiki",
+"Blaze Fang: Raid Battle - Edelma · RC4 - Battle Born"
+],
+"ready": false
+},
+"10010": {
+"sphere": "Life Shield",
+"cat": "Raid",
+"event": "Raid Battle - Laguna Rex",
+"key": "Timber Nut",
+"detail": [
+"Timber Nut: Raid Battle - Laguna Rex · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Star Shield: not on the wiki",
+"Sky Staff: not on the wiki",
+"Frozen Claw: not on the wiki"
+],
+"ready": false
+},
+"10011": {
+"sphere": "World Lance",
+"cat": "Raid",
+"event": "Raid Battle - Laguna Rex",
+"key": "Old Dagger",
+"detail": [
+"Old Dagger: not on the wiki",
+"Venom Knives: not on the wiki",
+"Phantom Pike: not on the wiki",
+"Cursed Sword: not on the wiki"
+],
+"ready": false
+},
+"10012": {
+"sphere": "Dark Lance",
+"cat": "Raid",
+"event": "Raid Battle - Reduhark",
+"key": "Soul Gun",
+"detail": [
+"Soul Gun: not on the wiki",
+"Death Cannon: not on the wiki",
+"Ogre Lance: not on the wiki",
+"Zeus's Bow: not on the wiki"
+],
+"ready": false
+},
+"10013": {
+"sphere": "Demon Dress",
+"cat": "Raid",
+"event": "Raid Battle - Raid Class 3 - Mission 3 \"Please Save Him!\" - Medronomus / Raid Battle - Raid Class 3 - Crater Death Match",
+"key": "Cobalt Pelt",
+"detail": [
+"Cobalt Pelt: Raid Battle - Raid Class 3 - Mission 3 \"Please Save Him!\" - Medronomus · Raid Battle - RC7 (Harvest) · Jungle Hunt · Subterranean Shadow",
+"Monster Robe: not on the wiki",
+"Shiny Nut: not on the wiki",
+"Dark Pelt: Raid Battle - Raid Class 3 - Crater Death Match - Reduhark · Colosseum - Stage 13, Red Chest, 400 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow"
+],
+"ready": false
+},
+"10014": {
+"sphere": "Gold Bangle",
+"cat": "Raid",
+"event": "Raid Battle - Reduhark / Raid Battle - Laguna Rex",
+"key": "Dark Claw",
+"detail": [
+"Dark Claw: Raid Battle - Reduhark · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Cure Gizmo 2: not on the wiki",
+"Timber Nut: Raid Battle - Laguna Rex · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Dark Claw: Raid Battle - Reduhark · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail"
+],
+"ready": false
+},
+"10015": {
+"sphere": "Goddess Flag",
+"cat": "Raid",
+"event": "Raid Battle - Van Lucy / Raid Battle - Laguna Rex",
+"key": "Fallen Eye",
+"detail": [
+"Fallen Eye: Raid Battle - Van Lucy · Colosseum - Stage 13, Green Chest, 200 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Royal Crest: not on the wiki",
+"Fallen Eye: Raid Battle - Van Lucy · Colosseum - Stage 13, Green Chest, 200 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Ruin Tear: not on the wiki"
+],
+"ready": false
+},
+"10016": {
+"sphere": "Demon Flag",
+"cat": "Raid",
+"event": "Raid Battle - Van Nader / Raid Battle - Reduhark",
+"key": "Wicked Eye",
+"detail": [
+"Wicked Eye: Raid Battle - Van Nader · Colosseum - Stage 13, Blue Chest, 200 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Ares' Crest: not on the wiki",
+"Wicked Eye: Raid Battle - Van Nader · Colosseum - Stage 13, Blue Chest, 200 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Wicked Tear: not on the wiki"
+],
+"ready": false
+},
+"10017": {
+"sphere": "Medulla Gem",
+"cat": "Raid",
+"event": "Raid Battle - Raid Class 3 - Crater Death Match - Reduhark",
+"key": "Dark Pelt",
+"detail": [
+"Dark Pelt: Raid Battle - Raid Class 3 - Crater Death Match - Reduhark · Colosseum - Stage 13, Red Chest, 400 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Shiny Nut: not on the wiki",
+"Dark Pelt: Raid Battle - Raid Class 3 - Crater Death Match - Reduhark · Colosseum - Stage 13, Red Chest, 400 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow"
+],
+"ready": false
+},
+"10018": {
+"sphere": "Angel Sword",
+"cat": "Raid",
+"event": "Raid Battle - Melion",
+"key": "Spirit Eye",
+"detail": [
+"Spirit Eye: Raid Battle - Melion · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"God Armor: not on the wiki",
+"Divine Sword: not on the wiki",
+"Blaze Pelt: not on the wiki"
+],
+"ready": false
+},
+"10019": {
+"sphere": "Alpha Shield",
+"cat": "Raid",
+"event": "Raid Battle - Reduhark",
+"key": "Dark Bone",
+"detail": [
+"Dark Bone: Raid Battle - Reduhark · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"King Shield: not on the wiki",
+"Godly Staff: not on the wiki",
+"Scaly Pelt: not on the wiki"
+],
+"ready": false
+},
+"10020": {
+"sphere": "Divine Jewel",
+"cat": "Raid",
+"event": "Raid Battle - Nalda Delia",
+"key": "Ominous Eye",
+"detail": [
+"Ominous Eye: Raid Battle - Nalda Delia · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Divine Gem: not on the wiki",
+"Ominous Eye: Raid Battle - Nalda Delia · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Disaster Eye: not on the wiki"
+],
+"ready": false
+},
+"10021": {
+"sphere": "Evil Halberd",
+"cat": "Raid",
+"event": "Raid Battle - Reduhark / Raid Battle - Melion",
+"key": "Dark Bone",
+"detail": [
+"Dark Bone: Raid Battle - Reduhark · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Spirit Eye: Raid Battle - Melion · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Dark Bone: Raid Battle - Reduhark · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Cobalt Pelt: Raid Battle - Raid Class 3 - Mission 3 \"Please Save Him!\" - Medronomus · Raid Battle - RC7 (Harvest) · Jungle Hunt · Subterranean Shadow"
+],
+"ready": false
+},
+"10022": {
+"sphere": "Demon Bow",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter",
+"key": "Evil Halberd",
+"detail": [
+"Evil Halberd: Frontier Hunter · Colosseum - Stage 14, Red Chest, 1200 CBP",
+"Blaze Pelt: not on the wiki",
+"Scaly Pelt: not on the wiki",
+"Flame Jewel: not on the wiki"
+],
+"ready": false
+},
+"10023": {
+"sphere": "Phoenix Wing",
+"cat": "Raid",
+"event": "Raid Battle - Van Lucy / Raid Battle - Nalda Delia",
+"key": "Fallen Hand",
+"detail": [
+"Fallen Hand: Raid Battle - Van Lucy · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Fallen Hand: Raid Battle - Van Lucy · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Holy Gear: not on the wiki",
+"Disaster Eye: not on the wiki"
+],
+"ready": false
+},
+"10024": {
+"sphere": "Demon Crown",
+"cat": "Raid",
+"event": "Raid Battle - Van Nader / Raid Battle - Nalda Delia",
+"key": "Wicked Hand",
+"detail": [
+"Wicked Hand: Raid Battle - Van Nader · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Wicked Hand: Raid Battle - Van Nader · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Holy Circuit: not on the wiki",
+"Ominous Eye: Raid Battle - Nalda Delia · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II"
+],
+"ready": false
+},
+"10025": {
+"sphere": "Legwand Gem",
+"cat": "Raid",
+"event": "Raid Battle - Nalda Delia",
+"key": "Calamity Eye",
+"detail": [
+"Calamity Eye: Raid Battle - Nalda Delia · Colosseum - Stage 18, Blue Chest, 300 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt",
+"Calamity Eye: Raid Battle - Nalda Delia · Colosseum - Stage 18, Blue Chest, 300 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt",
+"Doom Jewel: not on the wiki"
+],
+"ready": false
+},
+"10026": {
+"sphere": "Seal Sword",
+"cat": "Raid",
+"event": "Raid Battle - Mistzug, Phaeton 0~5 per run; drops more if you destroy more of the boss' parts",
+"key": "Daze Claw",
+"detail": [
+"Daze Claw: Raid Battle - Mistzug, Phaeton 0~5 per run; drops more if you destroy more of the boss' parts · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Ember Armor: not on the wiki",
+"God Sword: not on the wiki",
+"Daze Claw: Raid Battle - Mistzug, Phaeton 0~5 per run; drops more if you destroy more of the boss' parts · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II"
+],
+"ready": false
+},
+"10027": {
+"sphere": "Demon Shield",
+"cat": "Raid",
+"event": "Raid Battle - Mistzug, Phaeton",
+"key": "Lost Claw",
+"detail": [
+"Lost Claw: Raid Battle - Mistzug, Phaeton · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Dogma Shield: not on the wiki",
+"Order Staff: not on the wiki",
+"Lost Claw: Raid Battle - Mistzug, Phaeton · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II"
+],
+"ready": false
+},
+"10028": {
+"sphere": "Malice Jewel",
+"cat": "Raid",
+"event": "Raid Battle - Mistzug",
+"key": "Phantom Eye",
+"detail": [
+"Phantom Eye: Raid Battle - Mistzug · Colosseum - Stage 17, Red Chest, 1000 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Phantom Eye: Raid Battle - Mistzug · Colosseum - Stage 17, Red Chest, 1000 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Ghost Jewel: not on the wiki"
+],
+"ready": false
+},
+"10029": {
+"sphere": "Phoenix Orb",
+"cat": "Raid",
+"event": "Raid Battle - Van Lucy",
+"key": "Fallen Screw",
+"detail": [
+"Fallen Screw: Raid Battle - Van Lucy · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Fallen Screw: Raid Battle - Van Lucy · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Divine Core: not on the wiki",
+"Holy Gear: not on the wiki"
+],
+"ready": false
+},
+"10030": {
+"sphere": "Thorn Crown",
+"cat": "Raid",
+"event": "Raid Battle - Van Nader",
+"key": "Evil Screw",
+"detail": [
+"Evil Screw: Raid Battle - Van Nader · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Evil Screw: Raid Battle - Van Nader · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Divine Fuse: not on the wiki",
+"Holy Circuit: not on the wiki"
+],
+"ready": false
+},
+"10031": {
+"sphere": "Guard Brace",
+"cat": "Raid",
+"event": "Raid Battle - Golvorg",
+"key": "Shock Pelt",
+"detail": [
+"Shock Pelt: Raid Battle - Golvorg",
+"Fairy Robe: not on the wiki",
+"Mock Crystal: not on the wiki",
+"Shock Pelt: Raid Battle - Golvorg"
+],
+"ready": false
+},
+"10032": {
+"sphere": "Origin Slate",
+"cat": "Raid",
+"event": "Raid Battle",
+"key": "Solid Flame",
+"detail": [
+"Solid Flame: Raid Battle · Yugreia, Draegar, Real Yugreia · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Solid Flame: Raid Battle · Yugreia, Draegar, Real Yugreia · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Tragedy Drop: not on the wiki",
+"Fire Feather: not on the wiki"
+],
+"ready": false
+},
+"10033": {
+"sphere": "Hallow Sword",
+"cat": "Raid",
+"event": "Raid Battle - Balmedia",
+"key": "Ruling Fang",
+"detail": [
+"Ruling Fang: Raid Battle - Balmedia · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Dark Armor: not on the wiki",
+"Chosen Blade: not on the wiki",
+"Ruling Fang: Raid Battle - Balmedia · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II"
+],
+"ready": false
+},
+"10034": {
+"sphere": "Devil Shield",
+"cat": "Raid",
+"event": "Raid Battle - Nalda Delia",
+"key": "Ruling Fist",
+"detail": [
+"Ruling Fist: Raid Battle - Nalda Delia · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Grand Shield: not on the wiki",
+"Worship Cane: not on the wiki",
+"Ruling Fist: Raid Battle - Nalda Delia · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II"
+],
+"ready": false
+},
+"10035": {
+"sphere": "Buffer Jewel",
+"cat": "Raid",
+"event": "Raid Battle - Nalda Delia (target lower body)",
+"key": "Doom Ring",
+"detail": [
+"Doom Ring: Raid Battle - Nalda Delia (target lower body) · Colosseum · Stage 26, Red Chest, 2,500 CBP (2 pieces) · Stage 31, Blue Chest, 1,000 CBP (2 pieces)",
+"Doom Ring: Raid Battle - Nalda Delia (target lower body) · Colosseum · Stage 26, Red Chest, 2,500 CBP (2 pieces) · Stage 31, Blue Chest, 1,000 CBP (2 pieces)",
+"Blaze Pearl: not on the wiki"
+],
+"ready": false
+},
+"10036": {
+"sphere": "Ruin Lance",
+"cat": "Raid",
+"event": "Raid Battle - Grudkia",
+"key": "Fiend Claw",
+"detail": [
+"Fiend Claw: Raid Battle - Grudkia · Colosseum - Stage 38, Blue Chest, 2,000 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Venom Flower: not on the wiki",
+"Emerald Pike: not on the wiki",
+"Cursed Blade: not on the wiki"
+],
+"ready": false
+},
+"10037": {
+"sphere": "Havoc Pike",
+"cat": "Raid",
+"event": "Raid Battle - Grudkia",
+"key": "Fiend Pelt",
+"detail": [
+"Fiend Pelt: Raid Battle - Grudkia · Colosseum - Stage 39, Green Chest, 2,000 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Demon Gun: not on the wiki",
+"Dark Spear: not on the wiki",
+"Bolt Bow: not on the wiki"
+],
+"ready": false
+},
+"10038": {
+"sphere": "Fortune Cap",
+"cat": "Raid",
+"event": "Raid Battle - Real Yugreia (Bottom)",
+"key": "Feat Jewel",
+"detail": [
+"Feat Jewel: Raid Battle - Real Yugreia (Bottom) · Colosseum · Stage 33, Blue Chest, 2,000 CBP (2 pieces) · Stage 34, Red Chest, 4,000 CBP (2 pieces)",
+"Bandit Ring: not on the wiki",
+"Tech Gizmo 2: not on the wiki",
+"Cure Gizmo 2: not on the wiki"
+],
+"ready": false
+},
+"10039": {
+"sphere": "Grudge Bow",
+"cat": "Raid",
+"event": "Raid Battle - Meru-Meru (Raid:Class 5)",
+"key": "Eternal Bark",
+"detail": [
+"Eternal Bark: Raid Battle - Meru-Meru (Raid:Class 5) · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Fiend Jewel: not on the wiki",
+"Eternal Bark: Raid Battle - Meru-Meru (Raid:Class 5) · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail"
+],
+"ready": false
+},
+"10040": {
+"sphere": "Violet Pearl",
+"cat": "Raid",
+"event": "Raid Battle - Jirayen / Raid Battle - Jirayen (target claws)",
+"key": "Evil Horn",
+"detail": [
+"Evil Horn: Raid Battle - Jirayen",
+"Evil Horn: Raid Battle - Jirayen",
+"Evil Eye: Raid Battle - Jirayen (target claws) · Colosseum · Stage 42, Green Chest, 2,000 CBP (1 piece) · Stage 44, Red Chest, 2,000 CBP (1 piece)",
+"Shock Core: not on the wiki"
+],
+"ready": false
+},
+"10041": {
+"sphere": "Supreme Robe",
+"cat": "Raid",
+"event": "Raid Battle - Jirayen / Raid Battle - Jirayen (target claws)",
+"key": "Evil Scale",
+"detail": [
+"Evil Scale: Raid Battle - Jirayen",
+"Evil Scale: Raid Battle - Jirayen",
+"Evil Eye: Raid Battle - Jirayen (target claws) · Colosseum · Stage 42, Green Chest, 2,000 CBP (1 piece) · Stage 44, Red Chest, 2,000 CBP (1 piece)",
+"Blaze Scale: not on the wiki"
+],
+"ready": false
+},
+"10042": {
+"sphere": "Sky Blade",
+"cat": "Raid",
+"event": "Raid Battle - Arstallie",
+"key": "Sakura Leaf",
+"detail": [
+"Sakura Leaf: Raid Battle - Arstallie · Colosseum · Stage 41, Blue Chest, 1,000 CBP (10 pieces) · Stage 48, Green Chest, 4,000 CBP (10 pieces)",
+"Odd Armor: not on the wiki",
+"Carnage Edge: not on the wiki",
+"Cataract Ore: not on the wiki"
+],
+"ready": false
+},
+"10043": {
+"sphere": "Sky Buckler",
+"cat": "Raid",
+"event": "Raid Battle - Arstallie",
+"key": "Sakura Leaf",
+"detail": [
+"Sakura Leaf: Raid Battle - Arstallie · Colosseum · Stage 41, Blue Chest, 1,000 CBP (10 pieces) · Stage 48, Green Chest, 4,000 CBP (10 pieces)",
+"Ruler Shield: not on the wiki",
+"Nature Staff: not on the wiki",
+"Cataract Ore: not on the wiki"
+],
+"ready": false
+},
+"10044": {
+"sphere": "Sacred Treasure",
+"cat": "Raid",
+"event": "Raid Battle - Queen Sipla",
+"key": "Green Vine",
+"detail": [
+"Green Vine: Raid Battle - Queen Sipla · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Green Vine: Raid Battle - Queen Sipla · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Blaze Pearl: not on the wiki",
+"Flower Core: not on the wiki"
+],
+"ready": false
+},
+"10045": {
+"sphere": "Illusion Gizmo",
+"cat": "Raid",
+"event": "Raid Battle - Estoreit",
+"key": "Light Scale",
+"detail": [
+"Light Scale: Raid Battle - Estoreit · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Mock Crystal: not on the wiki",
+"Light Scale: Raid Battle - Estoreit · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Flower Core: not on the wiki"
+],
+"ready": false
+},
+"10046": {
+"sphere": "Revelation Book",
+"cat": "Raid",
+"event": "Raid Battle - Arkem / Frontier Hunter",
+"key": "Red Crystal",
+"detail": [
+"Red Crystal: Raid Battle - Arkem · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Royal Bud: Frontier Hunter · Colosseum - Stage 6, Red Chest, 100 CBP · Exchange Hall - 2,000 Merit Points (refreshes every 7 days)",
+"Red Crystal: Raid Battle - Arkem · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Flower Core: not on the wiki"
+],
+"ready": false
+},
+"10047": {
+"sphere": "Phoenix Crown",
+"cat": "Raid",
+"event": "Raid Battle - Estoreit - Wings / Raid Battle - Estoreit",
+"key": "Azure Sphere",
+"detail": [
+"Azure Sphere: Raid Battle - Estoreit - Wings · Colosseum · Stage 46, Blue Chest, 2,000 CBP (2 pieces) · Stage 48, Red Chest, 4,000 CBP (2 pieces)",
+"Azure Sphere: Raid Battle - Estoreit - Wings · Colosseum · Stage 46, Blue Chest, 2,000 CBP (2 pieces) · Stage 48, Red Chest, 4,000 CBP (2 pieces)",
+"Light Scale: Raid Battle - Estoreit · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Red Crystal: Raid Battle - Arkem · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail"
+],
+"ready": false
+},
+"10048": {
+"sphere": "Occult Treasure",
+"cat": "Raid",
+"event": "Raid Battle - Arkem (target thunder and dark parts) / Raid Battle - Jirayen (target claws)",
+"key": "Calamity Core",
+"detail": [
+"Calamity Core: Raid Battle - Arkem (target thunder and dark parts) · Colosseum · Stage 42, Blue Chest, 4,000 CBP (2 pieces) · Stage 46, Blue Chest, 2,000 CBP (2 pieces)",
+"Calamity Core: Raid Battle - Arkem (target thunder and dark parts) · Colosseum · Stage 42, Blue Chest, 4,000 CBP (2 pieces) · Stage 46, Blue Chest, 2,000 CBP (2 pieces)",
+"Evil Eye: Raid Battle - Jirayen (target claws) · Colosseum · Stage 42, Green Chest, 2,000 CBP (1 piece) · Stage 44, Red Chest, 2,000 CBP (1 piece)"
+],
+"ready": false
+},
+"10049": {
+"sphere": "War Demon's Blade",
+"cat": "Raid",
+"event": "Raid Battle - Shusui (RC6)",
+"key": "War Demon's Gem",
+"detail": [
+"War Demon's Gem: Raid Battle - Shusui (RC6) · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"War Demon's Gem: Raid Battle - Shusui (RC6) · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"War Demon's Hair: not on the wiki",
+"Shock Core: not on the wiki"
+],
+"ready": false
+},
+"10050": {
+"sphere": "Beiorg's Armor",
+"cat": "Raid",
+"event": "Raid Battle - Tech Armor Beiorg / Raid Battle - Estoreit - Wings",
+"key": "Beiorg's Scrap",
+"detail": [
+"Beiorg's Scrap: Raid Battle - Tech Armor Beiorg · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Beiorg's Scrap: Raid Battle - Tech Armor Beiorg · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Beiorg's Bulb: not on the wiki",
+"Azure Sphere: Raid Battle - Estoreit - Wings · Colosseum · Stage 46, Blue Chest, 2,000 CBP (2 pieces) · Stage 48, Red Chest, 4,000 CBP (2 pieces)"
+],
+"ready": false
+},
+"8002": {
+"sphere": "Hallowed Skull",
+"cat": "Guild",
+"event": "Hellborn Nightmare - Found on any level / First clear reward for Hellborn Nightmare - The Haunted Lands",
+"key": "",
+"detail": [
+"Cursed Bone: Hellborn Nightmare (Past Special Event) - Found on any level · Prosperity Brawl (Special Event) - Status Brawl Lv. 2",
+"Heinous Dust: First clear reward for Hellborn Nightmare - The Haunted Lands (Special Event) · Guild Exchange Hall"
+],
+"ready": false
+},
+"8003": {
+"sphere": "Sinister Orb ",
+"cat": "Special event",
+"event": "Hellborn Nightmare - Found on any level / First clear reward for Hellborn Nightmare - Demonic Vindication .",
+"key": "",
+"detail": [
+"Cursed Bone: Hellborn Nightmare (Past Special Event) - Found on any level · Prosperity Brawl (Special Event) - Status Brawl Lv. 2",
+"Evil Drop: First clear reward for Hellborn Nightmare - Demonic Vindication ."
+],
+"ready": false
+},
+"8009": {
+"sphere": "Forgebreaker",
+"cat": "Raid",
+"event": "First-clear reward for clearing Raid:X2 RC 3 Mission - Uprising",
+"key": "Plasma Fragment",
+"detail": [
+"Plasma Fragment: First-clear reward for clearing Raid:X2 RC 3 Mission - Uprising · Can be purchased in the Guild Exchange Hall in the \"Other\" section for 5500gt",
+"Plasma Fragment: First-clear reward for clearing Raid:X2 RC 3 Mission - Uprising · Can be purchased in the Guild Exchange Hall in the \"Other\" section for 5500gt",
+"Void Chunk: not on the wiki"
+],
+"ready": false
+},
+"8010": {
+"sphere": "Obsidian Core Amplifier",
+"cat": "Raid",
+"event": "First-clear reward for clearing Raid:X2 RC 3 Mission - Uprising",
+"key": "Obsidian Quartz",
+"detail": [
+"Obsidian Quartz: First-clear reward for clearing Raid:X2 RC 3 Mission - Uprising · Can be purchased in the Guild Exchange Hall in the \"Other\" section for 5500gt",
+"Obsidian Quartz: First-clear reward for clearing Raid:X2 RC 3 Mission - Uprising · Can be purchased in the Guild Exchange Hall in the \"Other\" section for 5500gt",
+"Void Chunk: not on the wiki"
+],
+"ready": false
+},
+"8011": {
+"sphere": "Blades of Ultor",
+"cat": "Raid",
+"event": "Raid X2 - First time completion of Relics of a Forgotten Era (Mission 11)",
+"key": "Cyclaw's Rage",
+"detail": [
+"Cyclaw's Rage: Raid X2 - First time completion of Relics of a Forgotten Era (Mission 11)",
+"Cyclaw's Rage: Raid X2 - First time completion of Relics of a Forgotten Era (Mission 11)",
+"Void Chunk: not on the wiki"
+],
+"ready": false
+},
+"8012": {
+"sphere": "Tridon's Trident",
+"cat": "Raid",
+"event": "Raid X2 - First time completion of Relics of a Forgotten Era (Mission 11)",
+"key": "Hydraloid's Wrath",
+"detail": [
+"Hydraloid's Wrath: Raid X2 - First time completion of Relics of a Forgotten Era (Mission 11)",
+"Hydraloid's Wrath: Raid X2 - First time completion of Relics of a Forgotten Era (Mission 11)",
+"Void Chunk: not on the wiki"
+],
+"ready": false
+},
+"8013": {
+"sphere": "Harp of Aurelia",
+"cat": "Grand Quest",
+"event": "The Tinkerer's Deceit - 90% completion",
+"key": "Stormwing’s Charm",
+"detail": [
+"Stormwing’s Charm: The Tinkerer's Deceit - 90% completion",
+"Stormwing’s Charm: The Tinkerer's Deceit - 90% completion",
+"Void Chunk: not on the wiki"
+],
+"ready": false
+},
+"8014": {
+"sphere": "Axe of Hadaron",
+"cat": "Grand Quest",
+"event": "The Tinkerer's Deceit - 100% completion",
+"key": "Netherhound’s Deceit",
+"detail": [
+"Netherhound’s Deceit: The Tinkerer's Deceit - 100% completion",
+"Netherhound’s Deceit: The Tinkerer's Deceit - 100% completion",
+"Void Chunk: not on the wiki"
+],
+"ready": false
+},
+"8015": {
+"sphere": "Bow of Andaria",
+"cat": "Achievements / Merit",
+"event": "Achievement System - 10000 Merit Points, can only be redeemed once",
+"key": "Euryalis’ Grace",
+"detail": [
+"Euryalis’ Grace: Achievement System - 10000 Merit Points, can only be redeemed once",
+"Euryalis’ Grace: Achievement System - 10000 Merit Points, can only be redeemed once",
+"Void Chunk: not on the wiki"
+],
+"ready": false
+},
+"8016": {
+"sphere": "Spear of Zedus",
+"cat": "Achievements / Merit",
+"event": "Achievement System - 10000 Merit Points, can only be redeemed once",
+"key": "Grievesnare’s Will",
+"detail": [
+"Grievesnare’s Will: Achievement System - 10000 Merit Points, can only be redeemed once",
+"Grievesnare’s Will: Achievement System - 10000 Merit Points, can only be redeemed once",
+"Void Chunk: not on the wiki"
+],
+"ready": false
+},
+"8017": {
+"sphere": "Vulcan Axe",
+"cat": "Raid",
+"event": "Raid X3 - One time reward after completing The Coin Toss (RC5)",
+"key": "Fury of the Destroyer",
+"detail": [
+"Fury of the Destroyer: Raid X3 - One time reward after completing The Coin Toss (RC5)",
+"Fury of the Destroyer: Raid X3 - One time reward after completing The Coin Toss (RC5)",
+"Orihalcum: not on the wiki"
+],
+"ready": false
+},
+"8018": {
+"sphere": "Glacies Staff",
+"cat": "Raid",
+"event": "Raid X3 - One time reward after completing The Coin Toss (RC5)",
+"key": "Scorn of the Ice Queen",
+"detail": [
+"Scorn of the Ice Queen: Raid X3 - One time reward after completing The Coin Toss (RC5)",
+"Scorn of the Ice Queen: Raid X3 - One time reward after completing The Coin Toss (RC5)",
+"Mithril: not on the wiki"
+],
+"ready": false
+},
+"8020": {
+"sphere": "Vorpal Chainblades",
+"cat": "Raid",
+"event": "Raid X4 - One time reward after completing He Who Sold The World (RC5)",
+"key": "Bond of the Monster Hunter",
+"detail": [
+"Bond of the Monster Hunter: Raid X4 - One time reward after completing He Who Sold The World (RC5)",
+"Bond of the Monster Hunter: Raid X4 - One time reward after completing He Who Sold The World (RC5)",
+"Orihalcum: not on the wiki"
+],
+"ready": false
+},
+"8021": {
+"sphere": "Eremorn's Aegis",
+"cat": "Raid",
+"event": "Raid X4 - One time reward after completing He Who Sold The World (RC5)",
+"key": "Grief of the Storm Champion",
+"detail": [
+"Grief of the Storm Champion: Raid X4 - One time reward after completing He Who Sold The World (RC5) · Guild Exchange Hall - 7500 Guild Tokens (only if sold)",
+"Grief of the Storm Champion: Raid X4 - One time reward after completing He Who Sold The World (RC5) · Guild Exchange Hall - 7500 Guild Tokens (only if sold)",
+"Mithril: not on the wiki"
+],
+"ready": false
+},
+"10052": {
+"sphere": "Blazing Fists",
+"cat": "Raid",
+"event": "Raid Battle - Barion / Raid Battle - Real Yugreia (Bottom)",
+"key": "Dragonlord Wing",
+"detail": [
+"Dragonlord Wing: Raid Battle - Barion · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Dragonlord Wing: Raid Battle - Barion · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Dragonlord's Scale: not on the wiki",
+"Blaze Scale: not on the wiki"
+],
+"ready": false
+},
+"10053": {
+"sphere": "All-Seeing Eyes",
+"cat": "Raid",
+"event": "Raid Battle - Amu Yunos",
+"key": "Spatial Crystal",
+"detail": [
+"Spatial Crystal: Raid Battle - Amu Yunos · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Health Charm: not on the wiki",
+"Spatial Crystal: Raid Battle - Amu Yunos · Raid Battle - RC7 (Harvest) · Jungle Hunt · Hot on the Trail",
+"Thunder Chip: not on the wiki"
+],
+"ready": false
+},
+"8004": {
+"sphere": "Sacred Snowglobe",
+"cat": "Special event",
+"event": "Winter Glades Blitz",
+"key": "",
+"detail": [
+"Snow Flake: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Snow Crystal: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Miracle Frost: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)"
+],
+"ready": true
+},
+"8005": {
+"sphere": "Frozen Myth",
+"cat": "Special event",
+"event": "Winter Glades Blitz",
+"key": "",
+"detail": [
+"Snow Flake: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Snow Crystal: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Snow Gemstone: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Miracle Frost: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)"
+],
+"ready": true
+},
+"8998": {
+"sphere": "Most Bravest Blade",
+"cat": "Special event",
+"event": "Burny & Friends UNLEASHED",
+"key": "",
+"detail": [
+"Jem: Burny & Friends UNLEASHED · First clear reward for completing Burny & Friends UNLEASHED Lv.2 · Tricky Escapade (Special Event)"
+],
+"ready": true
+},
+"10054": {
+"sphere": "Nature Shield",
+"cat": "Raid",
+"event": "Raid Battle - Mordlim",
+"key": "Forbidden Vines",
+"detail": [
+"Forbidden Vines: Raid Battle - Mordlim · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Forbidden Vines: Raid Battle - Mordlim · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Spider's Silk: not on the wiki",
+"Fiend Jewel: not on the wiki"
+],
+"ready": false
+},
+"8024": {
+"sphere": "Ritus Staff",
+"cat": "Grand Quest",
+"event": "Eneroth: Genesis - Gold 2 Achievement Reward",
+"key": "Love of the Loremaster",
+"detail": [
+"Love of the Loremaster: Eneroth: Genesis - Gold 2 Achievement Reward",
+"Love of the Loremaster: Eneroth: Genesis - Gold 2 Achievement Reward",
+"Mithril: not on the wiki"
+],
+"ready": false
+},
+"8025": {
+"sphere": "Nyami's Bells",
+"cat": "Grand Quest",
+"event": "Eneroth: Genesis - Gold 1 Achievement",
+"key": "Desire of the Shadow Cat",
+"detail": [
+"Desire of the Shadow Cat: Eneroth: Genesis - Gold 1 Achievement",
+"Desire of the Shadow Cat: Eneroth: Genesis - Gold 1 Achievement",
+"Orihalcum: not on the wiki"
+],
+"ready": false
+},
+"10055": {
+"sphere": "Twilight Stone",
+"cat": "Raid",
+"event": "Raid Battle - Mora / Frontier Hunter",
+"key": "Raiment of Grace",
+"detail": [
+"Raiment of Grace: Raid Battle - Mora · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Royal Bud: Frontier Hunter · Colosseum - Stage 6, Red Chest, 100 CBP · Exchange Hall - 2,000 Merit Points (refreshes every 7 days)",
+"Raiment of Grace: Raid Battle - Mora · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Shadow Gem: not on the wiki"
+],
+"ready": false
+},
+"10056": {
+"sphere": "Melord's Core",
+"cat": "Raid",
+"event": "Raid Battle - Melord",
+"key": "Demonblood Clot",
+"detail": [
+"Demonblood Clot: Raid Battle - Melord · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Pure Crystal: not on the wiki",
+"Demonblood Clot: Raid Battle - Melord · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Crystal Soul: not on the wiki"
+],
+"ready": false
+},
+"10051": {
+"sphere": "Diabolic Fang",
+"cat": "Raid",
+"event": "Raid Battle - Barbatos",
+"key": "Axe Fragment",
+"detail": [
+"Axe Fragment: Raid Battle - Barbatos",
+"Axe Fragment: Raid Battle - Barbatos",
+"Warrior's Thoughts: not on the wiki"
+],
+"ready": false
+},
+"10057": {
+"sphere": "Armor of Seals",
+"cat": "Raid",
+"event": "Raid Battle - Kalon",
+"key": "Scarlet Wing",
+"detail": [
+"Scarlet Wing: Raid Battle - Kalon · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Scarlet Wing: Raid Battle - Kalon · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II",
+"Crest Seal: not on the wiki",
+"Ghost Jewel: not on the wiki"
+],
+"ready": false
+},
+"8026": {
+"sphere": "Jeu'vrr's Battleheart",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4000 Guild Tokens",
+"key": "Jeu'vrr's Heart",
+"detail": [
+"Jeu'vrr's Heart: Guild Exchange Hall - 4000 Guild Tokens",
+"Jeu'vrr's Heart: Guild Exchange Hall - 4000 Guild Tokens",
+"Viper Tail: not on the wiki",
+"Molted Wyrmscale: not on the wiki"
+],
+"ready": false
+},
+"8027": {
+"sphere": "Jeu'vrr's Warsong",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4000 Guild Tokens (upgrade)",
+"key": "Jeu'vrr's Battleheart",
+"detail": [
+"Jeu'vrr's Battleheart: not on the wiki",
+"Viper Tail: not on the wiki",
+"Molted Wyrmscale: not on the wiki",
+"Sarayagaza Bloom: not on the wiki"
+],
+"ready": false
+},
+"8028": {
+"sphere": "Dehn's Bladesong",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4000 Guild Tokens",
+"key": "Dehn's Edge",
+"detail": [
+"Dehn's Edge: Guild Exchange Hall - 4000 Guild Tokens",
+"Dehn's Edge: Guild Exchange Hall - 4000 Guild Tokens",
+"Bone Club: not on the wiki",
+"Sarayagaza Bloom: not on the wiki"
+],
+"ready": false
+},
+"8029": {
+"sphere": "Dehn's Swordmyth",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4000 Guild Tokens (upgrade)",
+"key": "Dehn's Bladesong",
+"detail": [
+"Dehn's Bladesong: not on the wiki",
+"Bone Club: not on the wiki",
+"Sarayagaza Bloom: not on the wiki",
+"Molted Wyrmscale: not on the wiki"
+],
+"ready": false
+},
+"8030": {
+"sphere": "Ka-rzn's Coilwhip",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4000 Guild Tokens",
+"key": "Ka-rzn's Coils",
+"detail": [
+"Ka-rzn's Coils: Guild Exchange Hall - 4000 Guild Tokens",
+"Ka-rzn's Coils: Guild Exchange Hall - 4000 Guild Tokens",
+"Centipede Fang: not on the wiki",
+"Burbur Branch: not on the wiki"
+],
+"ready": false
+},
+"8031": {
+"sphere": "Ka-rzn's Excruciation",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4000 Guild Tokens (upgrade)",
+"key": "Ka-rzn's Coilwhip",
+"detail": [
+"Ka-rzn's Coilwhip: not on the wiki",
+"Centipede Fang: not on the wiki",
+"Burbur Branch: not on the wiki",
+"Shambler Cuttings: not on the wiki"
+],
+"ready": false
+},
+"8032": {
+"sphere": "Jeu'vrr's Oration",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4000 Guild Tokens",
+"key": "Jeu'vrr's Breath",
+"detail": [
+"Jeu'vrr's Breath: Guild Exchange Hall - 4000 Guild Tokens",
+"Jeu'vrr's Breath: Guild Exchange Hall - 4000 Guild Tokens",
+"Phrun Stingers: not on the wiki",
+"Shambler Cuttings: not on the wiki"
+],
+"ready": false
+},
+"8033": {
+"sphere": "Jeu'vrr's Warcry",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4000 Guild Tokens (upgrade)",
+"key": "Jeu'vrr's Oration",
+"detail": [
+"Jeu'vrr's Oration: not on the wiki",
+"Phrun Stingers: not on the wiki",
+"Shambler Cuttings: not on the wiki",
+"Burbur Branch: not on the wiki"
+],
+"ready": false
+},
+"8034": {
+"sphere": "Blight's Core",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8035": {
+"sphere": "Blight's Affliction",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8036": {
+"sphere": "Blight's Ire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8037": {
+"sphere": "Blight's Curse",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8038": {
+"sphere": "Blight's Oppression",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8039": {
+"sphere": "Blight's Rage",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8040": {
+"sphere": "Blight's Scourge",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8041": {
+"sphere": "Blight's Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8042": {
+"sphere": "Blight's Wrath",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8043": {
+"sphere": "Blight's Misfortune",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8044": {
+"sphere": "Weaver's Core",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8045": {
+"sphere": "Weaver's Poise",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8046": {
+"sphere": "Weaver's Deceit",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8047": {
+"sphere": "Weaver's Pride",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8048": {
+"sphere": "Weaver's Wisdom",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8049": {
+"sphere": "Weaver's Guile",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8050": {
+"sphere": "Weaver's Conceit",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8051": {
+"sphere": "Weaver's Acumen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8052": {
+"sphere": "Weaver's Artifice",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8053": {
+"sphere": "Weaver's Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8054": {
+"sphere": "Harbinger's Core",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8055": {
+"sphere": "Harbinger's Thirst",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8056": {
+"sphere": "Harbinger's Spite",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8057": {
+"sphere": "Harbinger's Ardor",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Weathered Bell",
+"detail": [
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6",
+"Ghost-Touched Herbs: not on the wiki",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8058": {
+"sphere": "Harbinger's Greed",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8059": {
+"sphere": "Harbinger's Cruelty",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8060": {
+"sphere": "Harbinger's Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8061": {
+"sphere": "Harbinger's Avarice",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8062": {
+"sphere": "Harbinger's Malice",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8063": {
+"sphere": "Harbinger's Lust",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5",
+"key": "Corroded Token",
+"detail": [
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Corroded Token: Raid:RC6 Kielazer X5",
+"Weathered Bell: Raid:RC6 Kielazer X5 · Raid:RC6 Zael X6"
+],
+"ready": false
+},
+"8064": {
+"sphere": "Demonic Skull",
+"cat": "Special event",
+"event": "Hellborn Nightmare - Found on any level",
+"key": "Hallowed Skull",
+"detail": [
+"Hallowed Skull: not on the wiki",
+"Eerie Bone: not on the wiki",
+"Cursed Bone: Hellborn Nightmare (Past Special Event) - Found on any level · Prosperity Brawl (Special Event) - Status Brawl Lv. 2"
+],
+"ready": false
+},
+"8065": {
+"sphere": "Ominous Orb",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 3,000 Guild Tokens (Redeemable once for recovery after accidental disposal) / Hellborn Nightmare -",
+"key": "Sinister Orb ",
+"detail": [
+"Sinister Orb : Guild Exchange Hall - 3,000 Guild Tokens (Redeemable once for recovery after accidental disposal)",
+"Eerie Bone: not on the wiki",
+"Cursed Bone: Hellborn Nightmare (Past Special Event) - Found on any level · Prosperity Brawl (Special Event) - Status Brawl Lv. 2"
+],
+"ready": false
+},
+"8066": {
+"sphere": "Patriot",
+"cat": "Collaboration",
+"event": "Overwhelming Darkness (Collaboration Event)",
+"key": "Courage Fragment",
+"detail": [
+"Courage Fragment: Overwhelming Darkness (Collaboration Event) · First clear rewards · 1 from An Explosive Disaster · 3 from A New Darkness Arises",
+"Courage Fragment: Overwhelming Darkness (Collaboration Event) · First clear rewards · 1 from An Explosive Disaster · 3 from A New Darkness Arises"
+],
+"ready": false
+},
+"8067": {
+"sphere": "Nhe'hed's Wish",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens",
+"key": "Nhe'hed's Blessing",
+"detail": [
+"Nhe'hed's Blessing: Guild Exchange Hall - 4,000 Guild Tokens",
+"Nhe'hed's Blessing: Guild Exchange Hall - 4,000 Guild Tokens",
+"Dhlerp Tail: not on the wiki",
+"Sea-star Crystal: not on the wiki"
+],
+"ready": false
+},
+"8068": {
+"sphere": "Nhe'hed's Will",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens (upgrade)",
+"key": "Nhe'hed's Wish",
+"detail": [
+"Nhe'hed's Wish: not on the wiki",
+"Dhlerp Tail: not on the wiki",
+"Sea-star Crystal: not on the wiki",
+"Chronal Sand: not on the wiki"
+],
+"ready": false
+},
+"8069": {
+"sphere": "Courage Buckler",
+"cat": "Collaboration",
+"event": "Overwhelming Darkness (Collaboration Event)",
+"key": "Courage Buckler",
+"detail": [
+"Courage Buckler: not on the wiki",
+"Courage Fragment: Overwhelming Darkness (Collaboration Event) · First clear rewards · 1 from An Explosive Disaster · 3 from A New Darkness Arises",
+"Litrock: not on the wiki",
+"Heaven's Ash: not on the wiki"
+],
+"ready": false
+},
+"8070": {
+"sphere": "Courage Shield",
+"cat": "Collaboration",
+"event": "Overwhelming Darkness (Collaboration Event)",
+"key": "Courage Shield",
+"detail": [
+"Courage Shield: not on the wiki",
+"Courage Fragment: Overwhelming Darkness (Collaboration Event) · First clear rewards · 1 from An Explosive Disaster · 3 from A New Darkness Arises",
+"Heaven's Ash: not on the wiki",
+"Sacred Crystal: not on the wiki"
+],
+"ready": false
+},
+"8071": {
+"sphere": "Courage Aegis",
+"cat": "Collaboration",
+"event": "Only available once per account / Overwhelming Darkness (Collaboration Event)",
+"key": "Courage Aegis",
+"detail": [
+"Courage Aegis: Only available once per account",
+"Courage Fragment: Overwhelming Darkness (Collaboration Event) · First clear rewards · 1 from An Explosive Disaster · 3 from A New Darkness Arises",
+"Holy Crystal: not on the wiki",
+"Spiritsand: not on the wiki"
+],
+"ready": false
+},
+"8072": {
+"sphere": "Ke'hret's Insanguination",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens (upgrade)",
+"key": "Ke'hret's Disintegration",
+"detail": [
+"Ke'hret's Disintegration: not on the wiki",
+"Cthnos Chain: not on the wiki",
+"Chronal Sand: not on the wiki",
+"Sea-star Crystal: not on the wiki"
+],
+"ready": false
+},
+"8073": {
+"sphere": "Ke'hret's Disintegration",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens",
+"key": "Ke'hret's Paw",
+"detail": [
+"Ke'hret's Paw: Guild Exchange Hall - 4,000 Guild Tokens",
+"Ke'hret's Paw: Guild Exchange Hall - 4,000 Guild Tokens",
+"Cthnos Chain: not on the wiki",
+"Chronal Sand: not on the wiki"
+],
+"ready": false
+},
+"8074": {
+"sphere": "Golden Heart",
+"cat": "Special event",
+"event": "Winter Bundle from Bundle Chest / Winter Glades Blitz",
+"key": "",
+"detail": [
+"Wooden Soldier: Winter Bundle from Bundle Chest · Jubilant Jingles - A Tear-Wrapped Reunion",
+"Snow Flake: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Snow Crystal: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Snow Gemstone: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)"
+],
+"ready": true
+},
+"8075": {
+"sphere": "Shiny Bauble",
+"cat": "Special event",
+"event": "Jubilant Jingles - Cold Awakenings, can be found in Treasure Chests or dropped from enemies. Most likely from 2nd room i",
+"key": "",
+"detail": [
+"Holiday Wreath: Jubilant Jingles - Cold Awakenings, can be found in Treasure Chests or dropped from enemies. Most likely from 2nd room in Cold Awakenings.",
+"Snow Flake: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Snow Crystal: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Miracle Frost: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)"
+],
+"ready": true
+},
+"8076": {
+"sphere": "Winter Donum",
+"cat": "Special event",
+"event": "Jubilant Jingles - Path of Broken Promises / Winter Glades Blitz",
+"key": "",
+"detail": [
+"Gift Sack: Jubilant Jingles - Path of Broken Promises",
+"Snow Crystal: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Snow Gemstone: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Miracle Frost: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)"
+],
+"ready": true
+},
+"8077": {
+"sphere": "Winter Memoria",
+"cat": "Special event",
+"event": "Jubilant Jingles - Path of Broken Promises / Winter Glades Blitz",
+"key": "",
+"detail": [
+"Gift Sack: Jubilant Jingles - Path of Broken Promises",
+"Snow Crystal: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Snow Gemstone: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Miracle Frost: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)"
+],
+"ready": true
+},
+"8078": {
+"sphere": "Fortunate Phoenix Crest",
+"cat": "Special event",
+"event": "Prosperity Brawl",
+"key": "",
+"detail": [
+"Golden Lion Regalia: not on the wiki",
+"Longevity Dew: Prosperity Brawl (Special Event)",
+"Happy Charm: Prosperity Brawl (Special Event)",
+"Lucky Coin: Prosperity Brawl"
+],
+"ready": false
+},
+"8079": {
+"sphere": "Prosperous Phoenix Emblem",
+"cat": "Special event",
+"event": "Prosperity Brawl",
+"key": "",
+"detail": [
+"Prosperity Essence: Prosperity Brawl (Special Event)",
+"Happy Charm: Prosperity Brawl (Special Event)",
+"Lucky Coin: Prosperity Brawl",
+"Phoenix Feather: Prosperity Brawl"
+],
+"ready": true
+},
+"8080": {
+"sphere": "Bow of Fervor",
+"cat": "Special event",
+"event": "Forgotten Shadows",
+"key": "",
+"detail": [
+"Glowing Rose: Forgotten Shadows (Special Event)",
+"Enchanted Bow: Forgotten Shadows (Special Event)",
+"Love Arrow: Forgotten Shadows (Special Event)"
+],
+"ready": true
+},
+"8081": {
+"sphere": "Bow of Devotion",
+"cat": "Special event",
+"event": "Forgotten Shadows",
+"key": "",
+"detail": [
+"Glowing Rose: Forgotten Shadows (Special Event)",
+"Enchanted Bow: Forgotten Shadows (Special Event)",
+"Love Arrow: Forgotten Shadows (Special Event)",
+"Silk Handkerchief: Forgotten Shadows (Special Event)"
+],
+"ready": true
+},
+"8082": {
+"sphere": "Bow of Passion",
+"cat": "Special event",
+"event": "Forgotten Shadows",
+"key": "",
+"detail": [
+"Enchanted Bow: Forgotten Shadows (Special Event)",
+"Love Arrow: Forgotten Shadows (Special Event)",
+"Silk Handkerchief: Forgotten Shadows (Special Event)"
+],
+"ready": true
+},
+"8083": {
+"sphere": "Orochi's Mark",
+"cat": "Collaboration",
+"event": "Collaboration Dungeon: Fighter's Challenge",
+"key": "",
+"detail": [
+"Orochi's Seal: Collaboration Dungeon: Fighter's Challenge",
+"Fire Essence: Collaboration Dungeon: Fighter's Challenge · Burning Electrocution · Two Enter, Only One Leaves",
+"Water Essence: Collaboration Dungeon: Fighter's Challenge · Granite Undertow · Two Enter, Only One Leaves",
+"Earth Essence: Collaboration Dungeon: Fighter's Challenge · Granite Undertow · Two Enter, Only One Leaves"
+],
+"ready": true
+},
+"8084": {
+"sphere": "Orochi's Symbol",
+"cat": "Collaboration",
+"event": "Collaboration Dungeon: Fighter's Challenge",
+"key": "",
+"detail": [
+"Orochi's Seal: Collaboration Dungeon: Fighter's Challenge",
+"Fire Essence: Collaboration Dungeon: Fighter's Challenge · Burning Electrocution · Two Enter, Only One Leaves",
+"Water Essence: Collaboration Dungeon: Fighter's Challenge · Granite Undertow · Two Enter, Only One Leaves",
+"Dark Essence: Collaboration Dungeon: Fighter's Challenge · Scintillating Darkness · Two Enter, Only One Leaves"
+],
+"ready": true
+},
+"8085": {
+"sphere": "Orochi's Crest",
+"cat": "Collaboration",
+"event": "Collaboration Dungeon: Fighter's Challenge",
+"key": "",
+"detail": [
+"Orochi's Seal: Collaboration Dungeon: Fighter's Challenge",
+"Thunder Essence: Collaboration Dungeon: Fighter's Challenge · Burning Electrocution · Two Enter, Only One Leaves",
+"Earth Essence: Collaboration Dungeon: Fighter's Challenge · Granite Undertow · Two Enter, Only One Leaves",
+"Light Essence: Collaboration Dungeon: Fighter's Challenge · Scintillating Darkness · Two Enter, Only One Leaves"
+],
+"ready": true
+},
+"8086": {
+"sphere": "Pyrespark Orb",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens",
+"key": "Pyre Orb",
+"detail": [
+"Pyre Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Pyre Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Infused Herbs: not on the wiki",
+"Aqueous Plague: not on the wiki"
+],
+"ready": false
+},
+"8087": {
+"sphere": "Pyre Essence Orb",
+"cat": "Raid",
+"event": "Guild Exchange Hall - 4,500 Guild Tokens",
+"key": "Pyrespark Orb",
+"detail": [
+"Pyrespark Orb: not on the wiki",
+"Aqueous Plague: not on the wiki",
+"Old Fossil: not on the wiki",
+"Distilled Ether: Guild Exchange Hall - 4,500 Guild Tokens · Event Bazaar · Raid Battle - 5,000 Orebi Shards · Exalted - 50 Exalted Tokens"
+],
+"ready": false
+},
+"8088": {
+"sphere": "Tidewater Orb",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens",
+"key": "Tide Orb",
+"detail": [
+"Tide Orb: Guild Exchange Hall - 4,000 Guild Tokens · Rare chance to obtain from Guild Chests",
+"Tide Orb: Guild Exchange Hall - 4,000 Guild Tokens · Rare chance to obtain from Guild Chests",
+"Old Fossil: not on the wiki",
+"Whiteland Rock: not on the wiki"
+],
+"ready": false
+},
+"8089": {
+"sphere": "Tidal Essence Orb",
+"cat": "Raid",
+"event": "Guild Exchange Hall - 4,500 Guild Tokens",
+"key": "Tidewater Orb",
+"detail": [
+"Tidewater Orb: not on the wiki",
+"Whiteland Rock: not on the wiki",
+"Infused Herbs: not on the wiki",
+"Distilled Ether: Guild Exchange Hall - 4,500 Guild Tokens · Event Bazaar · Raid Battle - 5,000 Orebi Shards · Exalted - 50 Exalted Tokens"
+],
+"ready": false
+},
+"8090": {
+"sphere": "Forestseed Orb",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens",
+"key": "Forest Orb",
+"detail": [
+"Forest Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Forest Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Whiteland Rock: not on the wiki",
+"Infused Herbs: not on the wiki"
+],
+"ready": false
+},
+"8091": {
+"sphere": "Forest Essence Orb",
+"cat": "Raid",
+"event": "Guild Exchange Hall - 4,500 Guild Tokens",
+"key": "Forestseed Orb",
+"detail": [
+"Forestseed Orb: not on the wiki",
+"Infused Herbs: not on the wiki",
+"Old Fossil: not on the wiki",
+"Distilled Ether: Guild Exchange Hall - 4,500 Guild Tokens · Event Bazaar · Raid Battle - 5,000 Orebi Shards · Exalted - 50 Exalted Tokens"
+],
+"ready": false
+},
+"8092": {
+"sphere": "Stormstrike Orb",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens",
+"key": "Storm Orb",
+"detail": [
+"Storm Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Storm Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Old Fossil: not on the wiki",
+"Aqueous Plague: not on the wiki"
+],
+"ready": false
+},
+"8093": {
+"sphere": "Storm Essence Orb",
+"cat": "Raid",
+"event": "Guild Exchange Hall - 4,500 Guild Tokens",
+"key": "Stormstrike Orb",
+"detail": [
+"Stormstrike Orb: not on the wiki",
+"Aqueous Plague: not on the wiki",
+"Whiteland Rock: not on the wiki",
+"Distilled Ether: Guild Exchange Hall - 4,500 Guild Tokens · Event Bazaar · Raid Battle - 5,000 Orebi Shards · Exalted - 50 Exalted Tokens"
+],
+"ready": false
+},
+"8094": {
+"sphere": "Solarflare Orb",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens",
+"key": "Solar Orb",
+"detail": [
+"Solar Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Solar Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Infused Herbs: not on the wiki",
+"Old Fossil: not on the wiki"
+],
+"ready": false
+},
+"8095": {
+"sphere": "Solar Essence Orb",
+"cat": "Raid",
+"event": "Guild Exchange Hall - 4,500 Guild Tokens",
+"key": "Solarflare Orb",
+"detail": [
+"Solarflare Orb: not on the wiki",
+"Old Fossil: not on the wiki",
+"Whiteland Rock: not on the wiki",
+"Distilled Ether: Guild Exchange Hall - 4,500 Guild Tokens · Event Bazaar · Raid Battle - 5,000 Orebi Shards · Exalted - 50 Exalted Tokens"
+],
+"ready": false
+},
+"8096": {
+"sphere": "Lunarshadow Orb",
+"cat": "Guild",
+"event": "Guild Exchange Hall - 4,000 Guild Tokens",
+"key": "Lunar Orb",
+"detail": [
+"Lunar Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Lunar Orb: Guild Exchange Hall - 4,000 Guild Tokens",
+"Whiteland Rock: not on the wiki",
+"Aqueous Plague: not on the wiki"
+],
+"ready": false
+},
+"8097": {
+"sphere": "Lunar Essence Orb",
+"cat": "Raid",
+"event": "Guild Exchange Hall - 4,500 Guild Tokens",
+"key": "Lunarshadow Orb",
+"detail": [
+"Lunarshadow Orb: not on the wiki",
+"Aqueous Plague: not on the wiki",
+"Infused Herbs: not on the wiki",
+"Distilled Ether: Guild Exchange Hall - 4,500 Guild Tokens · Event Bazaar · Raid Battle - 5,000 Orebi Shards · Exalted - 50 Exalted Tokens"
+],
+"ready": false
+},
+"8098": {
+"sphere": "Blight Arisen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8099": {
+"sphere": "Blight Arisen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8100": {
+"sphere": "Blight Arisen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8101": {
+"sphere": "Tormented Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8102": {
+"sphere": "Tormented Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8103": {
+"sphere": "Tormented Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8104": {
+"sphere": "Wrathful Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8105": {
+"sphere": "Wrathful Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8106": {
+"sphere": "Wrathful Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8107": {
+"sphere": "Gamblers Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8108": {
+"sphere": "Gamblers Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8109": {
+"sphere": "Gamblers Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8110": {
+"sphere": "Tormented Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8111": {
+"sphere": "Tormented Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8112": {
+"sphere": "Tormented Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8113": {
+"sphere": "Wrathful Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8114": {
+"sphere": "Wrathful Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8115": {
+"sphere": "Wrathful Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8116": {
+"sphere": "Gamblers Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8117": {
+"sphere": "Gamblers Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8118": {
+"sphere": "Gamblers Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Blight's Core",
+"detail": [
+"Blight's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8119": {
+"sphere": "Weaver Arisen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8120": {
+"sphere": "Weaver Arisen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8121": {
+"sphere": "Weaver Arisen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8122": {
+"sphere": "Obsessive Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8123": {
+"sphere": "Obsessive Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8124": {
+"sphere": "Obsessive Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8125": {
+"sphere": "Illusory Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8126": {
+"sphere": "Illusory Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8127": {
+"sphere": "Illusory Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8128": {
+"sphere": "Foolish Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8129": {
+"sphere": "Foolish Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8130": {
+"sphere": "Foolish Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8131": {
+"sphere": "Obsessive Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8132": {
+"sphere": "Obsessive Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8133": {
+"sphere": "Obsessive Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8134": {
+"sphere": "Illusory Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8135": {
+"sphere": "Illusory Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8136": {
+"sphere": "Illusory Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8137": {
+"sphere": "Foolish Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8138": {
+"sphere": "Foolish Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8139": {
+"sphere": "Foolish Desire",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Weaver's Core",
+"detail": [
+"Weaver's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8140": {
+"sphere": "Harbinger Arisen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8141": {
+"sphere": "Harbinger Arisen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8142": {
+"sphere": "Harbinger Arisen",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8143": {
+"sphere": "Avaricious Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8144": {
+"sphere": "Avaricious Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8145": {
+"sphere": "Avaricious Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8146": {
+"sphere": "Malicious Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8147": {
+"sphere": "Malicious Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8148": {
+"sphere": "Malicious Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8149": {
+"sphere": "Lustful Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8150": {
+"sphere": "Lustful Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8151": {
+"sphere": "Lustful Torment",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8152": {
+"sphere": "Avaricious Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8153": {
+"sphere": "Avaricious Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8154": {
+"sphere": "Avaricious Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8155": {
+"sphere": "Malicious Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8156": {
+"sphere": "Malicious Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8157": {
+"sphere": "Malicious Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8158": {
+"sphere": "Lustful Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8159": {
+"sphere": "Lustful Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8160": {
+"sphere": "Lustful Audacity",
+"cat": "Raid",
+"event": "Raid:RC6 Kielazer X5 (upgrade)",
+"key": "Harbinger's Core",
+"detail": [
+"Harbinger's Core: not on the wiki",
+"Saryn’s Robe: not on the wiki"
+],
+"ready": false
+},
+"8161": {
+"sphere": "Crystallized Tear",
+"cat": "Special event",
+"event": "Tricky Escapade",
+"key": "Salt",
+"detail": [
+"Salt: Tricky Escapade",
+"Salt: Tricky Escapade"
+],
+"ready": true
+},
+"8162": {
+"sphere": "Colorful Oval",
+"cat": "Special event",
+"event": "A Colorful Hunt",
+"key": "",
+"detail": [
+"Magic Chocolate: A Colorful Hunt (Special Event)",
+"Magic Candy Bits: A Colorful Hunt",
+"Cracked Egg: A Colorful Hunt (Special Event)"
+],
+"ready": true
+},
+"8163": {
+"sphere": "Patterned Egg",
+"cat": "Special event",
+"event": "A Colorful Hunt",
+"key": "",
+"detail": [
+"Magic Chocolate: A Colorful Hunt (Special Event)",
+"Magic Candy Bits: A Colorful Hunt",
+"Cracked Egg: A Colorful Hunt (Special Event)",
+"Gaian Carrot: A Colorful Hunt (Special Event)"
+],
+"ready": true
+},
+"8164": {
+"sphere": "Dyed Masterpiece",
+"cat": "Special event",
+"event": "A Colorful Hunt",
+"key": "",
+"detail": [
+"Magic Chocolate: A Colorful Hunt (Special Event)",
+"Magic Candy Bits: A Colorful Hunt",
+"Cracked Egg: A Colorful Hunt (Special Event)",
+"Gaian Carrot: A Colorful Hunt (Special Event)"
+],
+"ready": true
+},
+"8165": {
+"sphere": "Rainbow Carrot",
+"cat": "Special event",
+"event": "A Colorful Hunt",
+"key": "",
+"detail": [
+"Magic Chocolate: A Colorful Hunt (Special Event)",
+"Magic Candy Bits: A Colorful Hunt",
+"Cracked Egg: A Colorful Hunt (Special Event)",
+"Gaian Carrot: A Colorful Hunt (Special Event)"
+],
+"ready": true
+},
+"8870002": {
+"sphere": "Photon Sword",
+"cat": "Collaboration",
+"event": "Legends of NeoAvalon",
+"key": "",
+"detail": [
+"Photon Bot: Legends of NeoAvalon"
+],
+"ready": true
+},
+"8870004": {
+"sphere": "Arondight",
+"cat": "Raid",
+"event": "Raid Battle - Jirayen (target claws) / Raid Battle - Mistzug, Phaeton",
+"key": "",
+"detail": [
+"Demon Shard: not on the wiki",
+"Evil Eye: Raid Battle - Jirayen (target claws) · Colosseum · Stage 42, Green Chest, 2,000 CBP (1 piece) · Stage 44, Red Chest, 2,000 CBP (1 piece)",
+"Lost Claw: Raid Battle - Mistzug, Phaeton · Raid Battle - RC7 (Harvest) · Subterranean Shadow · Subterranean Shadow II"
+],
+"ready": false
+},
+"8870001": {
+"sphere": "The Grail",
+"cat": "Collaboration",
+"event": "Legends of NeoAvalon Lv. 6",
+"key": "",
+"detail": [
+"Fragment: Legends of NeoAvalon Lv. 6"
+],
+"ready": true
+},
+"8870003": {
+"sphere": "Caliburn",
+"cat": "Raid",
+"event": "Frontier Hunter / Raid Battle - Arkem (target thunder and dark parts)",
+"key": "",
+"detail": [
+"Royal Bud: Frontier Hunter · Colosseum - Stage 6, Red Chest, 100 CBP · Exchange Hall - 2,000 Merit Points (refreshes every 7 days)",
+"Calamity Core: Raid Battle - Arkem (target thunder and dark parts) · Colosseum · Stage 42, Blue Chest, 4,000 CBP (2 pieces) · Stage 46, Blue Chest, 2,000 CBP (2 pieces)",
+"Sakura Leaf: Raid Battle - Arstallie · Colosseum · Stage 41, Blue Chest, 1,000 CBP (10 pieces) · Stage 48, Green Chest, 4,000 CBP (10 pieces)"
+],
+"ready": false
+},
+"8166": {
+"sphere": "Miss Confire",
+"cat": "Collaboration",
+"event": "Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens / Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 6",
+"key": "",
+"detail": [
+"Rose Bolt: Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - All missions",
+"Love Bullet: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 6 · Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - A Revelating Survey, Explosive Brawl & A Grand Reception",
+"Pink Crystore: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 8 · Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - All missions",
+"VALIS Schematics: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 12 · Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - Dizzying Golden Locks, Explosive Brawl & A Grand Reception"
+],
+"ready": false
+},
+"8167": {
+"sphere": "Miss Travailler",
+"cat": "Collaboration",
+"event": "Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens / Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 6",
+"key": "",
+"detail": [
+"Rose Bolt: Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - All missions",
+"Love Bullet: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 6 · Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - A Revelating Survey, Explosive Brawl & A Grand Reception",
+"VALIS Schematics: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 12 · Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - Dizzying Golden Locks, Explosive Brawl & A Grand Reception",
+"Marriage Certificate: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 16 · Event Bazaar: Guilty Gear - 300 Guilty Gear Tokens · The Magnum Wedding - All missions"
+],
+"ready": false
+},
+"8168": {
+"sphere": "Nougat P08",
+"cat": "Collaboration",
+"event": "Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 6 / Brave Frontier x Guilty Gear Collaboration Log-in C",
+"key": "",
+"detail": [
+"Love Bullet: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 6 · Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - A Revelating Survey, Explosive Brawl & A Grand Reception",
+"Pink Crystore: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 8 · Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - All missions",
+"VALIS Schematics: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 12 · Event Bazaar: Guilty Gear - 200 Guilty Gear Tokens · The Magnum Wedding - Dizzying Golden Locks, Explosive Brawl & A Grand Reception",
+"Marriage Certificate: Brave Frontier x Guilty Gear Collaboration Log-in Campaign - Day 16 · Event Bazaar: Guilty Gear - 300 Guilty Gear Tokens · The Magnum Wedding - All missions"
+],
+"ready": false
+},
+"8190": {
+"sphere": "Tempest of Akachi",
+"cat": "Special event",
+"event": "Event Bazaar: Omni Arcanum - 60 Arcanum Tokens / Event Bazaar: Omni Arcanum - 35 Arcanum Tokens",
+"key": "",
+"detail": [
+"Veiled Drop: Event Bazaar: Omni Arcanum - 60 Arcanum Tokens",
+"Occult Fang: Event Bazaar: Omni Arcanum - 35 Arcanum Tokens",
+"Mystic Stone: Event Bazaar: Omni Arcanum - 50 Arcanum Tokens",
+"Psychic Eye: Event Bazaar: Omni Arcanum - 70 Arcanum Tokens"
+],
+"ready": false
+},
+"8182": {
+"sphere": "Chrome Steerwheel",
+"cat": "Collaboration",
+"event": "Desert Mayhem (Collaboration Event)",
+"key": "",
+"detail": [
+"Clockwork Device: Desert Mayhem (Collaboration Event)",
+"Fuel Cell: Desert Mayhem (Collaboration Event)",
+"Mechanical Lens: Desert Mayhem (Collaboration Event)",
+"Mysterious Gadget: Desert Mayhem (Collaboration Event)"
+],
+"ready": true
+},
+"8183": {
+"sphere": "Geared Steerwheel",
+"cat": "Collaboration",
+"event": "Desert Mayhem (Collaboration Event)",
+"key": "",
+"detail": [
+"Clockwork Device: Desert Mayhem (Collaboration Event)",
+"Fuel Cell: Desert Mayhem (Collaboration Event)",
+"Mechanical Lens: Desert Mayhem (Collaboration Event)",
+"Mysterious Gadget: Desert Mayhem (Collaboration Event)"
+],
+"ready": true
+},
+"8184": {
+"sphere": "Masked Steerwheel",
+"cat": "Collaboration",
+"event": "Desert Mayhem (Collaboration Event)",
+"key": "",
+"detail": [
+"Clockwork Device: Desert Mayhem (Collaboration Event)",
+"Fuel Cell: Desert Mayhem (Collaboration Event)",
+"Mechanical Lens: Desert Mayhem (Collaboration Event)",
+"Mysterious Gadget: Desert Mayhem (Collaboration Event)"
+],
+"ready": true
+},
+"8185": {
+"sphere": "Silver Key",
+"cat": "Collaboration",
+"event": "Fairy Tail",
+"key": "Fire Lacrima",
+"detail": [
+"Fire Lacrima: Fairy Tail (Special Event) · The Underworld (Special Event)",
+"Fire Lacrima: Fairy Tail (Special Event) · The Underworld (Special Event)",
+"Water Lacrima: not on the wiki",
+"Earth Lacrima: not on the wiki"
+],
+"ready": true
+},
+"8186": {
+"sphere": "Gold Key",
+"cat": "Collaboration",
+"event": "Fairy Tail",
+"key": "Silver Key",
+"detail": [
+"Silver Key: not on the wiki",
+"Fire Lacrima: Fairy Tail (Special Event) · The Underworld (Special Event)",
+"Earth Lacrima: not on the wiki",
+"Thunder Lacrima: not on the wiki"
+],
+"ready": false
+},
+"8187": {
+"sphere": "Diamond Key",
+"cat": "Collaboration",
+"event": "Fairy Tail",
+"key": "Gold Key",
+"detail": [
+"Gold Key: not on the wiki",
+"Fire Lacrima: Fairy Tail (Special Event) · The Underworld (Special Event)",
+"Water Lacrima: not on the wiki",
+"Earth Lacrima: not on the wiki"
+],
+"ready": false
+},
+"8188": {
+"sphere": "Book of E.N.D.",
+"cat": "Collaboration",
+"event": "Fairy Tail / The Underworld",
+"key": "",
+"detail": [
+"Fire Lacrima: Fairy Tail (Special Event) · The Underworld (Special Event)",
+"Dark Lacrima: The Underworld (Special Event)"
+],
+"ready": true
+},
+"8191": {
+"sphere": "Malevolent Charm",
+"cat": "Special event",
+"event": "Midnight Reverie / Event Bazaar: Halloween",
+"key": "",
+"detail": [
+"Mysterious Essence: Midnight Reverie",
+"Pyrite Ore: Event Bazaar: Halloween · Event Bazaar: Halloween 2018"
+],
+"ready": false
+},
+"8192": {
+"sphere": "Fairy Luck",
+"cat": "Special event",
+"event": "Winter 2017 Login Campaign - Day 2, 4, 6, 8 (12 pieces total)",
+"key": "",
+"detail": [
+"Fairy Dust: Winter 2017 Login Campaign - Day 2, 4, 6, 8 (12 pieces total) · Midwinter's Tale (Special Event)"
+],
+"ready": true
+},
+"8193": {
+"sphere": "Fairy Fortune",
+"cat": "Special event",
+"event": "Winter 2017 Login Campaign - Day 2, 4, 6, 8 (12 pieces total) / Midwinter's Tale",
+"key": "",
+"detail": [
+"Fairy Dust: Winter 2017 Login Campaign - Day 2, 4, 6, 8 (12 pieces total) · Midwinter's Tale (Special Event)",
+"Kitsu's Gift: Midwinter's Tale (Special Event)"
+],
+"ready": true
+},
+"8194": {
+"sphere": "Fairy Fate",
+"cat": "Special event",
+"event": "Winter 2017 Login Campaign - Day 2, 4, 6, 8 (12 pieces total) / Midwinter's Tale",
+"key": "",
+"detail": [
+"Fairy Dust: Winter 2017 Login Campaign - Day 2, 4, 6, 8 (12 pieces total) · Midwinter's Tale (Special Event)",
+"Kitsu's Gift: Midwinter's Tale (Special Event)"
+],
+"ready": true
+},
+"8197": {
+"sphere": "Photon Spear",
+"cat": "Raid",
+"event": "Raid Battle - Nalda Delia",
+"key": "Photon Sword",
+"detail": [
+"Photon Sword: not on the wiki",
+"Divine Gem: not on the wiki",
+"Calamity Eye: Raid Battle - Nalda Delia · Colosseum - Stage 18, Blue Chest, 300 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Jungle Hunt",
+"Shock Claw: not on the wiki"
+],
+"ready": false
+},
+"8198": {
+"sphere": "Gibbous Trinket",
+"cat": "Special event",
+"event": "Moonlight Parade",
+"key": "",
+"detail": [
+"Moonlit Essence: Moonlight Parade · Moonlight Harvest",
+"Spice Pouch: Moonlight Parade (Past Special Event) · Prosperity Brawl (Past Special Event) · Easter Madness (Special Event) · Moonlight Harvest (Special Event)",
+"Moon Bug: Moonlight Parade · Moonlight Harvest"
+],
+"ready": true
+},
+"8199": {
+"sphere": "Yue'yuan",
+"cat": "Special event",
+"event": "Brave Autumn 2018 Bazaar - 1,500 Tokens",
+"key": "",
+"detail": [
+"Lucky Crescent: Brave Autumn 2018 Bazaar - 1,500 Tokens"
+],
+"ready": false
+},
+"8200": {
+"sphere": "Vellum of Salvation",
+"cat": "Special event",
+"event": "Manor of Horrors - Master Bedroom first clear reward / Manor of Horrors",
+"key": "",
+"detail": [
+"Vellum of Curses: Manor of Horrors - Master Bedroom first clear reward",
+"Prismatic Crystallite: Manor of Horrors (Special Event)",
+"Luminous Solvent: Manor of Horrors (Special Event)"
+],
+"ready": false
+},
+"8201": {
+"sphere": "Vellum of Brilliance",
+"cat": "Special event",
+"event": "Manor of Horrors",
+"key": "",
+"detail": [
+"Prismatic Crystallite: Manor of Horrors (Special Event)",
+"Luminous Solvent: Manor of Horrors (Special Event)"
+],
+"ready": false
+},
+"8202": {
+"sphere": "Blaze Blossom",
+"cat": "Grand Quest",
+"event": "50% completion of Grand Quest: Everlasting Embrace / Grand Quest: Everlasting Embrace - 90% completion reward",
+"key": "",
+"detail": [
+"Flower of the Vale: 50% completion of Grand Quest: Everlasting Embrace",
+"Fae Blessing : Grand Quest: Everlasting Embrace - 90% completion reward"
+],
+"ready": false
+},
+"8206": {
+"sphere": "Blaze Blossom",
+"cat": "Grand Quest",
+"event": "Grand Quest: Everlasting Embrace - 90% completion reward",
+"key": "",
+"detail": [
+"Fae Blessing : Grand Quest: Everlasting Embrace - 90% completion reward"
+],
+"ready": false
+},
+"8210": {
+"sphere": "Melodious Harmony",
+"cat": "Special event",
+"event": "Event Bazaar: Winter 2018 - 2500 Tokens",
+"key": "",
+"detail": [
+"Frigid Melody: Event Bazaar: Winter 2018 - 2500 Tokens · Event Bazaar: The Longest Night - 1000 Tokens"
+],
+"ready": false
+},
+"100040": {
+"sphere": "Quintan Emerald",
+"cat": "Frontier Hunter",
+"event": "Exchange Hall - 25,000 Merit Points (refreshes monthly) / Exchange Hall - 20,000 Merit Points (refreshes monthly)",
+"key": "",
+"detail": [
+"Prized Light: Exchange Hall - 25,000 Merit Points (refreshes monthly)",
+"Prized Mercy: Exchange Hall - 20,000 Merit Points (refreshes monthly)",
+"Adaptation Jewel: Exchange Hall - 18,000 Merit Points (refreshes monthly) · Frontier Hunter Season 25 - Earn 1,700,000 Pts in Terminus",
+"Existence Jewel: Exchange Hall - 22,000 Merit Points (refreshes monthly)"
+],
+"ready": false
+},
+"8212": {
+"sphere": "Quintan Relic",
+"cat": "Achievements / Merit",
+"event": "Achievement System - Daily Challenges (Dec 6, 00:00 PST - Dec 19, 23:59 PST)",
+"key": "",
+"detail": [
+"Quintan Snowflake: Achievement System - Daily Challenges (Dec 6, 00:00 PST - Dec 19, 23:59 PST)"
+],
+"ready": false
+},
+"8213": {
+"sphere": "Kindling Melody",
+"cat": "Special event",
+"event": "One-time reward for completion of Winter Paradise",
+"key": "",
+"detail": [
+"Kindling Notes: One-time reward for completion of Winter Paradise · Of Snow and Flames · Story of Snow - A Shadowy Meeting · Story of Flames - Chasing Shadows"
+],
+"ready": true
+},
+"8214": {
+"sphere": "Excelsior Chip MK-1",
+"cat": "Special event",
+"event": "Event Bazaar: Valentines 2019 - 3000 Valentines Tokens / Glitch in the Heart - All Missions",
+"key": "",
+"detail": [
+"Broken Chip: Event Bazaar: Valentines 2019 - 3000 Valentines Tokens · Event Bazaar: Valentines 2020 - 2000 Precious Tokens",
+"Excelsior Lead: Glitch in the Heart (Special Event) - All Missions",
+"Excelsior Flux: Glitch in the Heart (Special Event) - All Missions"
+],
+"ready": false
+},
+"8215": {
+"sphere": "Excelsior Chip MK-2",
+"cat": "Special event",
+"event": "Glitch in the Heart - All Missions",
+"key": "",
+"detail": [
+"Excelsior Lead: Glitch in the Heart (Special Event) - All Missions",
+"Excelsior Flux: Glitch in the Heart (Special Event) - All Missions"
+],
+"ready": true
+},
+"8216": {
+"sphere": "Excelsior Chip MK-3",
+"cat": "Special event",
+"event": "Glitch in the Heart - All Missions",
+"key": "",
+"detail": [
+"Excelsior Lead: Glitch in the Heart (Special Event) - All Missions",
+"Excelsior Flux: Glitch in the Heart (Special Event) - All Missions"
+],
+"ready": true
+},
+"200001": {
+"sphere": "Revenant Soul",
+"cat": "Raid",
+"event": "Road to Orebus Login Campaign (Jan. 24, 00:00 PST - Feb. 12, 21:59 PST (2019)) / Orebus Paradise - First time completion",
+"key": "",
+"detail": [
+"Ashes of Orebus: Road to Orebus Login Campaign (Jan. 24, 00:00 PST - Feb. 12, 21:59 PST (2019)) · Raid Battle - RC7 · Fiend of Fire (max 6 per run) · Fiend of Fire II (max 10 per run)",
+"Proto Scale: Orebus Paradise - First time completion reward · Achievement System - Daily Challenges (Jan. 24, 00:00 PST - Feb. 6, 21:59 PST (2019)) · Raid Battle - RC7 · Hot on the Trail (max 4 per run)"
+],
+"ready": false
+},
+"200002": {
+"sphere": "Giselle's Kiss",
+"cat": "Raid",
+"event": "Road to Orebus Login Campaign (Jan. 24, 00:00 PST - Feb. 12, 21:59 PST (2019)) / Raid Battle - RC7 (Revenant - Left Fist",
+"key": "",
+"detail": [
+"Ashes of Orebus: Road to Orebus Login Campaign (Jan. 24, 00:00 PST - Feb. 12, 21:59 PST (2019)) · Raid Battle - RC7 · Fiend of Fire (max 6 per run) · Fiend of Fire II (max 10 per run)",
+"Cloudweave: Raid Battle - RC7 (Revenant - Left Fist, Right Fist) · Fiend of Fire (max 4 per run) · Fiend of Fire II (max 8 per run) · Tidal Terror (max 4 per run)"
+],
+"ready": false
+},
+"200003": {
+"sphere": "Dragonbane",
+"cat": "Raid",
+"event": "Orebus Paradise - First time completion reward",
+"key": "",
+"detail": [
+"Proto Scale: Orebus Paradise - First time completion reward · Achievement System - Daily Challenges (Jan. 24, 00:00 PST - Feb. 6, 21:59 PST (2019)) · Raid Battle - RC7 · Hot on the Trail (max 4 per run)"
+],
+"ready": false
+},
+"200004": {
+"sphere": "Seventy-two Forms",
+"cat": "Raid",
+"event": "Raid Battle - RC7 (Revenant - Left Fist, Right Fist)",
+"key": "",
+"detail": [
+"Cloudweave: Raid Battle - RC7 (Revenant - Left Fist, Right Fist) · Fiend of Fire (max 4 per run) · Fiend of Fire II (max 8 per run) · Tidal Terror (max 4 per run)",
+"Soul Splendor: not on the wiki"
+],
+"ready": false
+},
+"200009": {
+"sphere": "Hachiman Blade",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Fire Missions (Revenant - Main Body)",
+"key": "",
+"detail": [
+"Orebi Emberstone: Raid Battle - RC7: Fire Missions (Revenant - Main Body) · Hot on the Trail (max 2 per run) · Fiend of Fire (max 4 per run) · Fiend of Fire II (max 6 per run)"
+],
+"ready": false
+},
+"200010": {
+"sphere": "Hachiman Song",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Fire Missions (Revenant - Right Fist)",
+"key": "",
+"detail": [
+"Inferno Omphalos: Raid Battle - RC7: Fire Missions (Revenant - Right Fist) · Hot on the Trail (max 2 per run) · Fiend of Fire (max 6 per run) · Fiend of Fire II (max 10 per run)"
+],
+"ready": false
+},
+"200021": {
+"sphere": "Réparatrice",
+"cat": "Raid",
+"event": "Event Bazaar: Raid Battle - 2000 Orebi Shards / Event Bazaar: Raid Battle - 100 Orebi Shards",
+"key": "",
+"detail": [
+"Karcosan Plume: Event Bazaar: Raid Battle - 2000 Orebi Shards",
+"Lead Feather: Event Bazaar: Raid Battle - 100 Orebi Shards"
+],
+"ready": false
+},
+"8203": {
+"sphere": "Corrupted Blossom",
+"cat": "Grand Quest",
+"event": "50% completion of Grand Quest: Everlasting Embrace / Grand Quest: Everlasting Embrace - 90% completion reward",
+"key": "",
+"detail": [
+"Flower of the Vale: 50% completion of Grand Quest: Everlasting Embrace",
+"Void Stone: Grand Quest: Everlasting Embrace - 90% completion reward"
+],
+"ready": false
+},
+"8204": {
+"sphere": "Blaze Blossom EX",
+"cat": "Grand Quest",
+"event": "Grand Quest: Everlasting Embrace",
+"key": "",
+"detail": [
+"Fae Blazing: Grand Quest: Everlasting Embrace"
+],
+"ready": false
+},
+"8205": {
+"sphere": "Corrupted Blossom EX",
+"cat": "Grand Quest",
+"event": "Grand Quest: Everlasting Embrace",
+"key": "",
+"detail": [
+"Void Gem: Grand Quest: Everlasting Embrace"
+],
+"ready": false
+},
+"100039": {
+"sphere": "Chrysalis Zeta",
+"cat": "Frontier Hunter",
+"event": "Obtain from Frontier Hunter with HR 150 / Obtain from Frontier Hunter with HR 156",
+"key": "",
+"detail": [
+"Chrysalis Alpha: Obtain from Frontier Hunter with HR 150",
+"Chrysalis Omega: Obtain from Frontier Hunter with HR 156"
+],
+"ready": false
+},
+"200011": {
+"sphere": "Vision",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Water Missions (Revenant - Main Body)",
+"key": "",
+"detail": [
+"Orebi Cryostone: Raid Battle - RC7: Water Missions (Revenant - Main Body) · Slippery Spoor (max 2 per run) · Tidal Terror (max 4 per run) · Tidal Terror II (max 6 per run)"
+],
+"ready": false
+},
+"200012": {
+"sphere": "Providence",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Water Missions (Revenant - Right Fist)",
+"key": "",
+"detail": [
+"Blizzard Omphalos: Raid Battle - RC7: Water Missions (Revenant - Right Fist) · Slippery Spoor (max 2 per run) · Tidal Terror (max 6 per run) · Tidal Terror II (max 10 per run)"
+],
+"ready": false
+},
+"8195": {
+"sphere": "Photon Scepter",
+"cat": "Collaboration",
+"event": "Legends of NeoAvalon (upgrade)",
+"key": "Photon Sword",
+"detail": [
+"Photon Sword: not on the wiki",
+"God Sword: not on the wiki",
+"Blaze Pearl: not on the wiki",
+"Blaze Pelt: not on the wiki"
+],
+"ready": false
+},
+"8196": {
+"sphere": "Cursed Photon Rod",
+"cat": "Raid",
+"event": "Raid Battle - Mistzug",
+"key": "Photon Sword",
+"detail": [
+"Photon Sword: not on the wiki",
+"Health Charm: not on the wiki",
+"Phantom Eye: Raid Battle - Mistzug · Colosseum - Stage 17, Red Chest, 1000 CBP (2 pieces) · Raid Battle - RC7 (Harvest) · Subterranean Shadow",
+"Heth Feather: not on the wiki"
+],
+"ready": false
+},
+"200013": {
+"sphere": "Living Armor",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Earth Missions (Revenant - Main Body)",
+"key": "",
+"detail": [
+"Orebi Galestone: Raid Battle - RC7: Earth Missions (Revenant - Main Body) · Jungle Hunt (max 2 per run) · Subterranean Shadow (max 4 per run) · Subterranean Shadow II (max 6 per run)"
+],
+"ready": false
+},
+"200014": {
+"sphere": "Resolute Carapace",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Earth Missions (Revenant - Right Fist)",
+"key": "",
+"detail": [
+"Gaia Omphalos: Raid Battle - RC7: Earth Missions (Revenant - Right Fist) · Jungle Hunt (max 2 per run) · Subterranean Shadow (max 6 per run) · Subterranean Shadow II (max 10 per run)"
+],
+"ready": false
+},
+"200022": {
+"sphere": "Czorag's Malice",
+"cat": "Raid",
+"event": "Event Bazaar: Raid Battle - 2000 Orebi Shards / Event Bazaar: Raid Battle - 100 Orebi Shards",
+"key": "",
+"detail": [
+"Hellfire Grapnel: Event Bazaar: Raid Battle - 2000 Orebi Shards",
+"Hellfire Cartilage: Event Bazaar: Raid Battle - 100 Orebi Shards"
+],
+"ready": false
+},
+"200015": {
+"sphere": "Beiorg's Armor Mk II",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Thunder Missions (Revenant - Main Body)",
+"key": "",
+"detail": [
+"Orebi Sparkstone: Raid Battle - RC7: Thunder Missions (Revenant - Main Body) · Chasing Storms (max 2 per run) · Thundering Tyrant (max 4 per run) · Thundering Tyrant II (max 6 per run)"
+],
+"ready": false
+},
+"200016": {
+"sphere": "Beiorg's Armor Mk V",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Thunder Missions (Revenant - Right Fist)",
+"key": "",
+"detail": [
+"Storm Omphalos: Raid Battle - RC7: Thunder Missions (Revenant - Right Fist) · Chasing Storms (max 2 per run) · Thundering Tyrant (max 6 per run) · Thundering Tyrant II (max 10 per run)"
+],
+"ready": false
+},
+"200017": {
+"sphere": "Mora's Bane",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Light Missions (Revenant - Main Body)",
+"key": "",
+"detail": [
+"Orebi Gleamstone: Raid Battle - RC7: Light Missions (Revenant - Main Body) · Lightfinder (max 2 per run) · Shattered Sentinel (max 4 per run) · Shattered Sentinel II (max 6 per run)"
+],
+"ready": false
+},
+"200018": {
+"sphere": "Primal Desire",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Light Missions (Revenant - Right Fist)",
+"key": "",
+"detail": [
+"Dawn Omphalos: Raid Battle - RC7: Light Missions (Revenant - Right Fist) · Lightfinder (max 2 per run) · Shattered Sentinel (max 6 per run) · Shattered Sentinel II (max 10 per run)"
+],
+"ready": false
+},
+"200023": {
+"sphere": "Katerin's Torment",
+"cat": "Raid",
+"event": "Event Bazaar: Raid Battle - 2000 Orebi Shards / Event Bazaar: Raid Battle - 100 Orebi Shards",
+"key": "",
+"detail": [
+"Tears of Innocence: Event Bazaar: Raid Battle - 2000 Orebi Shards",
+"Grain of Sin: Event Bazaar: Raid Battle - 100 Orebi Shards"
+],
+"ready": false
+},
+"200019": {
+"sphere": "Bulwark of Menon",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Dark Missions (Revenant - Main Body)",
+"key": "",
+"detail": [
+"Orebi Gloomstone: Raid Battle - RC7: Dark Missions (Revenant - Main Body) · Piercing the Gloom (max 2 per run) · Devil in the Dark (max 4 per run) · Devil in the Dark II (max 6 per run)"
+],
+"ready": false
+},
+"200020": {
+"sphere": "Thousand Mimics",
+"cat": "Raid",
+"event": "Raid Battle - RC7: Dark Missions (Revenant - Right Fist)",
+"key": "",
+"detail": [
+"Dusk Omphalos: Raid Battle - RC7: Dark Missions (Revenant - Right Fist) · Piercing the Gloom (max 2 per run) · Devil in the Dark (max 6 per run) · Devil in the Dark II (max 10 per run)"
+],
+"ready": false
+},
+"8217": {
+"sphere": "Yata's Mirror",
+"cat": "Collaboration",
+"event": "Event Bazaar: The King of Fighters - 500 Tokens / Event Bazaar: The King of Fighters - 100 Tokens",
+"key": "",
+"detail": [
+"Orochi's Opal: Event Bazaar: The King of Fighters - 500 Tokens · Ascension of Orochi (Special Event) · Gaia's Will · Hakkesshu",
+"Sacred Regalia: Event Bazaar: The King of Fighters - 100 Tokens · Royal Rumble (Special Event) · The Sun and The Moon Lv. 2 · Legacy of Kagura Lv. 2",
+"Sacred Jadestones: Event Bazaar: The King of Fighters - 100 Tokens · Royal Rumble (Special Event) · The Sun and The Moon Lv. 2 · Legacy of Kagura Lv. 2"
+],
+"ready": true
+},
+"8218": {
+"sphere": "Yasakani Jewel",
+"cat": "Collaboration",
+"event": "Event Bazaar: The King of Fighters - 500 Tokens / Event Bazaar: The King of Fighters - 100 Tokens",
+"key": "",
+"detail": [
+"Orochi's Opal: Event Bazaar: The King of Fighters - 500 Tokens · Ascension of Orochi (Special Event) · Gaia's Will · Hakkesshu",
+"Sacred Regalia: Event Bazaar: The King of Fighters - 100 Tokens · Royal Rumble (Special Event) · The Sun and The Moon Lv. 2 · Legacy of Kagura Lv. 2",
+"Sacred Jadestones: Event Bazaar: The King of Fighters - 100 Tokens · Royal Rumble (Special Event) · The Sun and The Moon Lv. 2 · Legacy of Kagura Lv. 2"
+],
+"ready": true
+},
+"8219": {
+"sphere": "Kusanagi Sword",
+"cat": "Collaboration",
+"event": "Event Bazaar: The King of Fighters - 500 Tokens / Event Bazaar: The King of Fighters - 100 Tokens",
+"key": "",
+"detail": [
+"Orochi's Opal: Event Bazaar: The King of Fighters - 500 Tokens · Ascension of Orochi (Special Event) · Gaia's Will · Hakkesshu",
+"Sacred Regalia: Event Bazaar: The King of Fighters - 100 Tokens · Royal Rumble (Special Event) · The Sun and The Moon Lv. 2 · Legacy of Kagura Lv. 2",
+"Sacred Jadestones: Event Bazaar: The King of Fighters - 100 Tokens · Royal Rumble (Special Event) · The Sun and The Moon Lv. 2 · Legacy of Kagura Lv. 2"
+],
+"ready": true
+},
+"200024": {
+"sphere": "Victory Chant",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"200025": {
+"sphere": "Lament of Dread",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"200026": {
+"sphere": "Resolute Silence",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"200027": {
+"sphere": "Thrilling Harmony",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"200028": {
+"sphere": "Fleeting Ballad",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"200029": {
+"sphere": "Requiem of Regret",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"200030": {
+"sphere": "Formless Chroma",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"200031": {
+"sphere": "Hakuzo's Deceit",
+"cat": "Raid",
+"event": "Event Bazaar: Raid Battle - 2000 Orebi Shards / Event Bazaar: Raid Battle - 100 Orebi Shards",
+"key": "",
+"detail": [
+"Replica Trinket: Event Bazaar: Raid Battle - 2000 Orebi Shards",
+"Ruse Scrap: Event Bazaar: Raid Battle - 100 Orebi Shards"
+],
+"ready": false
+},
+"8221": {
+"sphere": "Vrána's Calling",
+"cat": "Raid",
+"event": "Event Bazaar: Raid Battle - 2000 Orebi Shards / Event Bazaar: Raid Battle - 100 Orebi Shards",
+"key": "",
+"detail": [
+"Royal Pinion: Event Bazaar: Raid Battle - 2000 Orebi Shards",
+"Crowsgrip: Event Bazaar: Raid Battle - 100 Orebi Shards"
+],
+"ready": false
+},
+"8222": {
+"sphere": "Tarok's Bloodlust",
+"cat": "Raid",
+"event": "Event Bazaar: Raid Battle - 100 Orebi Shards / Event Bazaar: Raid Battle - 2000 Orebi Shards",
+"key": "",
+"detail": [
+"Ritual Bone: Event Bazaar: Raid Battle - 100 Orebi Shards",
+"Grave Gold: Event Bazaar: Raid Battle - 2000 Orebi Shards"
+],
+"ready": false
+},
+"8207": {
+"sphere": "Corrupted Blossom",
+"cat": "Grand Quest",
+"event": "Grand Quest: Everlasting Embrace - 90% completion reward",
+"key": "",
+"detail": [
+"Void Stone: Grand Quest: Everlasting Embrace - 90% completion reward"
+],
+"ready": false
+},
+"8239": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Uncharted Frontier - Middle MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00 P",
+"key": "",
+"detail": [
+"Death Sword: Frontier Hunter - Uncharted Frontier - Middle MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8240": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Uncharted Frontier - End MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00 PST ",
+"key": "",
+"detail": [
+"Chaos Sword: Frontier Hunter - Uncharted Frontier - End MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8241": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Spark MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PS",
+"key": "",
+"detail": [
+"Spark Geyser: Frontier Hunter - Spark MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8242": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Overkill MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59",
+"key": "",
+"detail": [
+"Over Killer: Frontier Hunter - Overkill MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8243": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Multi-Kill MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:",
+"key": "",
+"detail": [
+"Multi Slayer: Frontier Hunter - Multi-Kill MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8244": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - BB Kill MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 ",
+"key": "",
+"detail": [
+"Burst King: Frontier Hunter - BB Kill MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8245": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - 1 Turn Kill MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23",
+"key": "",
+"detail": [
+"Speed Star: Frontier Hunter - 1 Turn Kill MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8246": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Participation MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, ",
+"key": "",
+"detail": [
+"Challenger: Frontier Hunter - Participation MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8247": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Helper MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 P",
+"key": "",
+"detail": [
+"Ally Savior: Frontier Hunter - Helper MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8248": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Uncharted Frontier - Entrance MVP Reward / Event reward for clearing Dichroma Chaos from May 02, 00:00",
+"key": "",
+"detail": [
+"Heaven Sword: Frontier Hunter - Uncharted Frontier - Entrance MVP Reward",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8249": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Uncharted Frontier - Terminus MVP / Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to",
+"key": "",
+"detail": [
+"Abyss Sword: Frontier Hunter - Uncharted Frontier - Terminus MVP",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8250": {
+"sphere": "Noel's Experiment",
+"cat": "Frontier Hunter",
+"event": "Frontier Hunter - Rank 1 Reward",
+"key": "",
+"detail": [
+"God Hunter: Frontier Hunter - Rank 1 Reward"
+],
+"ready": false
+},
+"8251": {
+"sphere": "Victory Roar",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8252": {
+"sphere": "Dirge of Dread",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8253": {
+"sphere": "Absolute Silence",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8254": {
+"sphere": "Joyous Harmony",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8255": {
+"sphere": "Eternal Ballad",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8256": {
+"sphere": "Elegy of Regret",
+"cat": "Special event",
+"event": "Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019)",
+"key": "",
+"detail": [
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens"
+],
+"ready": false
+},
+"8006": {
+"sphere": "Advent Solace",
+"cat": "Special event",
+"event": "First time reward for completing Lv. 2 and 3 of Winter Glades / Reward for first time completion for Level 4 of Winter G",
+"key": "",
+"detail": [
+"Frozen Heart: First time reward for completing Lv. 2 and 3 of Winter Glades (Special Event)",
+"Frozen Soul: Reward for first time completion for Level 4 of Winter Glades (Special Event)",
+"Snow Gemstone: Winter Glades Blitz (Special Event) · Glittering Wintertide (Special Event) · Jubilant Jingles (Special Event)",
+"Aspiration Stone: One-time giveaway in Presents Box on Jan 6 and Dec 23, 2015 PST · Achievement System - 2000 Merit Points, can only be exchanged up to 3 times"
+],
+"ready": false
+},
+"8007": {
+"sphere": "Auspicious Lion Charm",
+"cat": "Special event",
+"event": "First clear reward of Longevity Scuffle (Lv. 3) . / Moonlight Parade",
+"key": "",
+"detail": [
+"Embroidered Ball: First clear reward of Longevity Scuffle (Lv. 3) . · Guild Exchange Hall - 3500 Guild Tokens (only available if sold previously)",
+"Miracle Drop: Moonlight Parade (Past Special Event) · Prosperity Brawl (Special Event) - Lv. 2 & 3 · Easter Madness - Lv. 1, 2, 3, & 4",
+"Prosperity Essence: Prosperity Brawl (Special Event)",
+"Longevity Dew: Prosperity Brawl (Special Event)"
+],
+"ready": false
+},
+"8008": {
+"sphere": "Paskuan Enhancer",
+"cat": "Special event",
+"event": "First clear reward from Easter Fanfare Lv. 3 / Moonlight Parade",
+"key": "",
+"detail": [
+"Lilium : First clear reward from Easter Fanfare Lv. 3",
+"Miracle Drop: Moonlight Parade (Past Special Event) · Prosperity Brawl (Special Event) - Lv. 2 & 3 · Easter Madness - Lv. 1, 2, 3, & 4",
+"Rabbit's Foot: Easter Madness (Special Event) - Lv. 1,2, 3, & 4",
+"Ascension Bell: Easter Madness (Special Event) - Lv. 1, 2, 3, & 4"
+],
+"ready": false
+},
+"8999": {
+"sphere": "Bravest Blade",
+"cat": "Special event",
+"event": "Burny & Friends UNLEASHED",
+"key": "",
+"detail": [
+"Jem: Burny & Friends UNLEASHED · First clear reward for completing Burny & Friends UNLEASHED Lv.2 · Tricky Escapade (Special Event)"
+],
+"ready": true
+},
+"4": {
+"sphere": "Mystic Lantern",
+"cat": "Special event",
+"event": "Moonlight Parade : Moonlight Dance Lv. 3 - First Clear Reward / Harvesting in Town 's Mountain",
+"key": "",
+"detail": [
+"Undying Flame: Moonlight Parade : Moonlight Dance Lv. 3 - First Clear Reward",
+"Red Pelt: Harvesting in Town 's Mountain · St. Lamia - Mt. Craylia - The Mountain-Dwelling Devil: Rantoul, Verica"
+],
+"ready": false
+},
+"8023": {
+"sphere": "Lop Blessing",
+"cat": "Special event",
+"event": "First clear reward from Easter Fanfare Lv. 4 / Chance to drop from chests in Easter Fanfare Lv. 4",
+"key": "",
+"detail": [
+"Chromatic Blossom: First clear reward from Easter Fanfare Lv. 4",
+"Choco Bunny: Chance to drop from chests in Easter Fanfare Lv. 4",
+"Rabbit's Foot: Easter Madness (Special Event) - Lv. 1,2, 3, & 4",
+"Ascension Bell: Easter Madness (Special Event) - Lv. 1, 2, 3, & 4"
+],
+"ready": false
+},
+"8223": {
+"sphere": "Crescent of Khons",
+"cat": "Grand Quest",
+"event": "Burden of Aesys",
+"key": "",
+"detail": [
+"Shattered Faith: Burden of Aesys · Path of Devotion · In Sickness and In Death · Path of Valor"
+],
+"ready": true
+},
+"8224": {
+"sphere": "Harmony of Khons",
+"cat": "Grand Quest",
+"event": "Burden of Aesys",
+"key": "",
+"detail": [
+"Amulet of Renewal: Burden of Aesys · Path of Devotion · The Doom of Love · Path of Valor",
+"Shattered Faith: Burden of Aesys · Path of Devotion · In Sickness and In Death · Path of Valor"
+],
+"ready": true
+},
+"8225": {
+"sphere": "Blessing of Khons",
+"cat": "Grand Quest",
+"event": "Burden of Aesys",
+"key": "",
+"detail": [
+"Glittersand: Burden of Aesys · Redemption of Osiris",
+"Enveloping Grief: Burden of Aesys · Path of Devotion · A Wife's Pain · Path of Valor",
+"Amulet of Renewal: Burden of Aesys · Path of Devotion · The Doom of Love · Path of Valor"
+],
+"ready": false
+},
+"8226": {
+"sphere": "Miracle of Khons",
+"cat": "Grand Quest",
+"event": "Burden of Aesys",
+"key": "",
+"detail": [
+"Glittersand: Burden of Aesys · Redemption of Osiris",
+"Enveloping Grief: Burden of Aesys · Path of Devotion · A Wife's Pain · Path of Valor"
+],
+"ready": false
+},
+"8227": {
+"sphere": "Word of Athum",
+"cat": "Grand Quest",
+"event": "Amduat / Burden of Aesys",
+"key": "",
+"detail": [
+"Scribesblood: Amduat · Mysteries of the Gods · The First Truth · Shadowed Sun",
+"Shattered Faith: Burden of Aesys · Path of Devotion · In Sickness and In Death · Path of Valor"
+],
+"ready": true
+},
+"8228": {
+"sphere": "Cunei of Athum",
+"cat": "Grand Quest",
+"event": "Amduat / Burden of Aesys",
+"key": "",
+"detail": [
+"Arcane Remnant: Amduat · Night Falls",
+"Glittersand: Burden of Aesys · Redemption of Osiris",
+"Scribesblood: Amduat · Mysteries of the Gods · The First Truth · Shadowed Sun"
+],
+"ready": false
+},
+"8229": {
+"sphere": "Iridescent Hope",
+"cat": "Grand Quest",
+"event": "[Hard] The Savage Lion",
+"key": "",
+"detail": [
+"Starburst Dust: [Hard] The Savage Lion"
+],
+"ready": false
+},
+"8230": {
+"sphere": "Sha of Neith",
+"cat": "Grand Quest",
+"event": "Traversing Eternity / Amduat",
+"key": "",
+"detail": [
+"Oculus of Truth: Traversing Eternity · An Uneasy Reunion · Burning Dread",
+"Scribesblood: Amduat · Mysteries of the Gods · The First Truth · Shadowed Sun",
+"Shattered Faith: Burden of Aesys · Path of Devotion · In Sickness and In Death · Path of Valor"
+],
+"ready": true
+},
+"8231": {
+"sphere": "Paradox of Neith",
+"cat": "Grand Quest",
+"event": "Traversing Eternity / Burden of Aesys",
+"key": "",
+"detail": [
+"Oculus of Truth: Traversing Eternity · An Uneasy Reunion · Burning Dread",
+"Glittersand: Burden of Aesys · Redemption of Osiris",
+"Arcane Remnant: Amduat · Night Falls",
+"Blood Soil: Traversing Eternity · Fates in Our Hands"
+],
+"ready": false
+},
+"8232": {
+"sphere": "Divine Master Gate",
+"cat": "Raid",
+"event": "Reward for collecting Sky Orb , Heaven's Edge , Daltisk Phenomenon , Yggdrasil Edict , Ragnarok Edict , and Heaven-Binde",
+"key": "",
+"detail": [
+"Divine Master Key: Reward for collecting Sky Orb , Heaven's Edge , Daltisk Phenomenon , Yggdrasil Edict , Ragnarok Edict , and Heaven-Binder · Only obtainable once per account",
+"Seventh Element: Frontier Hunter - Hunter Rank 200",
+"Whispering Shard: Event reward for clearing Dichroma Chaos from May 02, 00:00 PST to May 13, 23:59 PST (2019) · Event Bazaar: Exalted - 25 Exalted Tokens",
+"Soul Splendor: not on the wiki"
+],
+"ready": false
+},
+"8233": {
+"sphere": "Grand Cloak",
+"cat": "Grand Quest",
+"event": "[Hard] The Curse Master",
+"key": "",
+"detail": [
+"Champion's Thread: [Hard] The Curse Master"
+],
+"ready": false
+},
+"8234": {
+"sphere": "Atar Unburning",
+"cat": "Grand Quest",
+"event": "Event Bazaar: Brave Winter 2019 / Eternal Night - Facing Darkness",
+"key": "",
+"detail": [
+"Zartosht Blessing: Event Bazaar: Brave Winter 2019",
+"Bronze Ingot: Eternal Night - Facing Darkness"
+],
+"ready": false
+},
+"8235": {
+"sphere": "Atar Eternal",
+"cat": "Grand Quest",
+"event": "Chasing Dawn - Rising Dawn",
+"key": "",
+"detail": [
+"Holy Kindling: Chasing Dawn - Rising Dawn"
+],
+"ready": true
+},
+"8236": {
+"sphere": "Lad Mirazh",
+"cat": "Grand Quest",
+"event": "[Hard] The Warmonger",
+"key": "",
+"detail": [
+"Demon Ore: [Hard] The Warmonger"
+],
+"ready": false
+},
+"8208": {
+"sphere": "Blaze Blossom",
+"cat": "Grand Quest",
+"event": "Grand Quest: Everlasting Embrace",
+"key": "",
+"detail": [
+"Fae Blazing: Grand Quest: Everlasting Embrace"
+],
+"ready": false
+},
+"8209": {
+"sphere": "Corrupted Blossom",
+"cat": "Grand Quest",
+"event": "Grand Quest: Everlasting Embrace",
+"key": "",
+"detail": [
+"Void Gem: Grand Quest: Everlasting Embrace"
+],
+"ready": false
+},
+"8237": {
+"sphere": "Blaze Blossom",
+"cat": "Grand Quest",
+"event": "Grand Quest: Everlasting Embrace - 90% completion reward",
+"key": "",
+"detail": [
+"Fae Blessing : Grand Quest: Everlasting Embrace - 90% completion reward"
+],
+"ready": false
+},
+"8238": {
+"sphere": "Corrupted Blossom",
+"cat": "Grand Quest",
+"event": "Grand Quest: Everlasting Embrace - 90% completion reward",
+"key": "",
+"detail": [
+"Void Stone: Grand Quest: Everlasting Embrace - 90% completion reward"
+],
+"ready": false
+},
+"20040": {
+"sphere": "Vash's Angel Arm",
+"cat": "Raid",
+"event": "Event Bazaar: Trigun Collaboration - 7000 & 1000 Tokens / Legato Bluesummers - First Clear Reward",
+"key": "",
+"detail": [
+"Silver AGL .45 Colt: Event Bazaar: Trigun Collaboration - 7000 & 1000 Tokens",
+"Hi-Spec Powder: Legato Bluesummers - First Clear Reward · Raid Battle · Chasing Legato [Solo] (max 1 per run) · Legato Cornered! [Up to 4 players] (max 3 per run)",
+"Crate of Hi-Spec Parts: Legato Bluesummers - First Clear Reward · Raid Battle · Chasing Legato [Solo] (max 1 per run) · Legato Cornered! [Up to 4 players] (max 3 per run)"
+],
+"ready": false
+},
+"20041": {
+"sphere": "The Punisher",
+"cat": "Raid",
+"event": "Event Bazaar: Trigun Collaboration - 7000 & 1000 Tokens / Legato Bluesummers - First Clear Reward",
+"key": "",
+"detail": [
+"Grader 2043.45: Event Bazaar: Trigun Collaboration - 7000 & 1000 Tokens",
+"Hi-Spec Powder: Legato Bluesummers - First Clear Reward · Raid Battle · Chasing Legato [Solo] (max 1 per run) · Legato Cornered! [Up to 4 players] (max 3 per run)",
+"Crate of Hi-Spec Parts: Legato Bluesummers - First Clear Reward · Raid Battle · Chasing Legato [Solo] (max 1 per run) · Legato Cornered! [Up to 4 players] (max 3 per run)"
+],
+"ready": false
+},
+"20042": {
+"sphere": "Knives' Angel Arm",
+"cat": "Raid",
+"event": "Event Bazaar: Trigun Collaboration - 7000 & 1000 Tokens / Legato Bluesummers - First Clear Reward",
+"key": "",
+"detail": [
+"Dark AGL .45 Colt: Event Bazaar: Trigun Collaboration - 7000 & 1000 Tokens",
+"Hi-Spec Powder: Legato Bluesummers - First Clear Reward · Raid Battle · Chasing Legato [Solo] (max 1 per run) · Legato Cornered! [Up to 4 players] (max 3 per run)",
+"Crate of Hi-Spec Parts: Legato Bluesummers - First Clear Reward · Raid Battle · Chasing Legato [Solo] (max 1 per run) · Legato Cornered! [Up to 4 players] (max 3 per run)"
+],
+"ready": false
+},
+"20050": {
+"sphere": "Sisters' Fury",
+"cat": "Grand Quest",
+"event": "[Hard] Chilling Beauties",
+"key": "",
+"detail": [
+"Frigid Fang: [Hard] Chilling Beauties"
+],
+"ready": false
+},
+"20051": {
+"sphere": "The Silver Blade",
+"cat": "Grand Quest",
+"event": "[Hard] The Silver Knight",
+"key": "",
+"detail": [
+"Silver Ore: [Hard] The Silver Knight"
+],
+"ready": false
+},
+"20052": {
+"sphere": "Sun Cuore's Will",
+"cat": "Grand Quest",
+"event": "[Hard] The Scorching Blade",
+"key": "",
+"detail": [
+"Sun's Tear: [Hard] The Scorching Blade"
+],
+"ready": false
+},
+"20053": {
+"sphere": "Iron Justice",
+"cat": "Grand Quest",
+"event": "[Hard] The Fighting Nun",
+"key": "",
+"detail": [
+"Chain Wristlet: [Hard] The Fighting Nun"
+],
+"ready": false
+},
+"20054": {
+"sphere": "Luminous Core",
+"cat": "Unknown",
+"event": "not on the wiki",
+"key": "",
+"detail": [
+"Memory Fragment: not on the wiki"
+],
+"ready": false
+},
+"8257": {
+"sphere": "Serenity",
+"cat": "Grand Quest",
+"event": "Grand Quest: Liminal End - Episode 12",
+"key": "",
+"detail": [
+"Liminal End: not on the wiki",
+"Kranus's Spark: Grand Quest: Liminal End - Episode 12"
+],
+"ready": false
+},
+"8258": {
+"sphere": "Freedom",
+"cat": "Grand Quest",
+"event": "Grand Quest: Liminal End - Episode 12",
+"key": "",
+"detail": [
+"Liminal End: not on the wiki",
+"S'eljah's Crown: Grand Quest: Liminal End - Episode 12"
+],
+"ready": false
+},
+"8259": {
+"sphere": "Serenity",
+"cat": "Grand Quest",
+"event": "Grand Quest: Liminal End - Episode 12",
+"key": "",
+"detail": [
+"Kranus's Spark: Grand Quest: Liminal End - Episode 12"
+],
+"ready": false
+},
+"8260": {
+"sphere": "Freedom",
+"cat": "Grand Quest",
+"event": "Grand Quest: Liminal End - Episode 12",
+"key": "",
+"detail": [
+"S'eljah's Crown: Grand Quest: Liminal End - Episode 12"
+],
+"ready": false
+},
+"20055": {
+"sphere": "Omni Star",
+"cat": "Special event",
+"event": "Event Bazaar: 7th Anniversary - 100 Tokens",
+"key": "",
+"detail": [
+"Courage Stone: Event Bazaar: 7th Anniversary - 100 Tokens",
+"Wisdom Stone: Event Bazaar: 7th Anniversary - 100 Tokens",
+"Endurance Stone: Event Bazaar: 7th Anniversary - 100 Tokens",
+"Fortune Stone: Event Bazaar: 7th Anniversary - 100 Tokens"
+],
+"ready": false
+},
+"20056": {
+"sphere": "Sheriff's Bell",
+"cat": "Grand Quest",
+"event": "[Hard] The Righteous Sheriff",
+"key": "",
+"detail": [
+"Joltstone: [Hard] The Righteous Sheriff"
+],
+"ready": false
+},
+"20057": {
+"sphere": "Woolie",
+"cat": "Special event",
+"event": "Event Bazaar: Brave Winter 2020 - 1500 Stray Pages Tokens",
+"key": "",
+"detail": [
+"Red Fluff: Event Bazaar: Brave Winter 2020 - 1500 Stray Pages Tokens",
+"Blue Fuzz: not on the wiki"
+],
+"ready": false
+}
+}

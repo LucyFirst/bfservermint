@@ -957,15 +957,48 @@ def facility_recipes(pl):
             out += [x for x in str(r.get('rGoJ6Ty9') or '').split(',') if x in _RECIPE_IDS]
     return list(dict.fromkeys(out))
 
+# Sphere House recipes the game lists from level 1 that come from events, Raid, Guild, Frontier Hunter...
+# (data/sphere_recipe_sources.json: recipe -> sphere, source group, event, from the wiki). They are hidden
+# until the admin page switches them on (settings 'sphere_on'); the Sphere House's own level-up recipes
+# and the story / town harvest ones are always there.
+SPHERE_SOURCES_FILE = os.path.join(HERE, 'data', 'sphere_recipe_sources.json')
+try:
+    SPHERE_SOURCES = json.load(open(SPHERE_SOURCES_FILE, encoding='utf-8'))
+except (OSError, ValueError):
+    SPHERE_SOURCES = {}
+SPHERE_ALWAYS = 'Town & story'
+
+def recipe_hidden(rid, on=None):
+    s = SPHERE_SOURCES.get(str(rid))
+    if not s or s.get('cat') == SPHERE_ALWAYS:
+        return False
+    return str(rid) not in (on if on is not None else set(admin_settings().get('sphere_on', ())))
+
 def ensure_recipes(pl):
+    on = set(admin_settings().get('sphere_on', ()))
+    hidden = lambda rid: recipe_hidden(rid, on)
     mine = [r for r in _rows(pl['state'].get(G_RECIPES)) if isinstance(r, dict)]
+    # switched off on the admin page: out of the player's list (kept aside with its craft count)
+    hid = pl.setdefault('recipes_hidden', {})
+    keep, moved = [], 0
+    for r in mine:
+        rid = str(r.get('4HqhTf3a'))
+        if hidden(rid):
+            hid[rid] = r
+            moved += 1
+        else:
+            keep.append(r)
+    back = [hid.pop(rid) for rid in list(hid) if not hidden(rid)]
+    mine = keep + back
     have = {str(r.get('4HqhTf3a')) for r in mine}
-    add = [dict(r, H6k1LIxC='0') for r in all_recipes() if str(r['4HqhTf3a']) not in have]
+    add = [dict(r, H6k1LIxC='0') for r in all_recipes()
+           if str(r['4HqhTf3a']) not in have and not hidden(r['4HqhTf3a'])]
     have |= {str(r['4HqhTf3a']) for r in add}
-    add += [{'4HqhTf3a': x, 'H6k1LIxC': '0', 'VDKB0Y5h': '-1'} for x in facility_recipes(pl) if x not in have]
-    if add:
+    add += [{'4HqhTf3a': x, 'H6k1LIxC': '0', 'VDKB0Y5h': '-1'} for x in facility_recipes(pl)
+            if x not in have and not hidden(x)]
+    if add or moved or back:
         pl['state'][G_RECIPES] = mine + add
-        log.info('%d crafting recipe(s) opened for %s', len(add), pl['user_id'])
+        log.info('crafting recipes for %s: %d opened, %d hidden, %d back', pl['user_id'], len(add), moved, len(back))
 
 def new_unit_row(pl, template, unit_id, uuid, unit_type=None):
     m = unit_mst().get(unit_id, {})
@@ -2220,7 +2253,8 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
                                'super': {'on': 0, 'chance': 3.0, 'mult': 2.0}, 'label': 'none'},
                     'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0, 'colosseum_enable': 0},
-                    'unitbox': 300,         # base unit box size every player has (the game starts at 300)
+                    'unitbox': 300,
+                    'sphere_on': [],        # event / raid Sphere House recipes switched on         # base unit box size every player has (the game starts at 300)
                     'on_extra': []}         # off-by-default extras switched on (JP trials, Brave Dances)
 
 # Game areas the admin page can switch off (the game's own featureCheck switches). What the game does
@@ -2270,6 +2304,7 @@ def admin_settings():
                 d['features'].update({str(k): 1 if v else 0 for k, v in (f.get('features') or {}).items()
                                       if str(k) in d['features']})
                 d['on_extra'] = [str(x) for x in (f.get('on_extra') or [])]
+                d['sphere_on'] = [str(x) for x in (f.get('sphere_on') or [])]
                 if str(f.get('unitbox', '')).isdigit():
                     d['unitbox'] = max(UNITBOX_START, min(UNITBOX_MAX, int(f['unitbox'])))
             except Exception:

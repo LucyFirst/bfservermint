@@ -197,6 +197,7 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
     <button data-t="honor">Honor Summon</button>
     <button data-t="units">Units</button>
     <button data-t="features">Game areas</button>
+    <button data-t="spheres">Spheres</button>
     <button data-t="rates">Rates</button>
     <button data-t="news">News</button>
   </nav>
@@ -555,6 +556,21 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
   <div id="nwPosts"></div>
 </section>
 
+<section id="t-spheres" class="hide">
+  <div class="card">
+    <h2>Sphere House: event spheres</h2>
+    <p class="hint">The Sphere House lists these spheres from level 1, but their materials came from events, Raid, Guild, Frontier Hunter and so on. Switched-off spheres are hidden from every player's Sphere List and cannot be crafted. Switch a group on when you bring in its event. The Sphere House's own level-up spheres and the story / town harvest ones are always on. "Drops now" = the server already gives out everything the sphere needs.</p>
+    <div class="toolbar sticky" style="background:var(--panel);padding:8px 0">
+      <input type="search" id="spQ" placeholder="Search a sphere or event">
+      <select id="spCat"></select>
+      <label class="chk"><input type="checkbox" id="spOnly"> Only switched on</label>
+      <button class="btn" id="spSave" style="flex:0 0 auto">Save</button>
+    </div>
+    <div class="msg" id="spmsg"></div>
+    <div id="spList"></div>
+  </div>
+</section>
+
 <section id="t-rates" class="hide">
   <div class="card">
     <h2>Rates</h2>
@@ -638,7 +654,7 @@ $$('#tabs button').forEach(b=>b.onclick=()=>{
   $$('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
   $$('main>section').forEach(s=>s.classList.toggle('hide',s.id!=='t-'+b.dataset.t));
   document.querySelector('main').classList.toggle('wide',b.dataset.t==='units'||b.dataset.t==='players'||b.dataset.t==='vortex'||b.dataset.t==='summons'||b.dataset.t==='honor');
-  ({trials:loadTrials,features:loadFeatures,summons:()=>loadSummons('summons'),honor:()=>loadSummons('honor'),players:loadPlayers,gifts:loadGifts,story:loadSettings,vortex:loadVortex,units:loadUnits,rates:loadSettings,news:loadNews})[b.dataset.t]();
+  ({trials:loadTrials,features:loadFeatures,summons:()=>loadSummons('summons'),honor:()=>loadSummons('honor'),players:loadPlayers,gifts:loadGifts,story:loadSettings,vortex:loadVortex,units:loadUnits,rates:loadSettings,news:loadNews,spheres:loadSpheres})[b.dataset.t]();
 });
 function start(){$('#gate').classList.add('hide');$('#app').classList.remove('hide');loadPlayers()}
 
@@ -853,6 +869,34 @@ async function loadSettings(){
   for(const k of ['exp','zel','karma','drop','item']) $('#m-'+k).value=S.mult[k];
   loadSell(); loadFusion(); loadUnitbox();
 }
+let SP=null;
+async function loadSpheres(){
+  try{SP=(await api('sphere_recipes')).recipes}catch(e){return say('#spmsg',e.message)}
+  const cats=[...new Set(SP.map(r=>r.cat))];
+  $('#spCat').innerHTML='<option value="">Every source</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');
+  drawSpheres();
+}
+function drawSpheres(){
+  const q=$('#spQ').value.trim().toLowerCase(), cat=$('#spCat').value, only=$('#spOnly').checked;
+  const rows=SP.filter(r=>(!cat||r.cat===cat)&&(!only||r.on)&&(!q||(r.sphere+' '+r.event+' '+r.key).toLowerCase().includes(q)));
+  const groups={};rows.forEach(r=>{const k=r.cat+'|||'+r.event;(groups[k]=groups[k]||[]).push(r)});
+  const keys=Object.keys(groups).sort();
+  let html='',last='';
+  for(const k of keys){
+    const [c,ev]=k.split('|||'), g=groups[k], n=g.filter(r=>r.on).length, fixed=g.every(r=>r.always);
+    if(c!==last){html+=`<h3 style="margin:18px 0 6px;color:var(--gold)">${esc(c)}</h3>`;last=c}
+    html+=`<div style="border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-bottom:8px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="flex:1 1 240px">${esc(ev)}</b>
+      <span style="color:var(--muted);font-size:12.5px">${n}/${g.length} on</span>
+      ${fixed?'<span class="pill on">always on</span>':`<button class="btn ghost sm" data-grp="${esc(k)}" data-v="1">All on</button><button class="btn ghost sm" data-grp="${esc(k)}" data-v="0">All off</button>`}</div>
+      <div class="grid" style="max-height:none;margin-top:6px">${g.map(r=>`<label class="tog" title="${esc((r.detail||[]).join('\n'))}"><input type="checkbox" data-sp="${r.id}"${r.on?' checked':''}${r.always?' disabled':''} style="accent-color:var(--good)"> <span>${esc(r.sphere)}${r.ready?' <span class="pill on">drops now</span>':''}</span></label>`).join('')}</div></div>`;
+  }
+  $('#spList').innerHTML=html||'<p class="hint">No spheres match.</p>';
+}
+$('#spQ').oninput=drawSpheres; $('#spCat').onchange=drawSpheres; $('#spOnly').onchange=drawSpheres;
+$('#spList').addEventListener('change',e=>{const c=e.target.closest('input[data-sp]');if(!c)return;const r=SP.find(x=>x.id===c.dataset.sp);if(r)r.on=c.checked});
+$('#spList').addEventListener('click',e=>{const b=e.target.closest('button[data-grp]');if(!b)return;const [c,ev]=b.dataset.grp.split('|||');SP.forEach(r=>{if(r.cat===c&&r.event===ev&&!r.always)r.on=b.dataset.v==='1'});drawSpheres()});
+$('#spSave').onclick=async()=>{try{const r=await api('sphere_recipes_save',{on:SP.filter(x=>x.on&&!x.always).map(x=>x.id)});say('#spmsg',r.ok,true);loadSpheres()}catch(e){say('#spmsg',e.message)}};
 let UB=null;
 async function loadUnitbox(){
   try{UB=await api('unitbox')}catch(e){return say('#ubmsg',e.message)}
