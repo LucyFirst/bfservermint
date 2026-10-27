@@ -575,6 +575,19 @@ class Battlegen:
 
     # ------------------------------------------------------------------ drops, chests, skills
     def _finish(self, mid, wiki, battles, runs, rng, story):
+        # monster-only enemies (no unit behind them: Juggernaut, Creator Maxwell...) taken from the
+        # datamine have no look of their own - sent as unit 0 the game crashes when they appear. They
+        # get the recorded enemy of the same name (its sprite, animations, AI and moves), this run's numbers.
+        for b in battles:
+            for m in b:
+                if not m.get('row') and (str(m.get('u')) == '0' or str(m.get('u')) not in self.U):
+                    ref = self.by_name.get(str(m.get('name') or '').strip().lower())
+                    if ref and ref.get('row'):
+                        m.update(row=ref['row'], u=ref['u'], ai=ref.get('ai', '1'),
+                                 act=list(ref.get('act') or m.get('act') or [1, 1]))
+                    elif self.log:
+                        self.log.warning('quest %s: no recorded look for monster %r - it may crash the game',
+                                         mid, m.get('name'))
         caps = [u for u in wiki.get('captures') or [] if u in self.U]
         boss_ok, boss_as = set(), {}
         for nn in wiki.get('cap_notes') or []:
