@@ -1726,8 +1726,10 @@ def deliver_server_gifts(pl):
             add_present(pl, g['type'], g['target'], g['count'], g['message'], created=g['created'], tag=g['id'])
         got.append(g['id'])
 
+FIRST_CLEAR_GEMS = 5        # gems every quest gives on its first clear (the original game gave 1)
+
 def first_clear_gift(pl, mid):
-    add_present(pl, 8, '', 1, 'First clear reward')
+    add_present(pl, 8, '', FIRST_CLEAR_GEMS, 'First clear reward')
 
 LC_DAYS, LC_GEMS = 15, 15
 LC_IMG = '/logincampaign/private15_login_icon_day{}.png'
@@ -2036,7 +2038,7 @@ def clear_bonus_text(mid):
     """MissionReward 92ms7J5M (the game's "clear bonus" list, "type:id:count,..." with the gift box
     type codes: 8 gems, 6 unit, 4 item): what the first clear put in the gift box, so the result
     screen shows it."""
-    gems, out = 1, []                                 # 1 gem: first_clear_gift
+    gems, out = FIRST_CLEAR_GEMS, []                  # first_clear_gift's gems
     if is_trial(mid):
         rw = TRIAL_REWARDS.get(str(mid)) or {}
         gems += _num(rw.get('gems')) or 0
