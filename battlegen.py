@@ -82,9 +82,11 @@ FIXED_LINEUPS = {
     '100103': {'pot_pick': POTS, 'pot_rate': 0.5, 'boss_pick': POTS},
 }
 
-# Elemental Heroes Vortex dungeons (Lv. 1-4): the hero boss is caught as itself (every recorded catch was
-# the boss's own form), at the original game's rate - 25%, Alma 35% (datamine, Lv. 3 / 4 bosses).
-HERO_BOSS_DROP = {'100700': 0.35, '100800': 0.25, '100900': 0.25, '101000': 0.25, '101100': 0.25, '101200': 0.25}
+# Elemental Heroes Vortex dungeons: beating the hero boss can give the hero's base form only, more often
+# the higher the quest level (Lv. 1-4 = the dungeon's quests in order): 5% / 10% / 15% / 20%.
+HERO_BOSS_DROP = {'100700': '50141', '100800': '60151', '100900': '10141', '101000': '20141', '101100': '30141',
+                  '101200': '40141'}       # dungeon -> base form (Alma, Oboro, Galant, Stya, Nemia, Zeln)
+HERO_LEVEL_RATES = [0.05, 0.10, 0.15, 0.20]
 
 # Ruins of Fire/Water/Earth/Thunder/Light/Dark Lv. 3: built on the Ruins of Miracles' original battle
 # list (the only one known), but the boss is that ruin's own totem - the Lv. 3 totem fight the Miracles
@@ -656,16 +658,20 @@ class Battlegen:
                 if not m.get('boss') and self.kind(m['u']) != '0' and m['u'] != MIMIC]
         mat_rate = _med(mats) if mats else 0.0
         out_b = []
-        hero_rate = HERO_BOSS_DROP.get(str((self.M.get(mid) or {}).get('dungeon')))
+        dun = str((self.M.get(mid) or {}).get('dungeon'))
+        hero_base, hero_rate = HERO_BOSS_DROP.get(dun), None
+        if hero_base:
+            lv = sorted(self.family.get(mid, [mid]), key=int).index(mid) if mid in self.family.get(mid, []) else 0
+            hero_rate = HERO_LEVEL_RATES[min(lv, len(HERO_LEVEL_RATES) - 1)]
         for bi, b in enumerate(battles):
             mons, unit_drops, chests = [], [], []
             for pos, m in enumerate(b[:5]):
                 drop = None
                 if m.get('force_drop'):
                     drop = m['u']
-                elif m.get('boss') and hero_rate is not None and self.kind(m['u']) == '0' and m['u'] in self.U:
+                elif m.get('boss') and hero_base and self.kind(m['u']) == '0' and m['u'] in self.U:
                     if rng.random() < _chance(hero_rate, 'drop'):
-                        drop = m['u']
+                        drop = hero_base
                 elif m.get('boss'):
                     tgt = boss_as.get(m['u']) or (m['u'] if m['u'] in boss_ok else None)
                     if not tgt and m['u'] in caps:
