@@ -73,8 +73,13 @@ GARDENS = {
 # enemies in the same order every run, each Idol at its own drop rate for that battle. 'boss_pick' swaps
 # the boss slot's unit between these, evenly (Garden of Idols: the Light Idol or the Thunder Idol,
 # the boss caught every time).
+POTS = [('10191', 'Fire Pot', '1'), ('20191', 'Water Pot', '2'), ('30191', 'Earth Pot', '3'),
+        ('40191', 'Thunder Pot', '4'), ('50191', 'Light Pot', '5'), ('60201', 'Dark Pot', '6')]
 FIXED_LINEUPS = {
     '100102': {'boss_pick': [('50122', 'Light Idol', '5'), ('40132', 'Thunder Idol', '4')]},   # Garden of Idols
+    # Phantom Pots: every pot in the waves is any of the six pots (each equally likely, 50% capture),
+    # and the boss pot is any of the six, caught every time
+    '100103': {'pot_pick': POTS, 'pot_rate': 0.5, 'boss_pick': POTS},
 }
 
 # Ruins of Fire/Water/Earth/Thunder/Light/Dark Lv. 3: built on the Ruins of Miracles' original battle
@@ -384,6 +389,10 @@ class Battlegen:
                 pct = (m.get('drop') or {}).get('pct')
                 if (m.get('drop') or {}).get('u') == m['u'] and pct:
                     e['drop_pct'] = float(pct) / 100      # this battle's own rate (Dark Idol 60% / 40%)
+                pots = cfg.get('pot_pick') or []
+                if bi < n - 1 and any(m['u'] == u for u, _, _ in pots):
+                    u, name, el = rng.choice(pots)
+                    e.update(u=u, name=name, el=int(el), drop_pct=cfg.get('pot_rate', 0.5))
                 if bi == n - 1:
                     e['boss'] = True
                     picks = cfg.get('boss_pick') or []
