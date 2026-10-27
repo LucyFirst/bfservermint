@@ -1719,6 +1719,12 @@ def deliver_server_gifts(pl):
     for g in gifts:
         if g['id'] in got or g.get('deleted') or now - g['created'] > PRESENT_DAYS * 86400:
             continue
+        if 'per_player' in g:              # only some players, each their own amount
+            n = int((g['per_player'] or {}).get(pl['user_id']) or 0)
+            if n > 0:
+                add_present(pl, g['type'], g['target'], n, g['message'], created=g['created'], tag=g['id'])
+            got.append(g['id'])
+            continue
         if str(g['type']) == '6':
             for _ in range(int(g['count'])):
                 add_present(pl, 6, g['target'], 1, g['message'], created=g['created'], tag=g['id'])
