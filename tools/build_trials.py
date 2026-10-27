@@ -416,8 +416,8 @@ def recorded_answer(mid):
 
 
 # status resistances the recorded answer has wrong (resist order: poison, weak, sick, injury, curse,
-# paralysis - 100 = immune). Trial No. 002: Grahdens can't be paralysed.
-RESIST_FIX = {'2000001': {'Grahdens': {5: '100'}}}
+# paralysis - 100 = immune). Trial No. 002: Grahdens only takes weak and injury.
+RESIST_FIX = {'2000001': {'Grahdens': {0: '100', 1: '0', 2: '100', 3: '0', 4: '100', 5: '100'}}}
 
 
 def from_recording(mid):
