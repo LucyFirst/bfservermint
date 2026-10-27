@@ -415,6 +415,11 @@ def recorded_answer(mid):
     raise SystemExit(f'no recording for {mid}')
 
 
+# status resistances the recorded answer has wrong (resist order: poison, weak, sick, injury, curse,
+# paralysis - 100 = immune). Trial No. 002: Grahdens can't be paralysed.
+RESIST_FIX = {'2000001': {'Grahdens': {5: '100'}}}
+
+
 def from_recording(mid):
     r = recorded_answer(mid)
     mons = {m['o49dYfpH']: m for m in r['U0v5IeJo']}
@@ -427,6 +432,11 @@ def from_recording(mid):
             sid = part.split(':')[0]
             if sid not in have and sid in S:
                 skills.append(skill_row(sid)); have.add(sid)
+    for m in r['U0v5IeJo']:
+        for i, v in (RESIST_FIX.get(mid, {}).get(m.get('3evIn0zZ')) or {}).items():
+            f = (m.get('CEeqs63b') or '0:0:0:0:0:0').split(':')
+            f[i] = v
+            m['CEeqs63b'] = ':'.join(f)
     return {'battles': nb, 'monsters': r['U0v5IeJo'], 'groups': r['75t0sx9z'], 'ai': r.get('89ausgc4') or [],
             'skills': skills, 'cgs': r.get('8hoyIF9Q') or [], 'names': names, 'src': 'bfrevive'}
 
