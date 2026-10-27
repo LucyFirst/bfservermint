@@ -1266,6 +1266,25 @@ def _relevel_team(t):
         log.info('player level up: %s -> %s', old, lv)
     return old, lv
 
+UNITBOX_START, UNITBOX_MAX = 300, 4000     # a new account's unit box / the most the admin page allows
+
+def fix_unitbox(pl):
+    """The admin page's base unit box size: every player's box (Px1X7fcd, which gem-shop expansions
+    also add to) is moved by the change in the base since this player last got it, so space a
+    player bought is kept. pl['unitbox_base'] = the base this player has now."""
+    t = team_row(pl['state'])
+    if t is None:
+        return
+    base = int(admin_settings().get('unitbox') or UNITBOX_START)
+    had = int(pl.get('unitbox_base') or UNITBOX_START)
+    if base == had:
+        return
+    before = _num(t.get('Px1X7fcd')) or UNITBOX_START
+    after = max(UNITBOX_START, before + base - had)
+    t['Px1X7fcd'] = after if isinstance(t.get('Px1X7fcd'), int) else str(after)
+    pl['unitbox_base'] = base
+    log.info('unit box: base %s -> %s, this player %s -> %s', had, base, before, after)
+
 def fix_progress(pl):
     st = pl['state'].setdefault(G_USERINFO, [{}])[0]
     if not st.get('N4XVE1uA'):
@@ -2201,6 +2220,7 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
                                'super': {'on': 0, 'chance': 3.0, 'mult': 2.0}, 'label': 'none'},
                     'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0, 'colosseum_enable': 0},
+                    'unitbox': 300,         # base unit box size every player has (the game starts at 300)
                     'on_extra': []}         # off-by-default extras switched on (JP trials, Brave Dances)
 
 # Game areas the admin page can switch off (the game's own featureCheck switches). What the game does
@@ -2250,6 +2270,8 @@ def admin_settings():
                 d['features'].update({str(k): 1 if v else 0 for k, v in (f.get('features') or {}).items()
                                       if str(k) in d['features']})
                 d['on_extra'] = [str(x) for x in (f.get('on_extra') or [])]
+                if str(f.get('unitbox', '')).isdigit():
+                    d['unitbox'] = max(UNITBOX_START, min(UNITBOX_MAX, int(f['unitbox'])))
             except Exception:
                 log.exception('admin_settings.json could not be read - using normal rates')
         _ADMIN_SETTINGS.update(mtime=mt, data=d)
@@ -3907,6 +3929,7 @@ def handle_action(rid, req):
         repair_permits(pl)
         fix_exp_model(pl)
         fix_squad(pl)
+        fix_unitbox(pl)
         fix_progress(pl)
         materials_to_lord(pl)
         fix_type_stats(pl)

@@ -345,6 +345,22 @@ class Admin:
             v = S.news_engine().admin_save(data)
             return dict(v, ok='Saved. Players see it the next time they open the News (Home > Info, '
                               'Menu > News, or News on the title screen).')
+        if action == 'unitbox':
+            return {'base': self.settings().get('unitbox', S.UNITBOX_START), 'start': S.UNITBOX_START,
+                    'max': S.UNITBOX_MAX}
+        if action == 'unitbox_save':
+            try:
+                n = int(str(data.get('base')).strip())
+            except (TypeError, ValueError):
+                raise ValueError('The unit box size must be a whole number.')
+            if not S.UNITBOX_START <= n <= S.UNITBOX_MAX:
+                raise ValueError(f'The unit box size must be {S.UNITBOX_START}-{S.UNITBOX_MAX}.')
+            s = self.settings()
+            s['unitbox'] = n
+            self.save_settings(s)
+            S.log.info('admin page: base unit box %s', n)
+            return {'ok': f'Saved. Every player\'s base unit box is now {n} (plus any space they bought '
+                          'with gems). Players see it the next time they open the game.'}
         if action == 'fusion_rates':
             return {'fusion': self.settings().get('fusion'), 'normal': S.FUSION_NORMAL}
         if action == 'fusion_rates_save':

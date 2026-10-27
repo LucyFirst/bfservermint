@@ -570,6 +570,13 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
     <div class="msg" id="rmsg"></div>
   </div>
   <div class="card">
+    <h2>Unit box</h2>
+    <p class="hint">How many units every player can hold before buying more space with gems. The game starts everyone at 300. Space a player bought with gems is kept on top of this. Players see the new size the next time they open the game.</p>
+    <div class="mults"><div><label>Base unit box size</label><input type="number" min="300" max="4000" step="1" id="ubBase"></div></div>
+    <div style="margin-top:14px" class="row"><button class="btn" id="ubSave" style="flex:0 0 auto">Save unit box</button><button class="btn ghost" id="ubReset" style="flex:0 0 auto">Back to normal</button></div>
+    <div class="msg" id="ubmsg"></div>
+  </div>
+  <div class="card">
     <h2>Fusion success</h2>
     <p class="hint">Great and Super Success when fusing units. Tick a boost to use your own chance and exp multiplier for it; unticked it stays normal (Great 12% x1.5, Super 3% x2). The label under the Unit screen's Fusion button is your choice below ("Super Success Rate Up" needs app v12 or newer). The game shows the multiplier after a fusion ("Super Success! 2x XP!") - players see a new multiplier after fully closing and reopening the game.</p>
     <div id="fuGrid"></div>
@@ -844,8 +851,18 @@ async function loadSettings(){
   $('#storyGrid').innerHTML=r.story_areas.map(a=>`<label class="tog${S.off.areas.includes(a.id)?' closed':''}"><input type="checkbox" value="${a.id}"${S.off.areas.includes(a.id)?' checked':''}><span>${esc(a.name)} <span style="color:var(--muted);font-size:12px">#${a.id}</span></span></label>`).join('');
   $$('#storyGrid input').forEach(c=>c.onchange=()=>c.parentElement.classList.toggle('closed',c.checked));
   for(const k of ['exp','zel','karma','drop','item']) $('#m-'+k).value=S.mult[k];
-  loadSell(); loadFusion();
+  loadSell(); loadFusion(); loadUnitbox();
 }
+let UB=null;
+async function loadUnitbox(){
+  try{UB=await api('unitbox')}catch(e){return say('#ubmsg',e.message)}
+  $('#ubBase').value=UB.base;
+}
+async function saveUnitbox(reset){
+  try{const r=await api('unitbox_save',{base:reset?UB.start:$('#ubBase').value});say('#ubmsg',r.ok,true);loadUnitbox()}catch(e){say('#ubmsg',e.message)}
+}
+$('#ubSave').onclick=()=>saveUnitbox(false);
+$('#ubReset').onclick=()=>saveUnitbox(true);
 let FU=null;
 async function loadFusion(){
   try{FU=await api('fusion_rates')}catch(e){return say('#fumsg',e.message)}
