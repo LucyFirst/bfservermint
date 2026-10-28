@@ -31,8 +31,8 @@ Claude keeps this list up to date. Newest first.
     Raid in the game's own Raid mode; full multiplayer Raid.
     28 Oct: BUILT (raid.py), switched OFF. Solo + multiplayer, 33 Raid quests (bfrevive's list minus
     the 4 "defeat 5 of an enemy" ones). Tested offline, incl. replaying both recordings' requests.
-    Next: switch Raid on in the admin page (Game areas), test solo on Beater, then Beater + LFtest
-    together - both LDPlayer windows on our server. Then: admin Raid tab, Raid Sphere House recipes.
+    Next: switch Raid on in the admin page (Game areas), test solo with one of our server's
+    accounts, then two of our accounts together (our app on two LDPlayer windows, or phone + PC). Then: admin Raid tab, Raid Sphere House recipes.
 
 [ ] Deemo and the Girl 6* (50565) crashes on its unit page - see "Units to test before release.txt".
 [ ] Luminous Core: the wiki has no source for its material (Sphere House extras, "Unknown").
