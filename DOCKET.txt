@@ -2,7 +2,7 @@ SERVER DOCKET - things agreed to do later
 =========================================
 Claude keeps this list up to date. Newest first.
 
-[ ] Story quest item drops (added 28 Oct 2026)
+[x] Story quest item drops (added 28 Oct 2026, DONE 29 Oct)
     Only 113 of the 1,173 story quests have the original game's drop rates (datamine). About 690 are
     built on recordings, almost all of them ONE recorded run, and the server replays that run's chests
     as if they were the drop table - e.g. the last Kagan Desert quest gives ~0.5 Red Claw per run
@@ -15,6 +15,13 @@ Claude keeps this list up to date. Newest first.
     origin unclear, some look partly generated - cross-check with the wiki). Their 192 "captured"
     quests are the same 2014 data as our datamine. Also: hand-built Sacred Land of the Souls Lv1-3
     (no recording here) and 470 readable enemy AI patterns as a fallback for unrecorded bosses.
+    29 Oct DONE (battlegen.py + data/story_drops.json, tools/build_story_drops.py): story quest chests
+    now hold items in the proportions of each quest's table from bf-private-server-data (2014 captures
+    carried enemy by enemy); how MANY chests still follows bfrevive's recordings (the quest's own runs,
+    the middle of its area's) or the table when none. A quest's own recorded items count n/(n+8).
+    Kagan's last quest: Red Claw ~0.1/run (was ~0.5); Phoenix ~0.28. Average items per run unchanged
+    (2.2 -> 2.3), but ~300 quests give fewer, ~430 more. Vortex untouched. Tell players.
+    Still open: Sacred Land of the Souls Lv1-3 battles; enemy AI fallback.
 
 [ ] Raid (added 28 Oct 2026)
     The old data files (old-mst) hold the Raid tables: 120 raid quests, 50 bosses, 33 maps, map

@@ -25,6 +25,16 @@ MIMICS = {MIMIC, BAT_MIMIC, DRAGON_MIMIC, METAL_MIMIC}
 MIMIC_CHANCE = {'story': 0.015, 'vortex': 0.025}     # per battle (not the boss), at most once per quest
 METAL_MIMIC_QUESTS = {'100200': 0.05, '100201': 0.05}  # Box of Desires Lv1/Lv2: a random wave encounter
 STORY_EXP_POWER = 0.43                  # enemy HP ~ exp^0.43 across 113 datamined story quests
+# Story quest treasure chests (data/story_drops.json): each enemy's own chest table from the original
+# game's data (2014 captures, carried enemy by enemy to every quest - joppe2001/bf-private-server-data).
+# How MANY chests: what this quest's recorded bfrevive runs found at each battle (quests with no
+# recording, and the 2014 datamined ones: each enemy's own chest chance from the table). What is IN
+# them: the quest's whole table, so items come out in the original proportions - plus, a chest in
+# n/(n + OWN_RUNS_PRIOR) of the cases holding what the quest's own n recorded runs found there
+# (1 run: 1/9, 8 runs: 1/2). One lucky run no longer decides a rare item's rate.
+OWN_RUNS_PRIOR = 8
+STORY_TABLE_MIN = 0.3
+OWN_VOLUME_PRIOR = 1                  # a recorded quest's chests per battle lean on its area's as on 1 run                  # a table with fewer chests per run than this is not used
 
 
 def _i(x, d=0):
@@ -108,14 +118,30 @@ def unit_drop_override(u):
         return max(0.0, min(100.0, float(custom[str(u)]))) / 100
     return UNIT_DROP.get(str(u))
 
+def _poisson(lam, rng):
+    """How many of something with lam expected (so runs differ, like the real game's)."""
+    if lam <= 0:
+        return 0
+    n, p, L = 0, 1.0, math.exp(-min(lam, 30))
+    while True:
+        p *= rng.random()
+        if p <= L:
+            return n
+        n += 1
+
 def _chance(p, k):
     return min(0.95, p * SETTINGS.get(k, 1.0)) if p < 1 else p
 
 class Battlegen:
-    def __init__(self, recorded, datamine, wiki, missions, unit_mst, log=None):
+    def __init__(self, recorded, datamine, wiki, missions, unit_mst, log=None, story_drops=None):
         """recorded: {mid: [MissionStart response, ...]}; datamine/wiki: data/battles.json specs;
-        missions: mission_mst; unit_mst: unit master."""
+        missions: mission_mst; unit_mst: unit master; story_drops: data/story_drops.json."""
         self.U, self.M, self.W, self.log = unit_mst, missions, wiki, log
+        self.SD = story_drops or {}
+        self.sd_by_unit = defaultdict(list)       # unit -> [(quest, chest table)] over every story quest
+        for q, t in self.SD.items():
+            for u, e in (t.get('units') or {}).items():
+                self.sd_by_unit[u].append((int(q), e))
         self.refs = defaultdict(list)            # mid -> [run]
         for mid, resps in recorded.items():
             for r in resps:
@@ -215,6 +241,8 @@ class Battlegen:
                 c = c.strip()
                 if c and '/' in c:
                     chests[bi].append(c.split('/', 1)[1])        # keep "box/type:..." and drop the position
+        if not any(chests) and n >= 4:
+            chests = None       # a long run with not one chest: the recording kept no chest data
         return {'src': 'recording', 'battles': battles, 'drops': drops, 'chests': chests, 'named': named,
                 'skills': r.get('8aiBoHg5') or [], 'ai': r.get('89ausgc4') or []}
 
@@ -579,6 +607,61 @@ class Battlegen:
         out.append([boss])
         return out
 
+    # ------------------------------------------------------------------ story chests
+    def _chest_tables(self, mid, table, battles, rng, want=None):
+        """(battle, position) -> [chest %, outcomes] for each enemy of this run: the enemy's own table in
+        this quest, else the same enemy's table in the nearest quest that has it, else one of this
+        quest's tables. Chances are then scaled so the run gives as many chests as the original quest."""
+        units, bosses = table.get('units') or {}, table.get('boss') or {}
+        pool = list(units.values()) or list(bosses.values())
+        q = int(mid)
+        out, picked = {}, {}
+        for bi, b in enumerate(battles):
+            for pos, m in enumerate(b[:5]):
+                u = str(m['u'])
+                if m.get('boss'):
+                    e = bosses.get(u) or units.get(u)
+                    if e is None and bosses:
+                        e = picked.setdefault(('boss', u), rng.choice(list(bosses.values())))
+                else:
+                    e = units.get(u) or bosses.get(u)
+                    if e is None and self.sd_by_unit.get(u):
+                        e = min(self.sd_by_unit[u], key=lambda x: abs(x[0] - q))[1]
+                    if e is None and pool:
+                        e = picked.setdefault(u, rng.choice(pool))
+                if e and u != MIMIC:
+                    out[(bi, pos)] = e
+        want = want if want is not None else float(table.get('chests') or 0)
+        have = sum(e[0] for e in out.values()) / 100
+        f = max(0.05, min(10.0, want / have)) if want and have else 1.0
+        return {k: [e[0] * f, e[1]] for k, e in out.items()}
+
+    def _chest_mix(self, mid, table):
+        """What the quest's chests hold, each outcome weighted by how often it came out per run."""
+        cache = self.__dict__.setdefault('_mix', {})
+        if mid not in cache:
+            w = Counter()
+            for e in list((table.get('units') or {}).values()) + list((table.get('boss') or {}).values()):
+                tot = sum(d[3] for d in e[1]) or 1
+                for t, target, amount, wt in e[1]:
+                    w[(t, target, amount)] += e[0] * wt / tot
+            cache[mid] = list(w.items())
+        return cache[mid]
+
+    @staticmethod
+    def _roll_chest(entry, mix, rng, sure=False):
+        """One enemy's chest: '1/<type>:...' or None. Types 1 zel / 2 karma / 4 item."""
+        if not entry or not mix:
+            return None
+        if not sure and rng.random() >= _chance(min(0.95, entry[0] / 100), 'item'):
+            return None
+        (t, target, amount), _ = rng.choices(mix, weights=[w for _, w in mix])[0]
+        if t == 4 and target:
+            return f'1/4:1000:{target}:{max(1, amount)}'
+        if t in (1, 2):
+            return f'1/{t}:25:{max(1, amount)}'
+        return None
+
     # ------------------------------------------------------------------ drops, chests, skills
     def _finish(self, mid, wiki, battles, runs, rng, story):
         # monster-only enemies (no unit behind them: Juggernaut, Creator Maxwell...) taken from the
@@ -657,6 +740,29 @@ class Battlegen:
         mats = [unit_rate(m['u']) for b in battles for m in b[:5]
                 if not m.get('boss') and self.kind(m['u']) != '0' and m['u'] != MIMIC]
         mat_rate = _med(mats) if mats else 0.0
+        table = self.SD.get(mid) if story else None
+        if table and (float(table.get('chests') or 0) < STORY_TABLE_MIN or
+                      not any(t == 4 for (t, _, _), _ in self._chest_mix(mid, table))):
+            table = None          # next to nothing known for this quest: as before (recordings, wiki)
+        if table:
+            # as many chests per run as this quest and its nearest recorded quests give (bfrevive's
+            # later-game quests give far more than the 2014 tables); the table if none is recorded
+            near = [sum(1 for cs in run['chests'] for c in cs if not c.startswith('2/'))
+                    for ref, run in runs if run['chests'] is not None]
+            own_dm = any(ref == mid and run['src'] == 'datamine' for ref, run in runs)   # the 2014 data itself
+            # (the middle one of these runs and the table's own count, so one odd run can't decide it)
+            want = _med(near + [float(table.get('chests') or 0)]) if near and not own_dm else None
+            chest_for = self._chest_tables(mid, table, battles, rng, want)
+            # only this quest's own recordings count for its chests, weighted by how many there are
+            own_obs, own_n = defaultdict(list), defaultdict(int)
+            for ref, run in runs:
+                if ref == mid and run['chests'] is not None:
+                    for bi, cs in enumerate(run['chests']):
+                        own_n[bi] += 1
+                        own_obs[bi].extend(c for c in cs if not c.startswith('2/'))
+            n_own = max(own_n.values()) if own_n else 0
+            own_dm = any(ref == mid and run['src'] == 'datamine' for ref, run in runs)   # the 2014 data itself
+            own_share = n_own / (n_own + OWN_RUNS_PRIOR)
         out_b = []
         dun = str((self.M.get(mid) or {}).get('dungeon'))
         hero_base, hero_rate = HERO_BOSS_DROP.get(dun), None
@@ -698,12 +804,45 @@ class Battlegen:
                 mons.append(dict(m, drop=drop))
                 if drop:
                     unit_drops.append(f'{pos}:0:{drop}:1:{rng.randint(1, 5)}')
-                for it in ([] if chest_obs.get(bi) else dm_items.get(m['u'], [])[:4]):   # recorded chests already cover this battle
+                for it in ([] if (table or chest_obs.get(bi)) else dm_items.get(m['u'], [])[:4]):   # recorded chests already cover this battle
                     if rng.random() < _chance(float(it.get('pct', 0)) / 100, 'item'):
                         chests.append(f'{pos}/1/4:1000:{it["i"]}:1')
                         break
             k = len(mons)
-            if chest_obs.get(bi) and n_runs.get(bi):
+            if table:
+                if own_n.get(bi) and not own_dm:
+                    # HOW MANY chests: what this quest's own recorded runs found at this battle
+                    # (bfrevive's later-game quests give far more than the 2014 ones), leaning
+                    # on its area's recorded quests as much as on one more run
+                    t_b = sum(e[0] for (b2, _), e in chest_for.items() if b2 == bi) / 100
+                    seen_b = own_obs.get(bi) or []
+                    rate = (len(seen_b) + OWN_VOLUME_PRIOR * t_b) / (own_n[bi] + OWN_VOLUME_PRIOR)
+                    p_seen = len(seen_b) / (len(seen_b) + OWN_VOLUME_PRIOR * t_b) if seen_b else 0.0
+                    mix = self._chest_mix(mid, table)
+                    items_mix = [x for x in mix if x[0][0] == 4]
+                    for _ in range(_poisson(rate * SETTINGS.get('item', 1.0), rng)):
+                        if rng.random() < p_seen:
+                            c = rng.choice(seen_b)
+                            # WHAT is in them: zel / karma chests as recorded; an item chest holds an
+                            # item from the quest's table - or, n/(n+8) of the time, what the runs found
+                            if c.startswith('1/4:') and rng.random() >= own_share:
+                                c = self._roll_chest([100, True], items_mix, rng, sure=True)
+                        else:
+                            c = self._roll_chest([100, True], mix, rng, sure=True)
+                        if c:
+                            chests.append(f'{rng.randrange(k)}/{c}')
+                else:
+                    for pos, m in enumerate(mons):
+                        c = self._roll_chest(chest_for.get((bi, pos)), self._chest_mix(mid, table), rng)
+                        if c:
+                            chests.append(f'{pos}/{c}')
+                if not any(t in (1, 2) for (t, _, _), _ in self._chest_mix(mid, table)) and \
+                        not any(c.split('/', 1)[1][:3] in ('1/1', '1/2') for c in chests) and rng.random() < 0.25:
+                    # the quest's table has no zel / karma chests (carried items only): the usual ones
+                    kind = rng.choice((1, 2))
+                    base = max(50, int((self.exp(mid) + 20) ** 0.5 * (60 if kind == 1 else 30)))
+                    chests.append(f'{rng.randrange(k)}/1/{kind}:25:{int(base * rng.uniform(.5, 1.5))}')
+            elif chest_obs.get(bi) and n_runs.get(bi):
                 # recorded chests at this point of the quest: how often, and what they held
                 rate = len(chest_obs[bi]) / n_runs[bi] * SETTINGS.get('item', 1.0)
                 for _ in range(int(rate) + (1 if rng.random() < rate - int(rate) else 0)):

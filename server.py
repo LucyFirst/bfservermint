@@ -2724,7 +2724,9 @@ MIMIC_ROW = next((m for _rs in _RECORDED.values() for _r in _rs for m in _r.get(
 def battle_generator():
     global _GEN
     if _GEN is None:
-        _GEN = battlegen.Battlegen(_RECORDED, BATTLES, BATTLES, MISSIONS, unit_mst(), log)
+        p = os.path.join(HERE, 'data', 'story_drops.json')     # story quest chests (tools/build_story_drops.py)
+        sd = json.load(open(p, encoding='utf-8')) if os.path.exists(p) else {}
+        _GEN = battlegen.Battlegen(_RECORDED, BATTLES, BATTLES, MISSIONS, unit_mst(), log, story_drops=sd)
     return _GEN
 
 def trial_mission_start(mid, req, base, spec):
