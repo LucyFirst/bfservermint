@@ -18,6 +18,11 @@ Claude keeps this list up to date. Newest first.
     (first a short solo run, then host + guest recorded at the same time).
     28 Oct: bfrevive's Raid works (tested on LDPlayer: camp, map movement, boss fight and the results
     screen with rewards all worked). Recording to follow.
+    28 Oct: FIRST RECORDING DONE - recordings_raw/bfrevive_raid_20261028.json.gz (decoded): 3 solo raids
+    on Beater (Fire Eater / Edelma, quick start, room list, camp rest, items, chat, harvest, progress,
+    mission end with rewards) + Frontier Hunter (ChallengeBase/ChallengeRankReward + its quests).
+    Raid runs entirely over the normal game server (action.php) - rooms are polled every ~4 s
+    (RaidRoomInfoRequest), no separate world server. Still to record: host + guest together.
     Options, smallest first: Raid materials as Vortex drops; Raid bosses as solo Vortex quests; solo
     Raid in the game's own Raid mode; full multiplayer Raid.
 
