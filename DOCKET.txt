@@ -22,7 +22,11 @@ Claude keeps this list up to date. Newest first.
     on Beater (Fire Eater / Edelma, quick start, room list, camp rest, items, chat, harvest, progress,
     mission end with rewards) + Frontier Hunter (ChallengeBase/ChallengeRankReward + its quests).
     Raid runs entirely over the normal game server (action.php) - rooms are polled every ~4 s
-    (RaidRoomInfoRequest), no separate world server. Still to record: host + guest together.
+    (RaidRoomInfoRequest), no separate world server.
+    28 Oct: MULTIPLAYER RECORDING DONE - recordings_raw/bfrevive_raid_multi_20261028.json.gz: Beater +
+    a new account (LFtest), both recorded, plus a third player (Mint) in the same rooms; friend
+    request/accept, room join, ready-up, raids from both sides, chat. Raid data needed to build
+    Raid (solo and multiplayer) is now complete enough to plan it.
     Options, smallest first: Raid materials as Vortex drops; Raid bosses as solo Vortex quests; solo
     Raid in the game's own Raid mode; full multiplayer Raid.
 
