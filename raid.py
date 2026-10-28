@@ -20,11 +20,14 @@ Request -> what happens here
   MissionStart                       host: start the quest for the room; everyone: join it
   MissionInfo / MissionInfoLight     the quest (polled; carries your place on the map)
   MissionHarvest                     search a point: one item from the point's drop list, 3 times
-  CampRestStart / Get / End          rest at a camp: the squad heals
-  LimitedUseItem / ItemEdit          use an item on the map / rearrange the bag
+  CampRestStart / Get / End          rest at a camp: the squad heals 10% of max HP every 4 s
+  LimitedUseItem / ItemEdit          use an item on the map / move items between item set and bag
+  ItemMix / ItemDelete               craft from the bag (town recipes, no karma) / throw away
+  ShopUse                            gem shop: 100 refill Raid entries, 101 refill hearts
   MissionBattleStart / BattleRestart a fight: small enemies, or the boss with its parts' HP now
   UpdateProgress                     damage done to the boss during the fight (shared)
-  MissionBattleEnd                   end of a fight (last damage, units' HP)
+  MissionBattleEnd                   end of a fight (last damage, units' HP; a wiped squad costs a
+                                     heart and comes back at full HP; items the fight dropped)
   MissionEnd / MissionExit           rewards (zel, karma, medals, what you picked up, Raid Class up)
   SendChat / GetChatLog              room stamps
 """
@@ -43,6 +46,11 @@ BOSS_HP, BOSS_ATK, BOSS_DEF = 40000, 450, 80     # bfrevive's Raid bosses (Raid 
 CLASS_MULT = {1: 1.0, 2: 2.0, 3: 3.0, 4: 4.0, 5: 5.0, 6: 6.0, 7: 7.0}   # harder Raid Classes
 MAX_CLASS = 7
 HARVEST_EMPTY = 'There is nothing more to find here.'
+LIVES = 3                                # hearts on the map; a wiped squad costs one (game: raid_max_p)
+CAMP_TICK, CAMP_HEAL = 4, 10             # resting heals 10% of max HP every 4 s (the game's camp)
+SHOP_ENTRIES, SHOP_LIVES = 100, 101      # Raid gem shop: refill entries / refill hearts
+SHOP_GEMS = 1                            # gems per refill (as continuing a quest costs here)
+BAG_STACKS = 50                          # picked-up items the Raid bag holds (game: raid_bag_cnt)
 
 # the map enemies bfrevive uses in every Raid quest (Moize Plains' fire set), and how often
 SMALL_ENEMIES = {'12300': 3, '11600': 3, '14550': 3, '11550': 3, '60550': 1, '10650': 1}
@@ -445,7 +453,7 @@ class Raid:
                         '98WfKiyA': str(r.get('98WfKiyA') or (helper or {}).get('98WfKiyA', '') if str(r.get('edy7fq3L')) == '0' else '')})
             units.append(row)
         self.use_ticket(st)
-        ps = {'pos': '1', 'visited': {}, 'camp': 0, 'camp_t': 0, 'battle': '0', 'boss_battle': 0, 'tries': {},
+        ps = {'pos': '1', 'visited': {}, 'camp': 0, 'camp_t': 0, 'lives': LIVES, 'battle': '0', 'boss_battle': 0, 'tries': {},
               'units': units, 'got': [], 'seqs': [], 'done': False, 'left': False, 'joined': time.time(),
               'unit_ids': [str(r.get('edy7fq3L')) for r in _rows('wc2DiMY1', req) if str(r.get('edy7fq3L')) != '0']}
         q['players'][pl['user_id']] = ps
@@ -466,7 +474,7 @@ class Raid:
             tries = ps['tries']
             last = max(tries, key=lambda k: tries[k]) if tries else ''
             row.update({'h7eY3sAK': uid, 'B5JQyV8j': p.get('name', ''), 'k3I8AWLs': p.get('leader', '0'),
-                        'pjX27bKB': ps['pos'], 'qbJcuC60': ps['pos'], 'fP1r39bd': '3', 'MFz8YRS6': str(ps['camp']),
+                        'pjX27bKB': ps['pos'], 'qbJcuC60': ps['pos'], 'fP1r39bd': str(ps.get('lives', LIVES)), 'MFz8YRS6': str(ps['camp']),
                         'zHs17TE2': self.visited_text(ps), 'EqgF1H8M': ps['battle'], '53NMFRL9': str(ps['boss_battle']),
                         '4rcdJRS6': '1' if tries else '0', '5soj5vGI': f'{last}:{tries[last]}' if tries else ''})
             out.append(row)
@@ -495,6 +503,16 @@ class Raid:
                         'DbMVG16I': '0', 'dJNpLc81': '1', 'Slkc395l': ''})
             out.append(row)
         return out
+
+    def take_got(self, ps, item, n):
+        took = 0
+        for e in ps['got']:
+            if e[0] == str(item) and n > took:
+                k = min(e[1], n - took)
+                e[1] -= k
+                took += k
+        ps['got'] = [e for e in ps['got'] if e[1] > 0]
+        return took
 
     def add_got(self, ps, item, n):
         for e in ps['got']:
@@ -800,7 +818,10 @@ class Raid:
                     resp['GvV1w4yM'] = st['sub']
             return resp
 
-        if name in ('UpDateCash', 'UpdateBlackList', 'MissionSelect', 'UpScenarioInfo', 'ItemDelete'):
+        if name == 'ShopUse':
+            return self.shop(pl, room, req)
+
+        if name in ('UpDateCash', 'UpdateBlackList', 'MissionSelect', 'UpScenarioInfo'):
             return {}                         # nothing kept for these (bfrevive answers them empty)
 
         if name == 'RoonItemEdit':
@@ -977,11 +998,13 @@ class Raid:
             if name == 'CampRestStart':
                 ps['camp'], ps['camp_t'] = 1, time.time()
             elif ps['camp']:
-                share = min(1.0, (time.time() - ps['camp_t']) / 10.0)
-                for u in ps['units']:
-                    mx, hp = _i(u.get('3WMz78t6')), _i(u.get('e7DK0FQT'))
-                    u['e7DK0FQT'] = str(min(mx, hp + int((mx - hp) * share)))
-                ps['camp_t'] = time.time()
+                ticks = int((time.time() - ps['camp_t']) // CAMP_TICK)
+                if ticks > 0:
+                    for u in ps['units']:
+                        mx, hp = _i(u.get('3WMz78t6')), _i(u.get('e7DK0FQT'))
+                        if 0 < mx and hp < mx:
+                            u['e7DK0FQT'] = str(min(mx, hp + ticks * ((mx * CAMP_HEAL + 99) // 100)))
+                    ps['camp_t'] += ticks * CAMP_TICK        # the part of a tick already rested counts on
                 if name == 'CampRestEnd':
                     ps['camp'] = 0
             return self.quest_groups(pl, room, q)
@@ -998,11 +1021,21 @@ class Raid:
         if name == 'ItemEdit':
             new = self.bag_rows(_rows('71U5wzhI', req))
             keep = {r['kixHbe54']: _i(r['wgV86x1q']) for r in new}
-            for r in st['bag']:
-                gone = _i(r['wgV86x1q']) - keep.get(r['kixHbe54'], 0)
-                if gone > 0:                 # taken out of the bag: carried as found items
-                    self.add_got(ps, r['kixHbe54'], gone)
-                    S.warehouse_take(pl, r['kixHbe54'], gone)
+            old = {r['kixHbe54']: _i(r['wgV86x1q']) for r in st['bag']}
+            for it in set(old) | set(keep):
+                d = keep.get(it, 0) - old.get(it, 0)
+                if d < 0:                    # out of the item set: into the bag of things carried
+                    self.add_got(ps, it, -d)
+                    S.warehouse_take(pl, it, -d)
+                elif d > 0:                  # into the item set: only from the bag
+                    took = self.take_got(ps, it, d)
+                    if took:
+                        S.add_item(pl, it, took)
+                    if took < d:
+                        for r in new:
+                            if r['kixHbe54'] == it:
+                                r['wgV86x1q'] = str(old.get(it, 0) + took)
+                        new = [r for r in new if _i(r['wgV86x1q']) > 0]
             st['bag'] = new
             return {'Fihk73ZR': st['bag'], 'UsDq1E6o': self.got_rows(pl, ps)}
 
@@ -1031,8 +1064,19 @@ class Raid:
         if name == 'MissionBattleEnd':
             self.update_units(ps, req)
             acks = self.apply_log(pl, q, ps, req)
-            ps['battle'], ps['boss_battle'] = '0', 0
             res = _row('zS9s5bEI', req)
+            if ps['battle'] != '0':          # once per fight (a resent BattleEnd finds it closed)
+                mine = [r for r in _rows('wc2DiMY1', req) if str(r.get('h7eY3sAK') or pl['user_id']) == pl['user_id']]
+                if mine and all(_i(r.get('e7DK0FQT')) <= 0 for r in mine):
+                    ps['lives'] = max(0, ps.get('lives', LIVES) - 1)
+                    for u in ps['units']:
+                        u.update({'e7DK0FQT': u.get('3WMz78t6', u.get('e7DK0FQT')), 'gU2xtQ0V': '0', 'nIGZ1X9C': '0'})
+                    S.log.info('raid: %s was wiped out - %s heart(s) left', pl.get('handle'), ps['lives'])
+                for part in str(res.get('4T0Q2Bh5') or '').split(','):     # items the fight dropped
+                    it, _, n = part.partition(':')
+                    if it.isdigit() and _i(n) > 0 and len(ps['got']) < BAG_STACKS:
+                        self.add_got(ps, it, min(_i(n), 99))
+            ps['battle'], ps['boss_battle'] = '0', 0
             sts = st['stats']
             sts['battles'] = sts.get('battles', 0) + 1
             if str(res.get('M4NAYyc6')) == '1':
@@ -1066,8 +1110,73 @@ class Raid:
             out[S.G_BADGE] = {'dUujjBBK': S.achievement_engine().badges(pl)} if hasattr(S, 'achievement_engine') else {}
             return out
 
+        if name == 'ItemMix':
+            self.mix(pl, ps, req)
+            return {'UsDq1E6o': self.got_rows(pl, ps)}
+
+        if name == 'ItemDelete':
+            rows = self.got_rows(pl, ps)
+            for d in _rows('qa3iN58C', req):
+                row = next((r for r in rows if r['n6E8iMf3'] == str(d.get('n6E8iMf3'))), None)
+                if row and row['kixHbe54']:
+                    self.take_got(ps, row['kixHbe54'], _i(d.get('wgV86x1q')) or 1)
+            return {'UsDq1E6o': self.got_rows(pl, ps)}
+
         S.log.warning('raid: %s not handled yet', cls)
         raise RaidError('This is not available on this server yet.')
+
+    def shop(self, pl, room, req):
+        """RaidShopUse: 100 refills Raid entries (from the room screens), 101 refills hearts on the
+        map. Gems are earned here, never bought, so spending them is fine; the price is the server's."""
+        S = self.S
+        st = self.state(pl)
+        sel = _row('32ibWjFG', req)
+        kind = _i(sel.get('60IsqxDt'))
+        q = self.quests.get((room or {}).get('quest')) if room else None
+        ps = self.player(q, pl) if q else None
+        if kind == SHOP_LIVES and not ps:
+            raise RaidError('You are not in a Raid quest.')
+        full = st['tickets'] >= TICKETS if kind != SHOP_LIVES else ps.get('lives', LIVES) >= LIVES
+        if not full:
+            if int(pl['wallet'].get('gems', 0)) < SHOP_GEMS:
+                raise RaidError('You do not have enough Gems.')
+            pl['wallet']['gems'] = int(pl['wallet'].get('gems', 0)) - SHOP_GEMS
+            if kind == SHOP_LIVES:
+                ps['lives'] = LIVES
+            else:
+                st['tickets'], st['tick_t'] = TICKETS, 0
+            S.log.info('raid: %s refilled %s for %s gem', pl.get('handle'),
+                       'hearts' if kind == SHOP_LIVES else 'Raid entries', SHOP_GEMS)
+        if kind == SHOP_LIVES:
+            out = self.quest_groups(pl, room, q)
+        else:
+            out = self.lobby(pl)
+            if room:
+                self.profile(pl)
+        out[S.G_TEAM] = [dict(S.team_row(pl['state']) or {})]
+        return out
+
+    def mix(self, pl, ps, req):
+        """RaidItemMix: craft on the map from the bag of things carried - the town's recipes the player
+        has opened, materials from the bag only, one item per craft, no karma (the game's own rule)."""
+        S = self.S
+        recipes = {str(r.get('4HqhTf3a')): r for r in S._town_mst('8f0bCciN') if isinstance(r, dict)}
+        mine = {str(r.get('4HqhTf3a')) for r in S._rows(pl['state'].get(S.G_RECIPES)) if isinstance(r, dict)}
+        for row in _rows('JTf2jY5o', req):
+            for order in str(row.get('4HqhTf3a') or '').split(','):
+                rid, _, times = order.partition(':')
+                rec = recipes.get(rid)
+                if not rec or rid not in mine:
+                    continue
+                for _ in range(max(1, min(99, _i(times) or 1))):
+                    need = [(it, _i(c) or 1) for it, _, c in (p.partition(':') for p in str(rec.get('75YV2q1i') or '').split(',')) if it]
+                    have = {e[0]: e[1] for e in ps['got']}
+                    if len(ps['got']) >= BAG_STACKS or any(have.get(it, 0) < c for it, c in need):
+                        break
+                    for it, c in need:
+                        self.take_got(ps, it, c)
+                    self.add_got(ps, str(rec.get('kixHbe54')), 1)
+                    S.log.info('raid: %s made %s on the map (recipe %s)', pl.get('handle'), rec.get('kixHbe54'), rid)
 
     def helper_pick(self, pl, h):
         """The helper chosen from RoomFriendGet (the list this server sent), as the game shows it."""

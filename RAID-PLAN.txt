@@ -119,14 +119,18 @@ Ending
     - map fights: bfrevive's set of small enemies (pots, totems, imps, idols...), 3-4 per fight,
       numbers +-3%, times the Raid Class
     - harvest: one item per search from the point's own drop list, 3 searches per point
-    - camp: heals the squad (full after ~10 s of rest)
+    - camp: heals 10% of max HP every 4 s of rest (the game's own camp, from the client's code -
+      thanks to joppe2001/bf-private-server's notes)
+    - hearts: 3 per quest; a wiped squad costs one and comes back at full HP; gem shop (1 gem)
+      refills hearts or Raid entries; items a fight drops go in the bag
+    - item mix on the map: town recipes the player has opened, bag materials only, no karma
     - entries: 3, one back every hour; joining a started quest: within 5 minutes
     - clear: zel / karma of the quest (x the admin page rates), Raid medals, what was picked up;
       clearing the Raid Class quest (2007, 3011...) moves you up a class; the class rewards
       (unit / gems / items) go to the gift box
     - raid squads: the player's own once they edit them, else copies of their quest squads; only
       shown to the game while Raid is open (so units are never locked by unseen raid squads)
-    - not recorded, answered empty: Raid shop, item mix, item delete, black list
+    - not recorded, answered empty: black list
 
   STEP 0  Check the Droplet has every F_RAID_* file the game asks for (probe script; fetch any
           missing with download_content.py). Restore raid squads: today server.py strips
