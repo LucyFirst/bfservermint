@@ -76,7 +76,7 @@ Battles
 
 Ending
   Phase 2 = boss dead, phase 4 = time up (server sets it when 8n7oG4fS hits 0).
-  RaidMissionEnd       rewards (4sbU8kdW: 3 zel, 11 probably raid exp, 4 items), boss name
+  RaidMissionEnd       rewards (4sbU8kdW: 3 zel, 11 karma, 4 items), boss name
                        (UC8S1AiX), player info (fEi17cnx), room + raid user + missions again.
                        Adds raid exp / rank, marks the mission cleared, items to the inventory.
   RaidMissionExit      quit mid-mission (counts as a loss for that player).
@@ -127,7 +127,8 @@ Ending
 
 5. OPEN QUESTIONS
 -----------------
-  - Reward type 11 (2000 / 2200 per clear) - raid exp or medals? Check against 1ry6BKoe.
+  - Reward type 11 (2000 / 2200 per clear) = KARMA (checked: HTVh8a65 rose by exactly 2200,
+    zel Najhr8m6 by exactly the type-3 amount 10000). Player exp did not change.
   - Exact camp heal rate and rest length (one camp recorded).
   - Boss movement speed along its route (compare boss point in the 223 polls over time).
   - Server memory: rooms are small (KBs); 1 GB + swap is fine for a handful of players.
