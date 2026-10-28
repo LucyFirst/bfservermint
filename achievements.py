@@ -9,11 +9,20 @@ Row fields (YTRJLG65): pG2n1A28 progress, 9g4hdDJn target, 0B5bQgZh 0 locked / 1
 2 achieved, rPk8gtY5 1 reward waiting / 2 reward taken. Points total: Bnc4LpM8.idfCDG70.
 Rewards (JQ23rIvk "type:id:count:..."): 6 unit, 7 item, 8 gems - they go to the gift box.
 """
+import json
+import os
 import time
 
 DAY = 86400
 DAILY_COUNT = 5
 MERIT_DAILY = 20000              # zel / karma trades a day (the game's own limit, shown on the trade screen)
+# Exchange Hall: evolution materials and spheres restock every week (Monday 00:00 UTC, like the day's
+# reset); everything else keeps its lifetime limit. Evolution materials = evolution units (Nymphs,
+# Spirits, Idols, Totems, Pots, Bulbs, Mecha Gods, Mimics), Legend Stone / Shards / Elementum Tome
+# and Rainbow Crystal (as joppe2001/bf-private-server's Merit Shop).
+WEEK = 7 * DAY
+WEEK_START = 4 * DAY             # Monday 1970-01-05 00:00 UTC (1970-01-01 was a Thursday)
+WEEKLY_UNITS = {'750006'}        # Rainbow Crystal
 UNTRACKABLE = {'9900'}           # raid quests: not on this server
 
 # what the game reports at the end of a quest (MissionEndRequest rXvA1E5y), named from its own code
@@ -54,6 +63,40 @@ class Achievements:
                 break
         self.by_id = {r['M7SXoc31']: r for r in self.master}
         self.trades = {r['Mdgsh04u']: r for r in (self.base or {}).get('82CcMZhp') or []}
+        self.weekly = self._weekly_offers()
+
+    def _weekly_offers(self):
+        try:
+            units = self.S.unit_mst()
+            items = json.load(open(os.path.join(self.S.HERE, 'data', 'item_names.json'), encoding='utf-8'))
+        except Exception:
+            return set()
+        out = set()
+        for tid, r in self.trades.items():
+            f = str(r.get('qBAb07rh', '')).split(':')
+            kind, what = f[0], f[1] if len(f) > 1 else ''
+            if kind == '6':
+                if str((units.get(what) or {}).get('xP9oi5Z2')) == '2' or what in WEEKLY_UNITS:
+                    out.add(tid)
+            elif kind in ('4', '5', '7') and (items.get(what) or [None, ''])[1] in ('evomat', 'sphere'):
+                out.add(tid)
+        return out
+
+    @staticmethod
+    def week(now=None):
+        return int(((now or time.time()) - WEEK_START) // WEEK)
+
+    def bought(self, pl, tid):
+        """How many of an offer count against its limit: this week's for the weekly ones."""
+        if tid in self.weekly:
+            w = pl.get('ach_trades_week') or {}
+            return (w.get('n') or {}).get(tid, 0) if w.get('week') == self.week() else 0
+        return (pl.get('ach_trades') or {}).get(tid, 0)
+
+    @staticmethod
+    def limit(r):
+        """S8rdp9zk is the per-player limit (what the game itself checks and shows)."""
+        return _i(r.get('S8rdp9zk'), 0) or _i(r.get('a0d2suLZ'), 999) or 999
 
     # ------------------------------------------------------------------ what the player has done
     def count(self, pl, cls):
@@ -361,8 +404,7 @@ class Achievements:
     def trade_rows(self, pl):
         """9j3ALx8I: what the Exchange Hall offers this player - every item of the game's trade list
         (82CcMZhp) except alternate arts (not on this server). H6k1LIxC = times already bought."""
-        bought = pl.get('ach_trades', {})
-        return [{'Mdgsh04u': r['Mdgsh04u'], 'H6k1LIxC': str(bought.get(r['Mdgsh04u'], 0)), 'VDKB0Y5h': '-1',
+        return [{'Mdgsh04u': r['Mdgsh04u'], 'H6k1LIxC': str(self.bought(pl, r['Mdgsh04u'])), 'VDKB0Y5h': '-1',
                  'ypV81b7k': '0'} for r in self.trades.values() if not str(r.get('qBAb07rh', '')).startswith('15:')]
 
     def trade(self, pl, req):
@@ -372,9 +414,9 @@ class Achievements:
         if not r or str(r.get('qBAb07rh', '')).startswith('15:'):
             return None, 'This item is not available.'
         bought = pl.setdefault('ach_trades', {})
-        limit = _i(r.get('a0d2suLZ'), 999) or 999
-        if bought.get(tid, 0) + n > limit:
-            return None, 'You cannot exchange for this item any more.'
+        if self.bought(pl, tid) + n > self.limit(r):
+            return None, ('Sold out for this week - it restocks on Monday.' if tid in self.weekly
+                          else 'You cannot exchange for this item any more.')
         cost = _i(r.get('3EWLm0sA')) * n
         if pl.get('ach_points', 0) < cost:
             return None, 'Not enough Merit Points.'
@@ -383,7 +425,13 @@ class Achievements:
         if kind not in ('2', '3', '4', '5', '6', '7', '8', '12'):
             return None, 'This item is not available.'
         pl['ach_points'] -= cost
-        bought[tid] = bought.get(tid, 0) + n
+        bought[tid] = bought.get(tid, 0) + n                  # all-time (Merit Points spent)
+        if tid in self.weekly:
+            w = pl.get('ach_trades_week') or {}
+            if w.get('week') != self.week():
+                w = {'week': self.week(), 'n': {}}
+            w['n'][tid] = w['n'].get(tid, 0) + n
+            pl['ach_trades_week'] = w
         name = str(r.get('hQ1SJZU9') or tid)
         if kind in ('6',):
             for _ in range(n):
