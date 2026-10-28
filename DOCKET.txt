@@ -16,6 +16,8 @@ Claude keeps this list up to date. Newest first.
     points/routes, drops per map point, enemy groups, boss parts. Missing: how the game talks to the
     server during Raid, and the multiplayer "world" server. Waiting on a bfrevive recording of Raid
     (first a short solo run, then host + guest recorded at the same time).
+    28 Oct: bfrevive's Raid works (tested on LDPlayer: camp, map movement, boss fight and the results
+    screen with rewards all worked). Recording to follow.
     Options, smallest first: Raid materials as Vortex drops; Raid bosses as solo Vortex quests; solo
     Raid in the game's own Raid mode; full multiplayer Raid.
 
