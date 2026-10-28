@@ -10,6 +10,11 @@ Claude keeps this list up to date. Newest first.
     Plan: for quests with few recorded runs, show recorded chests less often (about 1/3 with one run)
     and draw about half the chests from the area's wiki item list, at rates based on the 113
     datamined quests. Many story quests will give fewer items after this - tell players.
+    29 Oct: extra source - github.com/joppe2001/bf-private-server-data (author says free to use):
+    per-enemy drop tables for ~210 quests we only guess ("original+wiki" in their mission_sources.json;
+    origin unclear, some look partly generated - cross-check with the wiki). Their 192 "captured"
+    quests are the same 2014 data as our datamine. Also: hand-built Sacred Land of the Souls Lv1-3
+    (no recording here) and 470 readable enemy AI patterns as a fallback for unrecorded bosses.
 
 [ ] Raid (added 28 Oct 2026)
     The old data files (old-mst) hold the Raid tables: 120 raid quests, 50 bosses, 33 maps, map
@@ -36,5 +41,8 @@ Claude keeps this list up to date. Newest first.
 
 [ ] Deemo and the Girl 6* (50565) crashes on its unit page - see "Units to test before release.txt".
 [ ] Luminous Core: the wiki has no source for its material (Sphere House extras, "Unknown").
+[ ] Next features with a head start from github.com/joppe2001/bf-private-server's notes (client-side
+    behaviour read from the app): Colosseum, Guilds between players, Frontier Hunter, Frontier Gate,
+    Merit exchange, account transfer codes. Write our own (their code is AGPL; notes are fine).
 [ ] Offered, not decided: probe the ~28 bosses the wiki lists wrongly; fail2ban on the Droplet;
     a "Play on PC" guide.
