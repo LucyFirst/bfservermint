@@ -3,15 +3,22 @@ Arena on the private server.
 
 Opponents are never the recorded bfrevive players: each match is either another player on this
 server (their own squad, as it is now) or a challenger built on the spot to match your squad's
-strength. Points, wins, ranks and rank-up rewards follow the game's own arena table (ArenaRankMst,
-sent by the game data) and what the bfrevive recordings showed: about +95 points for a win at 300
-points, a little less as you climb; karma = 100 x your rank for a win; one orb per battle.
+strength. Ranks and rank-up rewards follow the game's own arena table (ArenaRankMst, sent by the
+game data); points (ABP) follow the wiki's description of the original (see ABP_* below), plus a
+flat bonus for wins in a row; karma = 100 x your rank for a win; one orb per battle.
 """
 import json
 import random
 import time
 
 ORB_SECONDS = 3600          # an orb comes back every hour (the recordings show a 3600 s timer)
+# Arena Battle Points, as the wiki describes the original game: a win gives 10..200 before bonuses -
+# more for beating a higher-ABP opponent (200 for one 3000 above you), and more the better you
+# fought (units left standing, HP left, damage done); a loss costs more against a lower-ABP
+# opponent, and less the better you fought.
+ABP_MIN, ABP_MAX, ABP_EVEN, ABP_SPAN = 10, 200, 105, 3000
+# consecutive wins: a flat bonus on every win once the streak is long enough (a loss resets it)
+STREAK_BONUS = [(10, 60), (5, 40), (3, 20)]       # (wins in a row incl. this one, bonus points)
 NAMES = ['Aldric', 'Brynn', 'Caelum', 'Dara', 'Eamon', 'Fenna', 'Galen', 'Hesper', 'Ilsa', 'Joren', 'Kaela',
          'Lorcan', 'Maren', 'Niall', 'Orla', 'Perrin', 'Quill', 'Rhea', 'Soren', 'Tamsin', 'Ulric', 'Vesna',
          'Wren', 'Xander', 'Yara', 'Zephyr', 'Ashe', 'Bastian', 'Corin', 'Delia', 'Elric', 'Fiora', 'Gideon',
@@ -294,6 +301,29 @@ class Arena:
                'U42YcFNu': json.dumps(o['units'], separators=(',', ':')), 'bM7RLu5K': '', 'IvuccUuD': '0'}
         return {'9NX83YVe': [row], self.S.G_TEAM: [dict(t or {})], '89ausgc4': self.ai_rows}, None
 
+    @staticmethod
+    def performance(res):
+        """0..1: how well the fight went - units left standing, HP left, damage done to the other side
+        (the game's own end-of-battle report: WDYR11jJ / chy3HnIm = each unit's 'HP left:max HP')."""
+        def hp(text):
+            out = []
+            for part in str(text or '').split(','):
+                a, _, b = part.partition(':')
+                if _i(b) > 0:
+                    out.append((max(0, _i(a)), _i(b)))
+            return out
+        mine, foe = hp(res.get('WDYR11jJ')), hp(res.get('chy3HnIm'))
+        if not mine or not foe:
+            return 0.5
+        alive = sum(1 for now, _ in mine if now > 0) / len(mine)
+        left = sum(now for now, _ in mine) / sum(m for _, m in mine)
+        dealt = 1 - sum(now for now, _ in foe) / sum(m for _, m in foe)
+        return max(0.0, min(1.0, (alive + left + dealt) / 3))
+
+    @staticmethod
+    def streak_bonus(streak):
+        return next((b for n, b in STREAK_BONUS if streak >= n), 0)
+
     def end(self, pl, req, badge):
         o = pl.pop('arena_opp', None) or {}
         res = ((req.get('yTEvm85f') or [{}])[0])
@@ -301,10 +331,18 @@ class Arena:
         win = str(res.get('3pAQY5KW')) == '1'
         me = self.info(pl)
         before = _i(me.get('U4pMNjy0'))
+        diff = _i(o.get('points'), before) - before            # opponent's ABP above (+) or below (-) yours
+        perf = self.performance(res)
+        streak = pl.get('arena_streak', 0) + 1 if win else 0
+        bonus = 0
         if win:
-            delta = max(10, round(101 - before / 50))
+            base = max(ABP_MIN, min(ABP_MAX, ABP_EVEN + diff * (ABP_MAX - ABP_EVEN) / ABP_SPAN))
+            gain = max(ABP_MIN, round(base * (0.5 + 0.5 * perf)))
+            bonus = self.streak_bonus(streak)
+            delta = gain + bonus
         else:
-            delta = -min(before, max(5, round((101 - before / 50) / 3)))
+            base = max(ABP_MIN, min(ABP_MAX, ABP_EVEN - diff * (ABP_MAX - ABP_EVEN) / ABP_SPAN))
+            delta = -min(before, max(ABP_MIN, round(base * (1 - 0.5 * perf))))
         after = max(0, before + delta)
         old_rank, new_rank = self.rank_of(before), self.rank_of(after)
         karma = 100 * new_rank if win else 0
@@ -351,15 +389,16 @@ class Arena:
                 self.S.daily_engine().event(pl, 'arena')
             except Exception:
                 self.S.log.exception('could not count daily tasks')
-        pl['arena_streak'] = pl.get('arena_streak', 0) + 1 if win else 0
+        pl['arena_streak'] = streak
         pl['arena_best_streak'] = max(pl.get('arena_best_streak', 0), pl['arena_streak'])
         self.regen_orbs(pl)
-        self.S.log.info('arena: %s vs %s - %+d points (%d), karma +%d%s', 'win' if win else 'loss',
-                        o.get('name', '?'), after - before, after, karma,
+        self.S.log.info('arena: %s vs %s (%+d ABP apart, fought %.0f%%) - %+d points%s (%d), karma +%d%s',
+                        'win' if win else 'loss', o.get('name', '?'), diff, perf * 100, after - before,
+                        f' incl. {bonus} for {streak} wins in a row' if bonus else '', after, karma,
                         f', rank up to {new_rank}' if new_rank > old_rank else '')
         out = {'yTEvm85f': [{'xL0p2MkY': str(res.get('xL0p2MkY') or o.get('battle', '')), '3pAQY5KW': str(res.get('3pAQY5KW', '0')),
                              's07yWuZR': str(shown_from), 'C1w4H62i': str(new_rank), 'jPoM1UV8': str(before),
-                             'TJ9cQ8AY': str(after), 'HTVh8a65': str(karma), 'Sx5H0Ikn': '0', 'tvWWL9wI': '0',
+                             'TJ9cQ8AY': str(after), 'HTVh8a65': str(karma), 'Sx5H0Ikn': '0', 'tvWWL9wI': str(bonus),
                              'ciDqCjAF': str(rule.get('ciDqCjAF', '3')), '59b1eE6N': str(rule.get('59b1eE6N', '100')),
                              '69vnphig': me['69vnphig']}],
                'okd0y3Ir': rewards, '8jBJ7uKR': [me], self.S.G_TEAM: [dict(self.S.team_row(pl['state']) or {})]}
