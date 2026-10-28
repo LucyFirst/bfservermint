@@ -26,7 +26,7 @@ Claude keeps this list up to date. Newest first.
     28 Oct: MULTIPLAYER RECORDING DONE - recordings_raw/bfrevive_raid_multi_20261028.json.gz: Beater +
     a new account (LFtest), both recorded, plus a third player (Mint) in the same rooms; friend
     request/accept, room join, ready-up, raids from both sides, chat. Raid data needed to build
-    Raid (solo and multiplayer) is now complete enough to plan it.
+    Raid (solo and multiplayer) is now complete enough to plan it. PLAN: RAID-PLAN.txt
     Options, smallest first: Raid materials as Vortex drops; Raid bosses as solo Vortex quests; solo
     Raid in the game's own Raid mode; full multiplayer Raid.
 

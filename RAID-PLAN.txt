@@ -1,0 +1,134 @@
+RAID PLAN (written 28 Oct 2026, from bfrevive recordings)
+==========================================================
+
+Recordings used
+  recordings_raw/bfrevive_raid_20261028.json.gz        3 solo raids + Frontier Hunter (Beater)
+  recordings_raw/bfrevive_raid_multi_20261028.json.gz  658 requests, Beater + LFtest + Mint:
+      room 10916 / mission 2006 - timer ran out (phase 4)
+      room 11025 / mission 2007 - 3 players, boss 40000 -> 35426 -> 20043 -> 2948 -> 0, won
+
+What we already have
+  - Keys for all 40 Raid* requests (templates.json.gz), so the game's requests can be read.
+  - The game already downloads the raid tables: URLMst KeC10fuL lists 15 F_RAID_* tables
+    (world, map, point, user route, boss route, boss, mission, battle group, playstyle, rc,
+    mission point, clear conditions, boss parts, mission boss, elemental lock). These are
+    served from cdn/content/mst like every other table. STEP 0 checks the Droplet has them.
+  - battlegen can build raid battles: RaidMissionBattleStart returns the same battle groups as
+    a normal quest (pj41dy9g, 75t0sx9z, U0v5IeJo ...).
+  - Admin feature toggle 'raid' already exists (off).
+
+Everything runs over action.php. There is no separate world server. Multiplayer is just
+several players polling the same room / mission on our server every ~4 s.
+
+
+1. THE FLOW, REQUEST BY REQUEST
+-------------------------------
+
+Lobby
+  RaidAgreement        first visit only (terms). Reply: 1ry6BKoe raid user, 2WqoMm4d missions,
+                       8LF2ohCY cleared missions. Mark player as agreed.
+  RaidUserInfo         raid rank/exp (1ry6BKoe), missions open (2WqoMm4d, 1800 s limit each),
+                       cleared (8LF2ohCY), room bag Fihk73ZR, raid storehouse GvV1w4yM.
+  RaidWorloInfo        worlds (taWh0Pr7) + missions + cleared. Same data as above.
+  RaidGetPlayerInfo    player raid stats (6nqGvdY1).
+  RaidRoonItemEdit     move items between storehouse and the bag taken into raids. No reply groups.
+
+Rooms (solo play also makes a room, just with one member)
+  RaidUpDataRoomInfo   create / edit room: mission, comment, public/friends, rank limit.
+                       Reply: room 8iBuZa3n, members uwH62EZy, raid user, member units 9PS8BLiC.
+  RaidQuickStart       join any open room for a mission (sends chosen helper ZX7gzQ6s).
+  RaidRoomList         open rooms matching filters.
+  RaidEnter / RaidExit join / leave a room. Host leaving dissolves it (RaidRoomDissolve).
+  RaidRoomKick         host removes a member.
+  RaidRoomFriendGet    friend list to pick a helper (ft4zY6Uv).
+  RaidFrlendSelect     chosen helper, stored on the member.
+  RaidUpDataUserReady  ready tick (uwH62EZy.uX87tAZB). Host can start when all are ready.
+  RaidRoomInfo         POLL (~4 s). Room state, members, their units. 297 calls in one session.
+  RaidSendChat / RaidGetChatLog   room chat (WCA9VhL3), chat id cursor pw38qdui.NLKce95n.
+  RaidUpdateBlackList  hide a player from your room lists.
+
+Mission (the map)
+  RaidMissionStart     host starts: room state -> in mission, creates the mission instance
+                       (g97TWISb: mission, phase 1, 1800 s left), every player's map state
+                       (81B4TvEK: point 1, visited list), boss state (Ts2zJ6gj: map, boss HP,
+                       boss point), squad HP/BB (wc2DiMY1), bag (UsDq1E6o).
+  RaidMissionInfo      POLL (~4 s, 223 calls). Same 7 groups. Timer counts down here, the boss
+  RaidMissionInfoLight moves along F_RAID_BOSS_ROUTE_MST, other players' positions show up.
+  RaidMissionHarvest   player moves to / searches a point ("5:1" = point:action). Drops rolled
+                       from the point's drop list ("rate:item:count"); empty points answer
+                       "There is nothing more to find here." Visited list updated.
+  RaidCampRestStart / Get / End   rest at a camp: heal squad HP over time, short timer.
+  RaidLimitedUseItem   use a bag item on the map (potion, revive ...): updates wc2DiMY1, bag.
+  RaidItemEdit         reorganise the bag during the mission.
+  RaidMissionUseItem / RaidItemMix / RaidShopUse   not in the recordings. Leave as plain
+                       acknowledgements first.
+
+Battles
+  RaidMissionBattleStart   fight at a point (2cBk5WH8: point, battle). Normal fights use the
+                       point's battle group; at the boss point it is the boss with its parts
+                       and the CURRENT shared HP. Returns the normal battle groups.
+  RaidUpdateProgress   sent DURING the boss fight: damage so far ("point:part:damage", QP4cwt7n)
+                       and squad HP. Server subtracts from the shared boss HP and returns the
+                       new total, so players see each other's damage live.
+  RaidMissionBattleEnd win/lose/escape, damage per part, units' HP. Server applies final damage,
+                       stores HP/BB, updates boss HP. Boss HP 0 -> mission phase 2 (won).
+  RaidMissionBattleRestart  retry a lost fight (not recorded; same as BattleStart).
+
+Ending
+  Phase 2 = boss dead, phase 4 = time up (server sets it when 8n7oG4fS hits 0).
+  RaidMissionEnd       rewards (4sbU8kdW: 3 zel, 11 probably raid exp, 4 items), boss name
+                       (UC8S1AiX), player info (fEi17cnx), room + raid user + missions again.
+                       Adds raid exp / rank, marks the mission cleared, items to the inventory.
+  RaidMissionExit      quit mid-mission (counts as a loss for that player).
+  RaidUpDateCash       sync after spending gems in raid (revive). Reply empty.
+
+
+2. WHAT THE SERVER STORES
+-------------------------
+  Per player (save file):  agreed, raid rank + exp, cleared missions, storehouse, raid bag,
+                           raid squads (squad type 3), blacklist, stats.
+  In memory (shared, lost on restart is fine):
+    rooms    id, host, mission, settings, comment, members [id, ready, helper, units], chat
+    missions id, room, mission id, start time (timer = 1800 - elapsed), phase, boss HP,
+             boss position, boss parts HP, damage log with seq numbers,
+             per player: point, visited, camp state, squad HP/BB, bag, harvested points
+
+  One lock around the raid store so two players hitting the boss at the same time can't
+  lose damage. Rooms with no poll for 60 s are removed.
+
+
+3. WHERE THE GAME DATA COMES FROM
+---------------------------------
+  The F_RAID_* tables the game downloads: missions, maps, points, routes, bosses, parts, clear
+  conditions. The server reads the same files (masterdata.Masters) so client and server agree.
+  Point drops and battle groups: F_RAID_MISSION_POINT_MST / F_RAID_BATTLE_GROUP_MST (old-mst
+  copies gVmh3Lw2 / fYJjG4B6 as fallback).
+  Rewards at the end: recorded MissionEnd rewards as the reference (rule: recordings are
+  templates, not replays), ranges from the 6 recorded ends + clear condition table.
+
+
+4. BUILD ORDER
+--------------
+  STEP 0  Check the Droplet has every F_RAID_* file the game asks for (probe script; fetch any
+          missing with download_content.py). Restore raid squads: today server.py strips
+          squad type 3 because nobody could edit them; with Raid on they must stay editable.
+  STEP 1  Lobby: Agreement, UserInfo, WorloInfo, GetPlayerInfo, RoonItemEdit.
+          Test: the Raid button opens the lobby and the mission list.
+  STEP 2  Solo: UpDataRoomInfo, RoomInfo, Ready, MissionStart, MissionInfo(+Light), Harvest,
+          camps, items, BattleStart/End, UpdateProgress, MissionEnd/Exit, timer + phases.
+          Test: clear Edelma (2000) solo on Beater, time-out on purpose once.
+  STEP 3  Multiplayer: RoomList, Enter, Exit, QuickStart, Kick, Dissolve, chat, friend helper,
+          shared boss HP, other players on the map.
+          Test: Beater + LFtest in one room (both LDPlayer windows pointed at our server).
+  STEP 4  Admin page: Raid tab - which missions are open, live rooms/missions, kick/close room,
+          reward multiplier. Feature toggle stays off until STEP 2 passes.
+  STEP 5  Sphere House: switch on the Raid recipes (Spheres tab) once raid materials drop.
+
+
+5. OPEN QUESTIONS
+-----------------
+  - Reward type 11 (2000 / 2200 per clear) - raid exp or medals? Check against 1ry6BKoe.
+  - Exact camp heal rate and rest length (one camp recorded).
+  - Boss movement speed along its route (compare boss point in the 223 polls over time).
+  - Server memory: rooms are small (KBs); 1 GB + swap is fine for a handful of players.
+  - Raid shop / item mix not recorded; record one if players will want them.
