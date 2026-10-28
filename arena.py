@@ -402,8 +402,15 @@ class Arena:
                              'ciDqCjAF': str(rule.get('ciDqCjAF', '3')), '59b1eE6N': str(rule.get('59b1eE6N', '100')),
                              '69vnphig': me['69vnphig']}],
                'okd0y3Ir': rewards, '8jBJ7uKR': [me], self.S.G_TEAM: [dict(self.S.team_row(pl['state']) or {})]}
-        if pl['state'].get('PQ56vbkI'):
-            out['PQ56vbkI'] = pl['state']['PQ56vbkI']
+        # PQ56vbkI (arena records): 7sXWfE8j = the win streak the result and Arena screens show
+        # ("Consecutive Victories"), KuZ6k5Vp = the best streak (the Arena trophy)
+        arch = pl['state'].get('PQ56vbkI')
+        row = arch[0] if isinstance(arch, list) and arch and isinstance(arch[0], dict) else \
+            (arch if isinstance(arch, dict) else {self.S.F_USERID: pl['user_id']})
+        row['7sXWfE8j'] = str(streak)
+        row['KuZ6k5Vp'] = str(max(_i(row.get('KuZ6k5Vp')), pl['arena_best_streak']))
+        pl['state']['PQ56vbkI'] = [row]
+        out['PQ56vbkI'] = [row]
         if badge is not None:
             out[self.S.G_BADGE] = badge
         return out
