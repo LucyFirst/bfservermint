@@ -2402,6 +2402,16 @@ def sell_price():
         _SELLPRICE = sellprice.SellPrice(sys.modules[__name__])
     return _SELLPRICE
 
+_SKILLLEVEL = None
+
+def skill_levels():
+    """Boss move numbers that follow the wiki (see skilllevel.py)."""
+    global _SKILLLEVEL
+    if _SKILLLEVEL is None:
+        import skilllevel
+        _SKILLLEVEL = skilllevel.SkillLevels(sys.modules[__name__])
+    return _SKILLLEVEL
+
 def evo_gate():
     """Evolutions into units switched off on the admin page (see evogate.py)."""
     global _EVOGATE
@@ -4256,6 +4266,10 @@ def handle_action(rid, req):
                 resp['KeC10fuL'] = sell_price().patch_versions(resp.get('KeC10fuL') or [])
             except Exception:
                 log.exception('could not offer the edited unit table (sell prices)')
+            try:
+                resp['KeC10fuL'] = skill_levels().patch_versions(resp.get('KeC10fuL') or [])
+            except Exception:
+                log.exception('could not offer the edited skill-level table')
             try:
                 patch_define_mst(resp)
             except Exception:

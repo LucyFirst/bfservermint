@@ -1,0 +1,4 @@
+{
+ "_how": "Moves whose numbers follow the wiki instead of the game's own skill-level table (skill id -> level params). The server hands the game an edited copy of F_SKILL_LEVEL_MST (see skilllevel.py).",
+ "1956": {"name": "Death Gate (Trial No. 003, Demon Abaddon)", "params": "1:1500:120,120,100,0,0,0,0,0,0", "was": "1:1500:150,150,100,0,0,0,0,0,0"}
+}

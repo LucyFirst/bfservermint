@@ -481,8 +481,60 @@ def use_monster_sprite(mid, spec):
     return spec
 
 
+# Trial No. 003, Creator Maxwell, as the wiki has it: Endless once when she first acts under 20%, and
+# also once for every dialogue threshold (70/50/30/20% HP) when several are crossed between two of her
+# actions. Flags 31-34: threshold 70/50/30/20 seen; flag 39: an Endless chain is running. The first
+# free action after a single crossing is a normal attack that marks the threshold as seen.
+MAXWELL_AI = '20000023'
+MAXWELL_SKILL = {'endless': 7}
+
+
+def maxwell_thresholds(spec):
+    rows = [r for r in spec['ai'] if r['4eEVw5hL'] == MAXWELL_AI]
+    rest = [r for r in spec['ai'] if r['4eEVw5hL'] != MAXWELL_AI]
+    rows.sort(key=lambda r: int(r['yu18xScw']))
+    label = rows[0]['L8PCsu0K']
+    e = MAXWELL_SKILL['endless']
+    endless = [                                     # (conditions, flags set)
+        (['flg_off:31', 'hp_pr_under:50'], (31, 1, 39, 1)),     # 70% and 50% crossed together
+        (['flg_off:32', 'hp_pr_under:30'], (32, 1, 39, 1)),     # 50% and 30%
+        (['flg_off:33', 'hp_pr_under:20'], (33, 1, 39, 1)),     # 30% and 20%
+        (['flg_on:39', 'flg_off:32', 'hp_pr_under:50'], (32, 1, 39, 0)),   # last of a chain
+        (['flg_on:39', 'flg_off:33', 'hp_pr_under:30'], (33, 1, 39, 0)),
+        (['flg_on:39', 'flg_off:34', 'hp_pr_under:20'], (34, 1, 39, 0)),
+        (['flg_off:34', 'hp_pr_under:20'], (34, 1)),            # 20% crossed on its own
+    ]
+    marks = [(['flg_off:31', 'hp_pr_under:70', 'hp_pr_over:50'], (31, 1)),
+             (['flg_off:32', 'hp_pr_under:50', 'hp_pr_over:30'], (32, 1)),
+             (['flg_off:33', 'hp_pr_under:30', 'hp_pr_over:20'], (33, 1))]
+    old = [r for r in rows if f'skill:{e}@' in r['q7Nit8JW']]
+    assert len(old) == 1, 'Maxwell: expected one Endless row'
+    out = []
+    for r in rows:
+        if r is old[0]:
+            out += [('skill', [f'skill:{e}'] + c, f) for c, f in endless]
+        else:
+            out.append(r)
+        if 'turn_end@' in r['Hhgi79M1'] and 'actbetween:5' in r['q7Nit8JW']:
+            out += [('attack', c, f) for c, f in marks]
+    new = []
+    for i, r in enumerate(out, 1):
+        if isinstance(r, tuple):
+            act, conds, flags = r
+            new.append(ai_row(MAXWELL_AI, label, i, act, conds, params=flags))
+        else:
+            new.append(dict(r, yu18xScw=str(i)))
+    spec['ai'] = rest + new
+    return spec
+
+
+# Death Gate (Abaddon) deals 120% HP like the wiki says: that number lives in the game's skill-level
+# table, not here - see data/skill_level_fix.json and skilllevel.py.
+
+
 def build():
     out = {mid: from_recording(mid) for mid in RECORDED}
+    out['2000002'] = maxwell_thresholds(out['2000002'])
     for mid in OFFICIAL_AI:
         out[mid] = use_official_ai(mid, out[mid])
     for mid in MONSTER_SPRITE:
