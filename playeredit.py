@@ -181,7 +181,9 @@ class PlayerEditor:
                           'has_sbb': str(u.get('iEFZ6H19') or '') not in ('', '0'),
                           'has_sp': str(u.get('pn16CNah')) in (S.FE.get('units') or {}),
                           'sp': S._num(u.get('bFQbZh3x')) or 0, 'sp_used': S._num(u.get('3RgneFpP')) or 0,
-                          'sp_max': S._num(u.get('GIO9DTif')) or 100})
+                          'sp_max': S._num(u.get('GIO9DTif')) or 100,
+                          'imps': [S._num(u.get(f)) or 0 for f in S.IMP_FIELDS],
+                          'imp_caps': S.IMPS['caps'].get(str(u.get('pn16CNah')), [0, 0, 0, 0])})
         units.sort(key=lambda x: (-x['rarity'], x['name'], x['uuid']))
         tot = {}
         for r in S._rows(pl['state'].get(S.G_WAREHOUSE)):
@@ -372,7 +374,7 @@ class PlayerEditor:
         pl['state']['UT1SVg59'] = rows
         return n
 
-    def set_unit(self, pl, uuid, level=None, remove=False, bb=None, sbb=None, sp=None):
+    def set_unit(self, pl, uuid, level=None, remove=False, bb=None, sbb=None, sp=None, imps=None):
         S = self.S
         u = pl['units'].get(str(uuid))
         if not u:
@@ -417,6 +419,13 @@ class PlayerEditor:
             if str(u.get('bFQbZh3x')) != str(v):
                 u['bFQbZh3x'] = str(v)
                 out.append(f'SP {v}')
+        if imps == 'max':                    # imp limit of this unit (HP/ATK/DEF/REC), game data
+            caps = S.IMPS['caps'].get(str(u.get('pn16CNah')))
+            now = [S._num(u.get(f)) or 0 for f in S.IMP_FIELDS]
+            if caps and any(n < c for n, c in zip(now, caps)):
+                for f, n, c in zip(S.IMP_FIELDS, now, caps):
+                    u[f] = str(max(c, n))
+                out.append('imps HP %s ATK %s DEF %s REC %s' % tuple(u[f] for f in S.IMP_FIELDS))
         if not out:
             raise ValueError('Nothing changed.')
         return f'unit {name} ({uuid}): ' + ', '.join(out)
@@ -518,7 +527,7 @@ class PlayerEditor:
                         'groups': self.quests(pl), 'cleared': len(S.cleared_ids(pl))}
             if action == 'pe_unit':
                 what = self.set_unit(pl, data.get('uuid'), data.get('level'), bool(data.get('remove')),
-                                     data.get('bb'), data.get('sbb'), data.get('sp'))
+                                     data.get('bb'), data.get('sbb'), data.get('sp'), data.get('imps'))
             elif action == 'pe_item':
                 what = self.set_item(pl, data.get('item'), data.get('count', 0))
             elif action == 'pe_flag':

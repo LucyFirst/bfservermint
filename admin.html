@@ -786,10 +786,13 @@ async function setQuests(ids,clear){
 let pqT=null;$('#pqSearch').oninput=()=>{clearTimeout(pqT);pqT=setTimeout(drawQuests,250)};
 $('#pqCat').onchange=drawQuests;$('#pqShow').onchange=drawQuests;
 // units
+function impTxt(u){const c=u.imp_caps||[];if(!c.some(x=>x>0))return'';const i=u.imps||[0,0,0,0];
+  if(i.every((v,k)=>v>=c[k]))return' · <span style="color:var(--gold)">imps maxed</span>';
+  return' · imps '+['HP','ATK','DEF','REC'].map((n,k)=>`${n} ${i[k]}/${c[k]}`).join(' ')}
 function drawPeUnits(){
   const q=$('#puSearch').value.trim().toLowerCase(), l=PE.units.filter(u=>!q||u.name.toLowerCase().includes(q)||u.id===q||u.uuid===q);
   $('#puCount').textContent=`${l.length} of ${PE.units.length} units`;
-  $('#puTable tbody').innerHTML=l.slice(0,300).map(u=>`<tr><td><img class="uimg" loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"></td><td>${esc(u.name)} <span style="color:var(--gold);font-size:12px">${u.rarity===8?'Omni':u.rarity+'★'}</span>${u.squad?' <span class="tag c">in squad</span>':''}<div style="color:var(--muted);font-size:12px">#${u.id} · unit ${u.uuid}</div></td>
+  $('#puTable tbody').innerHTML=l.slice(0,300).map(u=>`<tr><td><img class="uimg" loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"></td><td>${esc(u.name)} <span style="color:var(--gold);font-size:12px">${u.rarity===8?'Omni':u.rarity+'★'}</span>${u.squad?' <span class="tag c">in squad</span>':''}<div style="color:var(--muted);font-size:12px">#${u.id} · unit ${u.uuid}${impTxt(u)}</div></td>
     <td class="num"><input type="number" min="1" max="${u.max}" value="${u.level}" data-lv="${u.uuid}" style="width:80px;padding:6px"> <span style="color:var(--muted);font-size:12px">/ ${u.max}</span></td>
     <td class="num" style="white-space:nowrap">${u.has_bb?`<input type="number" min="1" max="10" value="${u.bb||1}" data-bb="${u.uuid}" style="width:58px;padding:6px" title="BB level">`:'<span style="color:var(--muted)">-</span>'}${u.has_sbb?` <input type="number" min="0" max="10" value="${u.sbb}" data-sbb="${u.uuid}" style="width:58px;padding:6px" title="SBB level">`:''}</td>
     <td class="num" style="white-space:nowrap">${u.has_sp?`<input type="number" min="${u.sp_used}" max="${u.sp_max}" value="${u.sp}" data-sp="${u.uuid}" style="width:64px;padding:6px" title="SP owned (${u.sp_used} used)"> <span style="color:var(--muted);font-size:12px">${u.sp_used} used</span>`:'<span style="color:var(--muted)">-</span>'}</td>
@@ -800,7 +803,7 @@ $('#puTable').onclick=async e=>{
   const b=e.target.closest('button');if(!b)return;
   let d={player:cur};
   if(b.dataset.set){const id=b.dataset.set,B=$(`input[data-bb="${id}"]`),SB=$(`input[data-sbb="${id}"]`);d.uuid=id;d.level=$(`input[data-lv="${id}"]`).value;if(B)d.bb=B.value;if(SB)d.sbb=SB.value;const SP=$(`input[data-sp="${id}"]`);if(SP)d.sp=SP.value}
-  else if(b.dataset.max){const u=PE.units.find(x=>x.uuid===b.dataset.max);d.uuid=b.dataset.max;d.level='max';if(u.has_bb)d.bb='max';if(u.has_sbb)d.sbb='max';if(u.has_sp)d.sp='max'}
+  else if(b.dataset.max){const u=PE.units.find(x=>x.uuid===b.dataset.max);d.uuid=b.dataset.max;d.level='max';if(u.has_bb)d.bb='max';if(u.has_sbb)d.sbb='max';if(u.has_sp)d.sp='max';d.imps='max'}
   else if(b.dataset.rm){const u=PE.units.find(x=>x.uuid===b.dataset.rm);if(!confirm(`Remove ${u.name} from this player's unit box?`))return;d.uuid=b.dataset.rm;d.remove=true}
   try{b.disabled=true;const r=await api('pe_unit',d);peSet(r.view);say('#pmsg',r.ok,true);loadPlayers()}catch(err){say('#pmsg',err.message);b.disabled=false}
 };
