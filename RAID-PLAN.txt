@@ -109,6 +109,25 @@ Ending
 
 4. BUILD ORDER
 --------------
+  STATUS 28 Oct: steps 0-3 built in raid.py (data: data/raid_data.json + data/raid_templates.json,
+  made by tools/build_raid_data.py). Raid stays OFF until switched on in the admin page (Game areas).
+  What it does, and the choices made where bfrevive's recordings could not tell:
+    - quests offered: bfrevive's 37 minus the 4 with no boss ("defeat 5 of an enemy") = 33, by Raid Class
+    - bosses: every boss built from the game's boss-parts table (look, parts), numbers as bfrevive:
+      main part 40000 HP, other parts 13333, Atk 450 / Def 80 - times the quest's Raid Class (x2 for
+      class 2 quests ...). Bosses stay on their start point (bfrevive's never moved).
+    - map fights: bfrevive's set of small enemies (pots, totems, imps, idols...), 3-4 per fight,
+      numbers +-3%, times the Raid Class
+    - harvest: one item per search from the point's own drop list, 3 searches per point
+    - camp: heals the squad (full after ~10 s of rest)
+    - entries: 3, one back every hour; joining a started quest: within 5 minutes
+    - clear: zel / karma of the quest (x the admin page rates), Raid medals, what was picked up;
+      clearing the Raid Class quest (2007, 3011...) moves you up a class; the class rewards
+      (unit / gems / items) go to the gift box
+    - raid squads: the player's own once they edit them, else copies of their quest squads; only
+      shown to the game while Raid is open (so units are never locked by unseen raid squads)
+    - not recorded, answered empty: Raid shop, item mix, item delete, black list
+
   STEP 0  Check the Droplet has every F_RAID_* file the game asks for (probe script; fetch any
           missing with download_content.py). Restore raid squads: today server.py strips
           squad type 3 because nobody could edit them; with Raid on they must stay editable.

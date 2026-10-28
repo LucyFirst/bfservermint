@@ -602,6 +602,12 @@ def town_harvest(pl, req):
 
 def apply_request(pl, cls, req):
     """Requests that carry the player's own choices."""
+    raid_only = False
+    if cls == 'DeckEditRequest':
+        try:
+            raid_only = raid_engine().save_squads(pl, req)   # raid squads are kept apart (raid.py)
+        except Exception:
+            log.exception('could not keep the raid squads')
     if cls == 'TownFacilityUpdateRequest':
         pay_town_upgrade(pl, req)        # before the new levels are saved over the old ones
     if cls == 'TownUpdateRequest':
@@ -623,7 +629,7 @@ def apply_request(pl, cls, req):
     for f in CLIENT_PROGRESS_FIELDS:
         if ui.get(f):
             st[f] = ui[f]
-    if cls == 'DeckEditRequest' and req.get('Ti62XfZK'):
+    if cls == 'DeckEditRequest' and req.get('Ti62XfZK') and not raid_only:
         t = team_row(pl['state'])
         if t is not None:      # current squad number and squad settings chosen in the game
             for k, v in (req['Ti62XfZK'][0] or {}).items():
@@ -1064,6 +1070,10 @@ def apply_wallet(pl, resp):
                 t[c] = pl['wallet'].get(k, 0) if isinstance(t.get(c), int) else str(pl['wallet'].get(k, 0))
 
 def apply_overrides(pl, resp):
+    try:
+        raid_engine().add_party(pl, resp)        # the raid squads, when Raid is open
+    except Exception:
+        log.exception('could not add the raid squads')
     ov = pl.get('overrides') or {}
     if not ov or not isinstance(resp, dict):
         return resp
@@ -2208,6 +2218,16 @@ def friend_engine():
     if _FRIENDS is None:
         _FRIENDS = _friends.Friends(sys.modules[__name__])
     return _FRIENDS
+
+_RAID = None
+
+def raid_engine():
+    """Raid Battle rooms and quests (raid.py)."""
+    global _RAID
+    if _RAID is None:
+        import raid
+        _RAID = raid.Raid(sys.modules[__name__])
+    return _RAID
 
 def achievement_engine():
     global _ACH
@@ -4002,6 +4022,12 @@ def handle_action(rid, req):
             achievement_engine().level_campaign(pl)
         except Exception:
             log.exception('could not check the Level Up Campaign')
+        if cls.startswith('Raid'):
+            resp = raid_engine().handle(pl, cls, req)
+            apply_wallet(pl, resp)
+            apply_overrides(pl, resp)
+            save_player(pl)
+            return resp
         apply_request(pl, cls, req)
         if cls == 'TownFacilityUpdateRequest':
             ensure_recipes(pl)          # the new facility level's recipes show in this reply
@@ -4448,6 +4474,11 @@ class Handler(BaseHTTPRequestHandler):
                 resp = handle_action(rid, req)
                 if resp is None:
                     resp = {}             # the game crashes on a null reply; bfrevive sends {}
+                if isinstance(resp, dict) and '_plain' in resp:
+                    # a message box with no reply data (how bfrevive answers Raid problems)
+                    log.info('%-34s message: %s', REQS[rid]['cls'], resp['_plain'].get('b5PH6mZa', {}).get('ZC0msu2L'))
+                    return self._send(200, dict({'F4q6i9xe': {'Hhgi79M1': rid, 'aV6cLn3v': '---'}}, **resp['_plain']),
+                                      'text/html; charset=utf-8')
                 if isinstance(resp, dict) and isinstance(resp.get('h23iRjGN'), dict):
                     resp = fix_badges(req, resp)
                 resp = patch_summons(resp)
