@@ -3843,7 +3843,8 @@ def do_evo(pl, plan, resp):
     highlight('evo', pl, old, new)
     resp['I82p0wCL'] = [{'pn16CNah': new, 'edy7fq3L': plan['base'], 't9FEW2KC': old,
                          'u1ECvfg8': plan['base'], 'dV3qji4I': '0'}]
-    resp[G_UNITS_ADD] = []
+    if G_UNITS_ADD in resp:                      # the game's own answer has no "units added" list
+        resp[G_UNITS_ADD] = []
     if G_MIX_RESULT in resp:
         resp[G_MIX_RESULT] = []
     log.info('evolution: %s -> %s (%s zel, %d materials)', um.get(old, {}).get('utP1c0CD', old),
