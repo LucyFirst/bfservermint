@@ -483,13 +483,14 @@ def use_monster_sprite(mid, spec):
 
 # Trial No. 003, Creator Maxwell, as the wiki has it: Endless once when she first acts under 20%, and
 # also once for every dialogue threshold (70/50/30/20% HP) when several are crossed between two of her
-# actions. Flags 31-34: threshold 70/50/30/20 seen; flag 39: an Endless chain is running.
+# actions. Flags 15-18: threshold 70/50/30/20 seen; flag 19: an Endless chain is running. (The game only
+# reads flags 1-20 - a first version used 31-39, which always read as off.)
 # The "seen" flags are set by her own moves: each of her moves comes in HP bands (70-50, 50-30, 30-20)
 # and the banded copy marks every threshold above her HP as seen. (A first try used a plain attack to
 # mark them; the game ignored the flags on that attack and she used Endless on a single crossing.)
 MAXWELL_AI = '20000023'
 MAXWELL_SKILL = {'endless': 7}
-BANDS = [(70, 50, (31, 1)), (50, 30, (31, 1, 32, 1)), (30, 20, (31, 1, 32, 1, 33, 1))]
+BANDS = [(70, 50, (15, 1)), (50, 30, (15, 1, 16, 1)), (30, 20, (15, 1, 16, 1, 17, 1))]
 
 
 def _conds(r):
@@ -551,13 +552,13 @@ def maxwell_thresholds(spec):
     label = rows[0]['L8PCsu0K']
     e = MAXWELL_SKILL['endless']
     endless = [                                     # (conditions, flags set)
-        (['flg_off:31', 'hp_pr_under:50'], (31, 1, 39, 1)),     # 70% and 50% crossed together
-        (['flg_off:32', 'hp_pr_under:30'], (32, 1, 39, 1)),     # 50% and 30%
-        (['flg_off:33', 'hp_pr_under:20'], (33, 1, 39, 1)),     # 30% and 20%
-        (['flg_on:39', 'flg_off:32', 'hp_pr_under:50'], (32, 1, 39, 0)),   # last of a chain
-        (['flg_on:39', 'flg_off:33', 'hp_pr_under:30'], (33, 1, 39, 0)),
-        (['flg_on:39', 'flg_off:34', 'hp_pr_under:20'], (34, 1, 39, 0)),
-        (['flg_off:34', 'hp_pr_under:20'], (34, 1)),            # 20% crossed on its own
+        (['flg_off:15', 'hp_pr_under:50'], (15, 1, 19, 1)),     # 70% and 50% crossed together
+        (['flg_off:16', 'hp_pr_under:30'], (16, 1, 19, 1)),     # 50% and 30%
+        (['flg_off:17', 'hp_pr_under:20'], (17, 1, 19, 1)),     # 30% and 20%
+        (['flg_on:19', 'flg_off:16', 'hp_pr_under:50'], (16, 1, 19, 0)),   # last of a chain
+        (['flg_on:19', 'flg_off:17', 'hp_pr_under:30'], (17, 1, 19, 0)),
+        (['flg_on:19', 'flg_off:18', 'hp_pr_under:20'], (18, 1, 19, 0)),
+        (['flg_off:18', 'hp_pr_under:20'], (18, 1)),            # 20% crossed on its own
     ]
     old = [r for r in rows if f'skill:{e}@' in r['q7Nit8JW']]
     assert len(old) == 1, 'Maxwell: expected one Endless row'
