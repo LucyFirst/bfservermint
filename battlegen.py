@@ -129,6 +129,44 @@ def _poisson(lam, rng):
             return n
         n += 1
 
+# Quests built straight from the wiki's description, because the recorded bfrevive runs of them are
+# filled with random placeholder enemies (Vargas, the element Gods, 50k-HP Burst Frogs...).
+# Each: normal battles from the zone's enemies, the wiki's room-3 encounters, the wiki's boss stages.
+# Numbers per quest: normal enemy (hp, atk, def); entries are (enemy name, hp, atk, def).
+_HN_ZONE = ['pumburkiny', 'cerberus', 'gloomy', 'king gloomy', 'skeleton king', 'medusa', 'lilin', 'imp', 'skeleton']
+_HN_ITEMS = [('10003', 1), ('10204', 1), ('10300', 1), ('10400', 1), ('10605', 1), ('800100', .35), ('880223', .35)]
+WIKI_LINEUPS = {
+    '8380130': {'normal': (1620, 510, 110), 'rare': [],
+                'room3': [],
+                'boss': [[('memetes', 17720, 860, 79), ('skeleton', 6910, 750, 110), ('skeleton', 6910, 750, 110)]]},
+    '8381130': {'normal': (2500, 570, 140), 'rare': [],
+                'room3': [[('vampire', 14000, 720, 120), ('lilin', 3200, 620, 120), ('lilin', 3200, 620, 120)],
+                          [('shida', 14000, 720, 120), ('lilin', 3200, 620, 120), ('lilin', 3200, 620, 120)]],
+                'boss': [[('hell king hades', 45000, 1000, 150), ('memetes', 11500, 800, 80), ('memetes', 11500, 800, 80)]]},
+    '8382130': {'normal': (3500, 630, 200), 'rare': ['burst frog'],
+                'room3': [[('lich', 22000, 900, 200), ('lilin', 4500, 700, 150), ('lilin', 4500, 700, 150)],
+                          [('garroter shida', 38000, 1000, 250)]],
+                'boss': [[('death god lodaga', 133720, 1420, 540), ('skull lord', 30000, 1200, 400), ('skull lord', 30000, 1200, 400)]]},
+    '8383130': {'normal': (6200, 850, 180), 'rare': ['burst frog'],
+                'room3': [[('necromancer lemia', 42000, 1100, 300), ('incubus', 9000, 950, 250), ('incubus', 9000, 950, 250)],
+                          [('executioner shida', 75000, 1200, 300)]],
+                'boss': [[('hellborn dilias', 217780, 1760, 480), ('skull lord', 45000, 1400, 450), ('skull lord', 45000, 1400, 450)]]},
+    '8384130': {'normal': (8000, 1000, 250), 'rare': ['burst frog'],
+                'room3': [[('necromancer lemia', 55000, 1250, 350), ('incubus', 12000, 1100, 300), ('incubus', 12000, 1100, 300)],
+                          [('executioner shida', 95000, 1350, 350)]],
+                'boss': [[('sanguine hood ciara', 470180, 1590, 760, '810107'), 'mob', 'mob?'],
+                         [('pumleficent semira', 470180, 1590, 760, '860107'), 'mob', 'mob?']]},
+    '8385130': {'normal': (10000, 1200, 300), 'rare': ['burst frog'],
+                'room3': [[('necromancer lemia', 70000, 1400, 400), ('incubus', 15000, 1250, 350), ('incubus', 15000, 1250, 350)],
+                          [('executioner shida', 120000, 1500, 400)]],
+                'boss': [[('abyssal witch ciara', 480000, 2360, 81), ('skull lord', 80000, 1800, 450), ('skull lord', 80000, 1800, 450)],
+                         [('ruinous despoiler galtier', 480000, 2360, 81), ('skull lord', 80000, 1800, 450), ('skull lord', 80000, 1800, 450)]]},
+}
+for _m in WIKI_LINEUPS.values():
+    _m.setdefault('zone', _HN_ZONE)
+    _m.setdefault('items', _HN_ITEMS)
+
+
 def _chance(p, k):
     return min(0.95, p * SETTINGS.get(k, 1.0)) if p < 1 else p
 
@@ -361,6 +399,8 @@ class Battlegen:
         wiki = self.W.get(mid) or {}
         if mid in GARDENS:
             return self._garden(mid, wiki, rng)
+        if mid in WIKI_LINEUPS:
+            return self._wiki_lineup(mid, wiki, rng)
         if mid in FIXED_LINEUPS and any(r['src'] == 'datamine' for r in self.refs.get(mid, [])):
             return self._fixed(mid, wiki, rng)
         if self.category(mid) == 'vortex':
@@ -377,6 +417,82 @@ class Battlegen:
             if src:
                 return self._vortex(mid, src[0], wiki, rng)
         return self._story(mid, wiki, rng)
+
+    # ------------------------------------------------------------------ built from the wiki (WIKI_LINEUPS)
+    def _wiki_lineup(self, mid, wiki, rng):
+        cfg = WIKI_LINEUPS[mid]
+        n = max(2, _i((self.M.get(mid) or {}).get('battles')) or _i(wiki.get('n')) or 5)
+        nhp, natk, ndef = cfg['normal']
+
+        def enemy(name, hp, atk, df, boss=False, look=None):
+            ref = self.by_name.get(name)
+            if not ref:
+                return None
+            e = {k: ref.get(k) for k in ('u', 'name', 'el', 'ai', 'row')}
+            if look and look in self.U:      # the wiki's picture of it (the recording shows another form)
+                e['u'] = look
+                e['row'] = dict(e['row'] or {}, pn16CNah=look) if e['row'] else None
+            e['act'] = list(ref.get('act') or [1, 1])
+            hp = max(1, int(hp * rng.uniform(.93, 1.07)))
+            zel = int(min(3000, max(30, hp * 0.03)))
+            e.update(hp=hp, atk=max(1, int(atk * rng.uniform(.95, 1.05))), boss=boss, filler=False,
+                     zel=int(zel * rng.uniform(.8, 1.2)), karma=int(zel * 0.6 * rng.uniform(.8, 1.2)), **{'def': int(df)})
+            return e
+
+        tough = {'king gloomy': 1.4, 'cerberus': 1.3, 'skeleton king': 1.2, 'gloomy': .7}
+        pool = [x for x in cfg['zone'] if x in self.by_name]
+        rare = [x for x in cfg.get('rare') or [] if x in self.by_name]
+
+        def mob(boss=False):
+            name = rng.choice(rare) if rare and rng.random() < 0.12 else rng.choice(pool)
+            f = tough.get(name, 1.0) * (1.3 if boss else 1.0)
+            return enemy(name, nhp * f, natk * (1.1 if boss else 1.0), ndef, boss)
+
+        battles = []
+        for bi in range(n - 1):
+            if bi == 2 and cfg['room3']:
+                b = [enemy(*x) for x in rng.choice(cfg['room3'])]
+            else:
+                b = [mob() for _ in range(rng.choice((2, 3, 3, 4)))]
+            battles.append([m for m in b if m])
+        last = []
+        for x in rng.choice(cfg['boss']):
+            if x == 'mob' or (x == 'mob?' and rng.random() < 0.5):
+                last.append(mob(boss=True))
+            elif isinstance(x, tuple):
+                last.append(enemy(*x[:4], boss=True, look=x[4] if len(x) > 4 else None))
+        battles.append([m for m in last if m])
+        if len(battles[-1]) == 3:          # the main boss in the middle, its two mates beside it
+            battles[-1] = [battles[-1][1], battles[-1][0], battles[-1][2]]
+        plan = self._finish(mid, wiki, battles, [], rng, story=False)
+        # the zone's material drops in chests now and then
+        items, w = zip(*cfg['items'])
+        for b in plan['battles'][:-1]:
+            k = len(b['mons'])
+            if rng.random() < _chance(0.35, 'item'):
+                b['chests'].append(f'{rng.randrange(k)}/1/4:1000:{rng.choices(items, weights=w)[0]}:1')
+            if rng.random() < 0.25:
+                kind = rng.choice((1, 2))
+                base = max(50, int((self.exp(mid) + 20) ** 0.5 * (60 if kind == 1 else 30)))
+                b['chests'].append(f'{rng.randrange(k)}/1/{kind}:25:{int(base * rng.uniform(.5, 1.5))}')
+        # the recorded enemies' own skills and AI rows (from one recorded run per enemy)
+        used = {(m.get('row') or {}).get('o49dYfpH') for b in plan['battles'] for m in b['mons']}
+        skills, ai, want = {}, {}, set(used)
+        for _, rs in sorted(self.refs.items(), key=lambda kv: _i(kv[0])):
+            for run in rs:
+                if not want:
+                    break
+                if run['src'] != 'recording':
+                    continue
+                has = {(m.get('row') or {}).get('o49dYfpH') for m in [m for b in run['battles'] for m in b] + run.get('named', [])}
+                if has & want:
+                    want -= has
+                    for row in run['skills']:
+                        skills.setdefault(row.get('nj9Lw7mV'), row)
+                    for row in run['ai']:
+                        ai.setdefault((row.get('4eEVw5hL'), row.get('yu18xScw')), row)
+        plan.update(skills=list(skills.values()), ai=list(ai.values()), label='built from the wiki')
+        return plan
 
     # ------------------------------------------------------------------ Garden of Nymphs / Spirits
     def _garden(self, mid, wiki, rng):

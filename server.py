@@ -1767,8 +1767,19 @@ def deliver_server_gifts(pl):
 
 FIRST_CLEAR_GEMS = 5        # gems every quest gives on its first clear (the original game gave 1)
 
+# Quests whose first clear also gives items / units (the wiki's first clear rewards)
+QUEST_FIRST_CLEAR = {
+    '8382130': {'items': [{'id': '800102', 'count': 1}]},                              # The Haunted Lands: Heinous Dust
+    '8383130': {'items': [{'id': '800101', 'count': 1}], 'units': [{'id': '10312', 'count': 1}]},  # Demonic Vindication: Evil Drop, Burst Frog
+}
+
 def first_clear_gift(pl, mid):
     add_present(pl, 8, '', FIRST_CLEAR_GEMS, 'First clear reward')
+    rw = QUEST_FIRST_CLEAR.get(str(mid)) or {}
+    for u in rw.get('units') or []:
+        add_present(pl, 6, str(u['id']), u.get('count', 1), 'First clear reward', unit_type=1)
+    for it in rw.get('items') or []:
+        add_present(pl, 4, str(it['id']), it.get('count', 1), 'First clear reward')
 
 LC_DAYS, LC_GEMS = 15, 15
 LC_IMG = '/logincampaign/private15_login_icon_day{}.png'
@@ -2078,6 +2089,11 @@ def clear_bonus_text(mid):
     type codes: 8 gems, 6 unit, 4 item): what the first clear put in the gift box, so the result
     screen shows it."""
     gems, out = FIRST_CLEAR_GEMS, []                  # first_clear_gift's gems
+    qrw = QUEST_FIRST_CLEAR.get(str(mid)) or {}
+    for u in qrw.get('units') or []:
+        out.append(f"6:{u['id']}:{u.get('count', 1)}")
+    for it in qrw.get('items') or []:
+        out.append(f"4:{it['id']}:{it.get('count', 1)}")
     if is_trial(mid):
         rw = TRIAL_REWARDS.get(str(mid)) or {}
         gems += _num(rw.get('gems')) or 0
