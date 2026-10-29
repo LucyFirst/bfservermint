@@ -119,9 +119,31 @@ class Raid:
             return False
         return all((self.D['bosses'].get(b['boss']) or {}).get('parts') for b in m['bosses'])
 
+    def max_class(self):
+        """Highest Raid Class open on the server (admin page, Game areas). Quests above it are not
+        offered and nobody's Raid Class goes past it."""
+        try:
+            return max(1, min(MAX_CLASS, int(self.S.admin_settings().get('raid_max_class', MAX_CLASS))))
+        except Exception:
+            return MAX_CLASS
+
+    def cls(self, pl):
+        """A player's Raid Class as far as the server lets it count."""
+        return min(self.state(pl)['cls'], self.max_class())
+
+    def quest_list(self):
+        """Every Raid quest we can run: bfrevive's list first (Raid Class 1-2), then the higher
+        classes' quests from the game's own tables, by class."""
+        if getattr(self, '_quests', None) is None:
+            first = [m for m in self.D.get('offered', []) if m in self.D['missions']]
+            more = sorted((m for m in self.D['missions'] if m not in first),
+                          key=lambda m: (self.D['missions'][m]['cls'], int(m)))
+            self._quests = [m for m in first + more if self.supported(m)]
+        return self._quests
+
     def offered(self, pl):
-        cls = self.state(pl)['cls']
-        return [mid for mid in self.D.get('offered', []) if self.supported(mid) and self.D['missions'][mid]['cls'] <= cls]
+        cls = self.cls(pl)
+        return [mid for mid in self.quest_list() if self.D['missions'][mid]['cls'] <= cls]
 
     # ------------------------------------------------------------------ player raid state
     def state(self, pl):
@@ -738,7 +760,7 @@ class Raid:
                 rewards.append(('4', item, n, '2'))
             if first:
                 st['cleared'].append(q['mission'])
-            if m.get('class_up') and m['cls'] == st['cls'] and st['cls'] < MAX_CLASS:
+            if m.get('class_up') and m['cls'] == st['cls'] and st['cls'] < min(MAX_CLASS, self.max_class()):
                 st['cls'] += 1
                 class_up = True
                 for rtype, target, n in self.D['class_rewards'].get(str(st['cls']), []):
@@ -857,7 +879,7 @@ class Raid:
             mine = self.where.get(pl['user_id'])
             rows = [self.room_row(rm) for rm in self.rooms.values()
                     if rm['id'] != mine and rm['state'] == 0 and len(rm['members']) < min(MAX_MEMBERS, self.D['missions'][rm['mission']]['players'])
-                    and self.D['missions'][rm['mission']]['cls'] <= st['cls']]
+                    and self.D['missions'][rm['mission']]['cls'] <= self.cls(pl)]
             return {'8iBuZa3n': rows}
 
         if name == 'Enter':
@@ -871,7 +893,7 @@ class Raid:
                     raise RaidError('This Room is full.')
                 if room['state'] != 0:
                     raise RaidError('The quest in this Room has already started.')
-                if self.D['missions'][room['mission']]['cls'] > st['cls']:
+                if self.D['missions'][room['mission']]['cls'] > self.cls(pl):
                     raise RaidError('Your Raid Class is too low for this quest.')
                 self.leave(pl)
                 room['members'].append(pl['user_id'])

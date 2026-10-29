@@ -350,6 +350,11 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
     <h2>Game areas</h2>
     <p class="hint">Switch parts of the game off for every player. These are the game's own switches, so a switched-off area cannot be opened - players do not get sent back to the home screen. Players see changes after fully closing and reopening the game.</p>
     <div id="featList"></div>
+    <div style="margin-top:12px">
+      <b>Raid Classes open</b>
+      <select id="raidCls" style="margin-left:8px"></select>
+      <p class="hint" style="margin:6px 0 0">Raid quests above this Raid Class are not offered, and nobody's Raid Class goes past it (clearing the class-up quest of the top open class does nothing until you open the next one).</p>
+    </div>
     <div class="msg" id="featmsg"></div>
   </div>
 </section>
@@ -991,8 +996,10 @@ async function loadFeatures(){
       <input type="checkbox" data-feat="${f.id}"${f.on?'':' checked'} style="margin-top:3px">
       <span><b>${esc(f.name)}</b> <span style="color:var(--muted);font-size:12px">· ${esc(f.where)}</span>
       <br><span style="color:var(--muted);font-size:12.5px">${f.on?'On.':'Off.'} When off: ${esc(f.off_effect)}</span></span></label>`).join('');
+    $('#raidCls').innerHTML=[1,2,3,4,5,6,7].map(n=>`<option value="${n}"${n==r.raid_max_class?' selected':''}>Raid Class 1 to ${n}</option>`).join('');
   }catch(e){say('#featmsg',e.message)}
 }
+$('#raidCls').onchange=async e=>{try{const r=await api('raid_class_set',{n:+e.target.value});say('#featmsg',r.ok,true)}catch(err){say('#featmsg',err.message)}};
 $('#featList').addEventListener('change',async e=>{const c=e.target.closest('input[data-feat]');if(!c)return;
   try{const r=await api('feature_set',{id:c.dataset.feat,on:!c.checked});say('#featmsg',r.ok,true);loadFeatures()}catch(err){say('#featmsg',err.message)}});
 

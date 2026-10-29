@@ -45,6 +45,9 @@ Claude keeps this list up to date. Newest first.
     the 4 "defeat 5 of an enemy" ones). Tested offline, incl. replaying both recordings' requests.
     Next: switch Raid on in the admin page (Game areas), test solo with one of our server's
     accounts, then two of our accounts together (our app on two LDPlayer windows, or phone + PC). Then: admin Raid tab, Raid Sphere House recipes.
+    30 Oct: admin page Game areas has "Raid Classes open" (default 1 to 3). Raid Class 3 quests (27) now
+    come from the game's own tables (bfrevive only listed Class 1-2) - UNTESTED in the game; bosses are
+    the Class 1 numbers x3 (CLASS_MULT). Test a Class 3 quest before players reach Class 3.
 
 [ ] Deemo and the Girl 6* (50565) crashes on its unit page - see "Units to test before release.txt".
 [ ] Luminous Core: the wiki has no source for its material (Sphere House extras, "Unknown").

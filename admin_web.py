@@ -233,7 +233,17 @@ class Admin:
         if action == 'features':
             cur = self.settings().get('features', {})
             return {'features': [{'id': k, 'name': n, 'where': w, 'off_effect': e, 'on': bool(cur.get(k, 1))}
-                                 for k, n, w, e in S.GAME_FEATURES]}
+                                 for k, n, w, e in S.GAME_FEATURES],
+                    'raid_max_class': self.settings().get('raid_max_class', 3)}
+        if action == 'raid_class_set':
+            n = int(data.get('n') or 0)
+            if not 1 <= n <= 7:
+                raise ValueError('Raid Class must be 1 to 7.')
+            s = self.settings()
+            s['raid_max_class'] = n
+            self.save_settings(s)
+            S.log.info('admin page: Raid Classes open up to %d', n)
+            return {'ok': f'Raid Classes 1 to {n} are open. Takes effect straight away (players see the quest list change next time they open it).'}
         if action == 'feature_set':
             k = str(data.get('id', ''))
             if k not in {f[0] for f in S.GAME_FEATURES}:

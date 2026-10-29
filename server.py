@@ -2281,6 +2281,7 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
                                'super': {'on': 0, 'chance': 3.0, 'mult': 2.0}, 'label': 'none'},
                     'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0, 'colosseum_enable': 0},
+                    'raid_max_class': 3,    # Raid Battle: highest Raid Class open (quests and class-ups)
                     'unitbox': 300,
                     'sphere_on': [],        # event / raid Sphere House recipes switched on         # base unit box size every player has (the game starts at 300)
                     'on_extra': []}         # off-by-default extras switched on (JP trials, Brave Dances)
@@ -2332,6 +2333,8 @@ def admin_settings():
                 d['features'].update({str(k): 1 if v else 0 for k, v in (f.get('features') or {}).items()
                                       if str(k) in d['features']})
                 d['on_extra'] = [str(x) for x in (f.get('on_extra') or [])]
+                if str(f.get('raid_max_class', '')).isdigit():
+                    d['raid_max_class'] = max(1, min(7, int(f['raid_max_class'])))
                 d['sphere_on'] = [str(x) for x in (f.get('sphere_on') or [])]
                 if str(f.get('unitbox', '')).isdigit():
                     d['unitbox'] = max(UNITBOX_START, min(UNITBOX_MAX, int(f['unitbox'])))
