@@ -483,10 +483,65 @@ def use_monster_sprite(mid, spec):
 
 # Trial No. 003, Creator Maxwell, as the wiki has it: Endless once when she first acts under 20%, and
 # also once for every dialogue threshold (70/50/30/20% HP) when several are crossed between two of her
-# actions. Flags 31-34: threshold 70/50/30/20 seen; flag 39: an Endless chain is running. The first
-# free action after a single crossing is a normal attack that marks the threshold as seen.
+# actions. Flags 31-34: threshold 70/50/30/20 seen; flag 39: an Endless chain is running.
+# The "seen" flags are set by her own moves: each of her moves comes in HP bands (70-50, 50-30, 30-20)
+# and the banded copy marks every threshold above her HP as seen. (A first try used a plain attack to
+# mark them; the game ignored the flags on that attack and she used Endless on a single crossing.)
 MAXWELL_AI = '20000023'
 MAXWELL_SKILL = {'endless': 7}
+BANDS = [(70, 50, (31, 1)), (50, 30, (31, 1, 32, 1)), (30, 20, (31, 1, 32, 1, 33, 1))]
+
+
+def _conds(r):
+    return [c for c in r['q7Nit8JW'].split('#')[1].split('@') if c and c != 'non:0']
+
+
+def _banded(r, label):
+    """Copies of a recorded AI row for each HP band, marking the thresholds above it as seen."""
+    conds = _conds(r)
+    if any(c.startswith('limited_act') for c in conds) or not r['Hhgi79M1'].startswith(('skill@', 'attack@')):
+        return []
+    if any(p != '-1' for p in r['Hhgi79M1'].split('@')[1].split(',') if p):
+        return []                                   # already sets flags of its own
+    hi = min([int(c.split(':')[1]) for c in conds if c.startswith('hp_pr_under:')] or [101])
+    lo = max([int(c.split(':')[1]) for c in conds if c.startswith('hp_pr_over:')] or [-1])
+    rest = [c for c in conds if not c.startswith(('hp_pr_under:', 'hp_pr_over:'))]
+    act = r['Hhgi79M1'].split('@')[0]
+    out = []
+    for top, bottom, flags in BANDS:
+        u, o = min(hi, top), max(lo, bottom)
+        if u <= o:
+            continue
+        c = rest + [f'hp_pr_under:{u}', f'hp_pr_over:{o}']
+        if len(c) > 5:
+            continue
+        skill = [x for x in c if x.startswith('skill:')]
+        other = [x for x in c if not x.startswith('skill:')]
+        row = ai_row(MAXWELL_AI, label, 0, act, other if act == 'attack' else other, int(r['ug9xV4Fz']),
+                     r['VBj9u0ot'], int(r['4xctV8gF']), params=flags)
+        if skill:                                   # keep the skill term first, like the game's rows
+            row = ai_row(MAXWELL_AI, label, 0, act, skill + other, int(r['ug9xV4Fz']), r['VBj9u0ot'],
+                         int(r['4xctV8gF']), params=flags)
+        out.append(row)
+    return out
+
+
+def _outside(r):
+    """A chance-based row whose banded copies already roll inside 70-20%: the original only rolls
+    outside the bands, so each move keeps its own chance (one roll per action, not two)."""
+    conds = _conds(r)
+    hi = min([int(c.split(':')[1]) for c in conds if c.startswith('hp_pr_under:')] or [101])
+    lo = max([int(c.split(':')[1]) for c in conds if c.startswith('hp_pr_over:')] or [-1])
+    rest = [c for c in conds if not c.startswith(('hp_pr_under:', 'hp_pr_over:'))]
+    out = []
+    for u, o in ((hi, max(lo, 70)), (min(hi, 20), lo)):
+        if u <= o:
+            continue
+        c = rest + ([f'hp_pr_under:{u}'] if u < 101 else []) + ([f'hp_pr_over:{o}'] if o >= 0 else [])
+        cs = c + ['non:0'] * (5 - len(c))
+        party = r['q7Nit8JW'].split('#')[0]
+        out.append(dict(r, q7Nit8JW=party + '#' + '@'.join(cs) + '@'))
+    return out
 
 
 def maxwell_thresholds(spec):
@@ -504,27 +559,16 @@ def maxwell_thresholds(spec):
         (['flg_on:39', 'flg_off:34', 'hp_pr_under:20'], (34, 1, 39, 0)),
         (['flg_off:34', 'hp_pr_under:20'], (34, 1)),            # 20% crossed on its own
     ]
-    marks = [(['flg_off:31', 'hp_pr_under:70', 'hp_pr_over:50'], (31, 1)),
-             (['flg_off:32', 'hp_pr_under:50', 'hp_pr_over:30'], (32, 1)),
-             (['flg_off:33', 'hp_pr_under:30', 'hp_pr_over:20'], (33, 1))]
     old = [r for r in rows if f'skill:{e}@' in r['q7Nit8JW']]
     assert len(old) == 1, 'Maxwell: expected one Endless row'
     out = []
     for r in rows:
         if r is old[0]:
-            out += [('skill', [f'skill:{e}'] + c, f) for c, f in endless]
+            out += [ai_row(MAXWELL_AI, label, 0, 'skill', [f'skill:{e}'] + c, params=f) for c, f in endless]
         else:
-            out.append(r)
-        if 'turn_end@' in r['Hhgi79M1'] and 'actbetween:5' in r['q7Nit8JW']:
-            out += [('attack', c, f) for c, f in marks]
-    new = []
-    for i, r in enumerate(out, 1):
-        if isinstance(r, tuple):
-            act, conds, flags = r
-            new.append(ai_row(MAXWELL_AI, label, i, act, conds, params=flags))
-        else:
-            new.append(dict(r, yu18xScw=str(i)))
-    spec['ai'] = rest + new
+            band = _banded(r, label)
+            out += band + (_outside(r) if band and int(r['ug9xV4Fz']) < 100 else [r])
+    spec['ai'] = rest + [dict(r, yu18xScw=str(i)) for i, r in enumerate(out, 1)]
     return spec
 
 
