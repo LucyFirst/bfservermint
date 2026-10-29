@@ -55,7 +55,7 @@ Claude keeps this list up to date. Newest first.
     a "Play on PC" guide.
 
 [ ] Evolution: the unit list icon stays on the old form until the next quest or a restart (added 30 Oct 2026)
-    Reported: Lucy evolved Boxer Nemia (2*) -> Brawler Nemia (3*); ADMIN evolved Fire Beast Zegar (4*)
+    Reported: Lucy evolved Boxer Nemia (2*) -> Brawler Nemia (3*); Komik evolved Fire Beast Zegar (4*)
     -> Beast King Zegar (5*). After the evolution the unit list / evolve list / fusion list icon still
     shows the OLD form. Everything else is right: the unit's info page, sprite and stats show the new
     form, the admin page shows the new icon, and fusing into it works on the new unit. The icon only
