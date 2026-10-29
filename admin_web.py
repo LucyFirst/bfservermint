@@ -314,6 +314,7 @@ class Admin:
                 if b:
                     boosts[did] = b
             return {'tabs': tabs, 'closed': self.settings()['off'].get('banners', []),
+                    'closed_quests': self.settings()['off'].get('quests', []),
                     'closed_tabs': self.settings()['off'].get('vortex', []), 'schedules': sched,
                     'boosts': boosts,
                     'today': time.localtime().tm_wday}
@@ -483,7 +484,7 @@ class Admin:
             return {'ok': msg + '. Players see it after their next login.'}
         if action == 'banner_close':
             s = self.settings()
-            key = 'vortex' if data.get('tab') else 'banners'
+            key = 'vortex' if data.get('tab') else 'quests' if data.get('quest') else 'banners'
             cur = set(s['off'].get(key, []))
             ids = {str(x) for x in data.get('ids') or []}
             cur = cur | ids if data.get('close') else cur - ids

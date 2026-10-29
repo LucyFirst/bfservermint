@@ -1192,12 +1192,12 @@ $('#smPicSave').onclick=async()=>{if(!smPicImg)return say('#smPicMsg','Pick a pi
   catch(err){say('#smPicMsg',err.message)} finally{$('#smPicSave').disabled=false}};
 
 // ---------- vortex
-let VX=null, picFor=null, picImg=null;
+let VX=null, picFor=null, picImg=null, VQ=new Set();
 async function loadVortex(){VX=await api('vortex');drawVortex()}
 function drawVortex(){
   const q=$('#vSearch').value.trim().toLowerCase(), only=$('#vListed').checked, co=$('#vClosedOnly').checked, so=$('#vSchedOnly').checked, oo=$('#vOpenOnly').checked;
   const SC=VX.schedules||{}; BO=VX.boosts||{};
-  const closed=new Set(VX.closed), ctab=new Set(VX.closed_tabs);
+  const closed=new Set(VX.closed), ctab=new Set(VX.closed_tabs), cq=new Set(VX.closed_quests||[]);
   const byId={}, kids={};
   VX.tabs.forEach(t=>byId[t.id]=t);
   VX.tabs.forEach(t=>{if(t.parent&&byId[t.parent]&&t.parent!==t.id)(kids[t.parent]=kids[t.parent]||[]).push(t)});
@@ -1209,7 +1209,7 @@ function drawVortex(){
   const card=(b,c)=>`<div class="bn${c?' closed':''}">
         <div class="pic" style="background-image:url('${b.image?'/admin/img/banner/'+encodeURIComponent(b.image):''}')">${b.image?'':'no picture'}</div>
         <div class="bd"><div class="t">${esc(b.name)}${b.custom?'<span class="tag c">custom</span>':''}${b.edited?'<span class="tag e">changed</span>':''}${closed.has(b.id)?'<span class="tag x">closed</span>':''}${BO[b.id]?`<span class="tag b">${esc(boText(BO[b.id]))}</span>`:''}</div>
-        <div class="sub">banner #${b.id} · ${b.quests.length} quest${b.quests.length==1?'':'s'}${b.listed?'':' · not listed in the game'}</div>
+        <div class="sub">banner #${b.id} · ${b.quests.length} quest${b.quests.length==1?'':'s'}${b.quests.filter(x=>cq.has(x.id)).length?` · <span style="color:var(--bad,#ff8a80)">${b.quests.filter(x=>cq.has(x.id)).length} closed${b.quests.every(x=>cq.has(x.id))?' (banner hidden)':''}</span>`:''}${b.listed?'':' · not listed in the game'}</div>
         ${SC[b.id]?`<div style="margin:-2px 0 8px"><span class="tag d${SC[b.id].open_now?'':' no'}" style="margin-left:0">${esc(schText(SC[b.id]))} · ${SC[b.id].open_now?'open today':'closed today'}</span></div>`:''}
         <div class="acts">
           <button class="btn ghost sm" data-q="${b.id}">Quests</button>
@@ -1221,7 +1221,7 @@ function drawVortex(){
           ${b.edited?`<button class="btn ghost sm" data-restore="${b.id}">Restore original</button>`:''}
           ${b.custom?`<button class="btn danger sm" data-del="${b.id}">Delete</button>`:''}
         </div>
-        <ul class="qs hide" id="qs-${b.id}">${b.quests.map(x=>`<li>${esc(x.name)}<span>#${x.id}${x.energy?' · '+x.energy+' energy':''}</span></li>`).join('')||'<li>No quests</li>'}</ul></div></div>`;
+        <ul class="qs${VQ.has(b.id)?'':' hide'}" id="qs-${b.id}">${b.quests.map(x=>`<li${cq.has(x.id)?' style="opacity:.55"':''}>${esc(x.name)}${cq.has(x.id)?' <span class="tag x" style="margin-left:4px">closed</span>':''}<span>#${x.id}${x.energy?' · '+x.energy+' energy':''}</span><button class="btn ${cq.has(x.id)?'ghost':'danger'} sm" style="padding:2px 8px;font-size:12px" data-qid="${x.id}" data-close="${cq.has(x.id)?0:1}">${cq.has(x.id)?'Open':'Close'}</button></li>`).join('')||'<li>No quests</li>'}</ul></div></div>`;
   // one tab with its banners, then the tabs inside it
   const block=(t,depth,seen,parentHit)=>{
     if(seen.has(t.id))return '';seen.add(t.id);
@@ -1251,7 +1251,8 @@ $('#vClosedOnly').addEventListener('change',()=>{if($('#vClosedOnly').checked)$(
 $('#vTabs').onclick=async e=>{
   const b=e.target.closest('button'); if(!b)return;
   try{
-    if(b.dataset.q) return $('#qs-'+b.dataset.q).classList.toggle('hide');
+    if(b.dataset.q){VQ.has(b.dataset.q)?VQ.delete(b.dataset.q):VQ.add(b.dataset.q);return $('#qs-'+b.dataset.q).classList.toggle('hide')}
+    if(b.dataset.qid){await api('banner_close',{quest:1,ids:[b.dataset.qid],close:b.dataset.close==='1'});return loadVortex()}
     if(b.dataset.tab){await api('banner_close',{tab:1,ids:[b.dataset.tab],close:b.dataset.close==='1'});return loadVortex()}
     if(b.dataset.b){await api('banner_close',{ids:[b.dataset.b],close:b.dataset.close==='1'});return loadVortex()}
     if(b.dataset.sch) return openSchedule(b.dataset.sch,b.dataset.name);

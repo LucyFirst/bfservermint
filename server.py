@@ -2296,7 +2296,7 @@ _ADMIN = None
 ADMIN_SETTINGS_FILE = os.path.join(SAVE_DIR, 'admin_settings.json')
 _ADMIN_SETTINGS = {'mtime': None, 'data': None}
 DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 'item': 1.0},
-                    'off': {'areas': [], 'vortex': [], 'banners': [], 'units': [], 'trials': []},
+                    'off': {'areas': [], 'vortex': [], 'banners': [], 'units': [], 'trials': [], 'quests': []},
                     'schedule': {},
                     'boost': {},
                     'gold_names': [],
@@ -2478,7 +2478,23 @@ def dungeon_closed(did):
     if str(did) == TRIAL_DUNGEON:
         return False
     return (str(did) in admin_settings()['off'].get('banners', []) or area_closed(dungeon_area(did))
-            or schedule_closed(did))
+            or schedule_closed(did) or all_quests_closed(did))
+
+def all_quests_closed(did):
+    """A Vortex banner whose quests the admin page closed one by one, every one of them."""
+    off = set(admin_settings()['off'].get('quests', []))
+    if not off:
+        return False
+    if _DUN_QUESTS.get('n') != len(MISSIONS):          # custom banners add quests: rebuild then
+        by = {}
+        for m, v in MISSIONS.items():
+            by.setdefault(str(v.get('dungeon')), []).append(m)
+        _DUN_QUESTS.clear()
+        _DUN_QUESTS.update(n=len(MISSIONS), by=by)
+    qs = _DUN_QUESTS['by'].get(str(did)) or []
+    return bool(qs) and all(m in off for m in qs)
+
+_DUN_QUESTS = {}
 
 # --------------------------------------------------------------------------- banner days
 # Day-of-the-week banners (the game's weekday dungeons, found by their monday/tuesday/... pictures)
@@ -2632,6 +2648,8 @@ def trial_replay(pl, mid):
 def mission_closed(mid):
     if is_trial(mid):
         return trial_closed(mid)     # trials: only their own switch counts
+    if str(mid) in admin_settings()['off'].get('quests', []):
+        return True                  # closed on its own (admin page, Vortex > Quests)
     d = (MISSIONS.get(str(mid)) or {}).get('dungeon')
     return area_closed(mission_place(mid)[0]) or (d is not None and (str(d) in admin_settings()['off'].get('banners', [])
                                                                     or schedule_closed(d)))
