@@ -801,7 +801,9 @@ def highlight(event, *args):
     except Exception:
         log.exception('highlight %s', event)
 
-def roll_unit(gid):
+def roll_unit(gid, only=None):
+    """One unit from a summon's pool: (unit id, rarity). only: a set of unit ids to draw from instead
+    (a summon's guarantee) - same rarity chances and rate-ups, among those units."""
     try:
         pool = summon_editor().pool(str(gid))
     except Exception:
@@ -813,6 +815,11 @@ def roll_unit(gid):
     units = {int(r): [u for u in v if str(u) not in off] for r, v in (pool.get('units') or {}).items() if v}
     units = {r: v for r, v in units.items() if v} or \
         {int(r): v for r, v in (pool.get('units') or {}).items() if v}       # everything closed: ignore
+    if only:
+        sub = {r: [u for u in v if str(u) in only] for r, v in units.items()}
+        sub = {r: v for r, v in sub.items() if v}
+        if sub:
+            units = sub
     rates = {int(r): float(p) for r, p in (pool.get('rates') or {}).items() if int(r) in units}
     if not rates:
         rates = {r: 1.0 for r in units}
@@ -1028,8 +1035,24 @@ def do_summon(pl, req, resp):
     tmpl_row = (resp.get(G_UNITS_ADD) or [{}])[0]
     tmpl_ope = (resp.get(G_OPE_UNIT) or [{}])[0]
     ope, add, best = [], [], None
+    try:
+        pity = summon_editor().pool(gid).get('pity')
+    except Exception:
+        pity = None
+    counts = pl.setdefault('pity', {})
     for _ in range(count):
-        unit_id, rare = roll_unit(gid)
+        if pity:
+            # the banner's guarantee: one of its units within every N summons here (the count starts
+            # again whenever one comes, by luck or by the guarantee)
+            counts[gid] = counts.get(gid, 0) + 1
+            forced = counts[gid] >= pity['every']
+            unit_id, rare = roll_unit(gid, set(pity['units']) if forced else None)
+            if str(unit_id) in pity['units']:
+                if forced:
+                    log.info('summon guarantee on %s for %s (after %d summons)', gid, pl.get('handle'), counts[gid])
+                counts[gid] = 0
+        else:
+            unit_id, rare = roll_unit(gid)
         uuid = fresh_unit_id(pl)
         row = new_unit_row(pl, tmpl_row, unit_id, uuid)
         add.append(row)

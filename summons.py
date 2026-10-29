@@ -189,7 +189,12 @@ class Summons:
             rates = {r: round(100.0 / len(units), 2) for r in units} if units else {}
         have = {u for v in units.values() for u in v}
         rateup = {str(u): float(m) for u, m in (e.get('rateup') or {}).items() if str(u) in have and float(m) > 1}
-        return {'units': units, 'rates': rates, 'rateup': rateup}
+        out = {'units': units, 'rates': rates, 'rateup': rateup}
+        pity = e.get('pity') or {}
+        pu = [str(u) for u in pity.get('units') or [] if str(u) in have]
+        if pu and _i(pity.get('every')) >= 2:
+            out['pity'] = {'units': pu, 'every': _i(pity['every'])}
+        return out
 
     def chances(self, gid, off=()):
         """{unit id: percent per summon} - rarity chance shared by weight (rate-up units count more)."""
@@ -244,6 +249,12 @@ class Summons:
             shown = ', '.join(names[:8])
             more = f', and {len(names) - 8} more' if len(names) > 8 else ''
             line = f'<br><color=255:0:0>{top}\u2605</color> {shown}{more}'
+        pity = p.get('pity')
+        if pity:
+            pn = sorted({(um.get(u) or {}).get('utP1c0CD') or u for u in pity['units']})
+            who = ', '.join(pn[:4]) + (f' and {len(pn) - 4} more' if len(pn) > 4 else '')
+            line += (f'<br><color=255:255:0>Guaranteed:</color> {"one of " if len(pn) > 1 else ""}{who} '
+                     f'within every {pity["every"]} summons')
         return (f'<center>[<color=255:255:0>{name}</color>]<br><color=0:255:0>Tap the picture for rates and all units</color>'
                 f'{line}<center>')
 
@@ -352,6 +363,7 @@ class Summons:
                         'copied_from': ((self.state.get(gid) or {}).get('custom') or {}).get('from'),
                         'default_pool': self.uses_default(gid), 'rates': p.get('rates', {}),
                         'counts': counts, 'units': ids, 'rateup': p.get('rateup', {}),
+                        'pity': p.get('pity') or {},
                         'text': (self.state.get(gid) or {}).get('text') or '',
                         'auto_text': self.plain(self.auto_text(gid)),
                         'auto_markup': self.markup(self.auto_text(gid)),
@@ -403,6 +415,19 @@ class Summons:
                 e['rateup'] = ru
                 if not ru:
                     e.pop('rateup')
+            if 'pity' in data and data['pity'] is not None:
+                pity = data['pity'] or {}
+                every = _i(pity.get('every'))
+                pu = list(dict.fromkeys(str(u) for u in pity.get('units') or []))
+                if pu and every:
+                    if not 2 <= every <= 1000:
+                        raise ValueError('The guarantee must be every 2 to 1000 summons.')
+                    have = set(e.get('units') or [u for v in self.pool(gid).get('units', {}).values() for u in v])
+                    if any(u not in have for u in pu):
+                        raise ValueError('Guaranteed units must be in this summon.')
+                    e['pity'] = {'units': pu, 'every': every}
+                else:
+                    e.pop('pity', None)
             if 'rates' in data and data['rates'] is not None:
                 rates = {str(r): float(p) for r, p in data['rates'].items() if str(p).strip() not in ('', 'None')}
                 if any(p < 0 for p in rates.values()) or not any(p > 0 for p in rates.values()):
