@@ -53,3 +53,26 @@ Claude keeps this list up to date. Newest first.
     Merit exchange, account transfer codes. Write our own (their code is AGPL; notes are fine).
 [ ] Offered, not decided: probe the ~28 bosses the wiki lists wrongly; fail2ban on the Droplet;
     a "Play on PC" guide.
+
+[ ] Evolution: the unit list icon stays on the old form until the next quest or a restart (added 30 Oct 2026)
+    Reported: Lucy evolved Boxer Nemia (2*) -> Brawler Nemia (3*); ADMIN evolved Fire Beast Zegar (4*)
+    -> Beast King Zegar (5*). After the evolution the unit list / evolve list / fusion list icon still
+    shows the OLD form. Everything else is right: the unit's info page, sprite and stats show the new
+    form, the admin page shows the new icon, and fusing into it works on the new unit. The icon only
+    corrects itself after running any quest or restarting the app (the game then rebuilds its list).
+    Cause (our reading): the game draws each list icon once and keeps it under the unit's own id
+    (edy7fq3L). Our evolution keeps that id - like the official recordings do (UnitEvoRequest answer
+    I82p0wCL: pn16CNah new id, edy7fq3L user unit id, t9FEW2KC old unit id, u1ECvfg8 user unit id
+    before, dV3qji4I evolution type; both ids are the same in both recordings) - so the game reuses
+    the cached picture. The app's UnitEvoInfo has setUserUnitIDBefore / setUserUnitID, so it is built
+    to accept a NEW user unit id on evolution.
+    Already tried (0971e1e): evolution answer no longer adds an empty "units added" list (qC2tJs4E)
+    that the official answer doesn't have. Did NOT fix it.
+    Possible fix: give the evolved unit a new user unit id (u1ECvfg8 = old id, edy7fq3L = new id) and
+    move everything that points at the old id: the game's squads (party rows, all squads incl. trial
+    teams), arena squad, raid squads (pl['raid']['squads']), equipped spheres (0R3qTPK9/RXfC31FA rows
+    and the sphere storage rows that name the unit), favourite flag, 'Bvkx8s6M' (copy of the unit id
+    inside the row), lord/type, imps, BB/SBB/SP levels (they live on the row, so copying the row covers
+    them). Risk: a missed reference leaves an empty squad slot or a loose sphere. Test on Komik with a
+    cheap evolution, in and out of a squad, with spheres on, before releasing.
+    Decided 30 Oct: leave it (cosmetic, nothing lost). Workaround for players: run a quest or restart.
