@@ -4238,6 +4238,15 @@ def handle_action(rid, req):
             pl['state'][G_FRIEND_GIFTS] = []
             save_player(pl)
             return resp
+        if cls == 'UserLoginCampaignInfoRequest':
+            # The game asks again every 12 hours (and on the Home screen until it gets an answer).
+            # Without one it kept opening the Login Campaign screen; the answer says whether today's
+            # screen is still to be shown (4tswNoV9) - once per day, like in GetUserInfo.
+            login_gifts(pl)
+            resp = {'3da6bd0a': login_campaign_groups(pl)['3da6bd0a']}
+            (pl.get('login_campaign') or {}).pop('new', None)
+            save_player(pl)
+            return resp
         if cls == 'GetUserInfoRequest':
             welcome_gifts(pl)
             login_gifts(pl)
