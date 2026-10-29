@@ -13,6 +13,9 @@ What counts (config.json, all optional):
     "highlight_evo_stars": 5         evolutions into this rarity or more
     "highlight_level_every": 10      player level milestones (every 10 levels)
     "highlight_skip": ["userid"]     accounts never posted (e.g. a test account)
+    "highlight_no_firsts": ["userid"] accounts that never take a "first on the server" (their clears
+                                     are still posted, without the "first"). The account named ADMIN
+                                     never takes one either.
 
 Several things happening close together go out as one message (at most one post every 15 s).
 Nothing here can break the game: every hook catches its own errors.
@@ -45,11 +48,17 @@ class Highlights:
         self.evo_min = int(cfg.get('highlight_evo_stars', 5))
         self.level_every = int(cfg.get('highlight_level_every', 10))
         self.skip = {str(x) for x in cfg.get('highlight_skip') or []}
+        self.no_firsts = {str(x) for x in cfg.get('highlight_no_firsts') or []}
         self.state_file = os.path.join(srv.SAVE_DIR, 'highlights_state.json')
         try:
             self.state = json.load(open(self.state_file))
         except Exception:
             self.state = {}
+        if not self.state.get('_fix_admin_trial003'):    # ADMIN's Trial No. 003 clear was taken as the first
+            if '2000002' in (self.state.get('trial') or []):
+                self.state['trial'].remove('2000002')
+            self.state['_fix_admin_trial003'] = 1
+            self._save()
         self.lines = []
         self.lock = threading.Lock()
         if self.url:
@@ -74,8 +83,15 @@ class Highlights:
         with self.lock:
             self.lines.append(line)
 
-    def _server_first(self, kind, key):
-        """True the first time anyone on the server does this (remembered across restarts)."""
+    def _can_first(self, pl):
+        return (str(pl.get('user_id')) not in self.no_firsts
+                and str(pl.get('handle') or '').strip().upper() != 'ADMIN')
+
+    def _server_first(self, kind, key, pl=None):
+        """True the first time anyone on the server does this (remembered across restarts). Accounts
+        that can't take firsts (ADMIN) never use one up."""
+        if pl is not None and not self._can_first(pl):
+            return False
         seen = self.state.setdefault(kind, [])
         if str(key) in seen:
             return False
@@ -121,7 +137,7 @@ class Highlights:
                 continue        # materials (crystals, idols, frogs, imps, golems...) are never highlighted
             name, stars = self._unit(uid)
             if stars >= self.drop_min:
-                first = ' — a first for the server!' if self._server_first('capture', uid) else ''
+                first = ' — a first for the server!' if self._server_first('capture', uid, pl) else ''
                 self._add(f"🎁 {self._who(pl)} captured **{_esc(name)}** ({stars}★)"
                           f"{f' in {_esc(quest)}' if quest else ''}{first}")
 
@@ -129,7 +145,7 @@ class Highlights:
         if not self._ok(pl):
             return
         name = (self.S.MISSIONS.get(str(mid)) or {}).get('name', mid)
-        first = self._server_first('trial', mid)
+        first = self._server_first('trial', mid, pl)
         self._add(f"🏆 {self._who(pl)} cleared the trial **{_esc(name)}**"
                   + (' — first on the server!' if first else '!'))
 
@@ -141,7 +157,7 @@ class Highlights:
             name = (self.S._GEO.get('area', {}).get(str(area_id)) or {}).get('name') or f'area {area_id}'
         except Exception:
             name = f'area {area_id}'
-        first = self._server_first('area', area_id)
+        first = self._server_first('area', area_id, pl)
         self._add(f"🗺️ {self._who(pl)} finished **{_esc(name)}**"
                   + (' — first on the server!' if first else '!'))
 
