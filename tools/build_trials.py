@@ -489,6 +489,10 @@ def use_monster_sprite(mid, spec):
 # and the banded copy marks every threshold above her HP as seen. (A first try used a plain attack to
 # mark them; the game ignored the flags on that attack and she used Endless on a single crossing.)
 MAXWELL_AI = '20000023'
+# Off: in the game the "threshold seen" flags don't survive her dialogue (or are never kept), so she
+# used Endless on single crossings in three recorded runs. Back to the recorded AI: Endless once,
+# the first time she acts under 20%.
+MAXWELL_THRESHOLDS = False
 MAXWELL_SKILL = {'endless': 7}
 BANDS = [(70, 50, (15, 1)), (50, 30, (15, 1, 16, 1)), (30, 20, (15, 1, 16, 1, 17, 1))]
 
@@ -579,7 +583,8 @@ def maxwell_thresholds(spec):
 
 def build():
     out = {mid: from_recording(mid) for mid in RECORDED}
-    out['2000002'] = maxwell_thresholds(out['2000002'])
+    if MAXWELL_THRESHOLDS:
+        out['2000002'] = maxwell_thresholds(out['2000002'])
     for mid in OFFICIAL_AI:
         out[mid] = use_official_ai(mid, out[mid])
     for mid in MONSTER_SPRITE:
