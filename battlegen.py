@@ -162,6 +162,13 @@ WIKI_LINEUPS = {
                 'boss': [[('abyssal witch ciara', 480000, 2360, 81), ('skull lord', 80000, 1800, 450), ('skull lord', 80000, 1800, 450)],
                          [('ruinous despoiler galtier', 480000, 2360, 81), ('skull lord', 80000, 1800, 450), ('skull lord', 80000, 1800, 450)]]},
 }
+# their bosses' real moves (game skills + AI from the wiki's descriptions): tools/build_event_bosses.py
+try:
+    import json as _json, os as _os
+    EVENT_BOSSES = _json.load(open(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'data', 'event_bosses.json'),
+                                   encoding='utf-8'))
+except (OSError, ValueError):
+    EVENT_BOSSES = {}
 for _m in WIKI_LINEUPS.values():
     _m.setdefault('zone', _HN_ZONE)
     _m.setdefault('items', _HN_ITEMS)
@@ -429,6 +436,11 @@ class Battlegen:
             if not ref:
                 return None
             e = {k: ref.get(k) for k in ('u', 'name', 'el', 'ai', 'row')}
+            ev = EVENT_BOSSES.get(name)
+            if ev and e['row']:               # its real moves, not the ones recorded somewhere else
+                e['row'] = dict(e['row'], F4bQ7r8C=ev['skills'], i74vGUFa=ev['ai'], CEeqs63b=ev['resist'],
+                                m4EK7Gt6=str(ev['act'][0]), oMGC3hW0=str(ev['act'][1]))
+                e['ai'], e['act'] = ev['ai'], list(ev['act'])
             if look and look in self.U:      # the wiki's picture of it (the recording shows another form)
                 e['u'] = look
                 e['row'] = dict(e['row'] or {}, pn16CNah=look) if e['row'] else None
@@ -491,6 +503,14 @@ class Battlegen:
                         skills.setdefault(row.get('nj9Lw7mV'), row)
                     for row in run['ai']:
                         ai.setdefault((row.get('4eEVw5hL'), row.get('yu18xScw')), row)
+        for b in plan['battles']:
+            for m in b['mons']:
+                ev = EVENT_BOSSES.get(str(m.get('name') or '').strip().lower())
+                if ev and (m.get('row') or {}).get('i74vGUFa') == ev['ai']:
+                    for row in ev['skill_rows']:
+                        skills[row['nj9Lw7mV']] = row
+                    for row in ev['ai_rows']:
+                        ai[(row['4eEVw5hL'], row['yu18xScw'])] = row
         plan.update(skills=list(skills.values()), ai=list(ai.values()), label='built from the wiki')
         return plan
 

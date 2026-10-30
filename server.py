@@ -2773,6 +2773,10 @@ for _rs in _RECORDED.values():
                 AI_ROWS[_row['4eEVw5hL']].append(_row)
         for _row in _r.get('8aiBoHg5', []) or []:
             SKILL_ROWS.setdefault(_row.get('nj9Lw7mV'), _row)
+for _ev in battlegen.EVENT_BOSSES.values():       # event bosses' real moves (tools/build_event_bosses.py)
+    AI_ROWS[_ev['ai']] = list(_ev['ai_rows'])
+    for _row in _ev['skill_rows']:
+        SKILL_ROWS[_row['nj9Lw7mV']] = _row
 # Monster-only enemies (no unit behind them, e.g. Creator Maxwell, Juggernaut) need their animation
 # list (8hoyIF9Q) sent with the quest, keyed by the monster's id - without it the game crashes as
 # the enemy appears. Indexed by the monster's own animation file, from every recording.
