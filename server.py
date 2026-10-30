@@ -3821,6 +3821,40 @@ def shop_use(pl, req):
 # --------------------------------------------------------------------------- spheres
 SPHERE_FROGS = {'20302'}
 
+SPHERE_SLOTS = (('0R3qTPK9', 'Ge8Yo32T'), ('RXfC31FA', 'mZA7fH2v'))
+
+def _sphere_row_for(pl, row_id, item, taken):
+    """The storage row a unit should hold for this sphere: the one asked for when it really is that
+    sphere and no other unit has it, else a free row of the same sphere (None if there is none)."""
+    rows = {str(r.get('n6E8iMf3')): r for r in _wh(pl)}
+    r = rows.get(str(row_id))
+    if r is not None and str(r.get('kixHbe54')) == str(item) and str(row_id) not in taken:
+        return str(row_id)
+    for rid, r in rows.items():
+        if str(r.get('kixHbe54')) == str(item) and rid not in taken:
+            return rid
+    return None
+
+def fix_sphere_links(pl):
+    """Every sphere a unit has on must point at its own storage row of that sphere - the game shows a
+    sphere as off when the row is missing, holds another item, or is on another unit too."""
+    taken, fixed = set(), []
+    for u in pl['units'].values():
+        for rf, itf in SPHERE_SLOTS:
+            rid, item = str(u.get(rf) or ''), str(u.get(itf) or '')
+            if rid in ('', '0', '-1') or item in ('', '0', '-1'):
+                continue
+            good = _sphere_row_for(pl, rid, item, taken)
+            if good is None:
+                continue                      # no such sphere in storage at all: leave it as it is
+            taken.add(good)
+            if good != rid:
+                u[rf] = good
+                fixed.append(f"{u.get('pn16CNah')} {item_names_get(item)} row {rid}->{good}")
+    if fixed:
+        log.info('sphere links repaired for %s: %s', pl['user_id'], '; '.join(fixed))
+    return fixed
+
 def equip_spheres(pl, req):
     """ItemSphereEqp wx1ZLFj9.a2utCvs8 = "slot1 storage row:slot2 storage row:unit:slot1 item:slot2 item"
     (-1 / 0 = empty). Unit fields: 0R3qTPK9/Ge8Yo32T slot 1, RXfC31FA/mZA7fH2v slot 2 (RXfC31FA -1 =
@@ -3835,9 +3869,37 @@ def equip_spheres(pl, req):
         locked = str(u.get('RXfC31FA')) == '-1' and not u.get('5gXxT7LZ')
         if locked and not empty(r2):
             return 'The second sphere slot is locked (fuse a Sphere Frog to open it).'
-        u['0R3qTPK9'], u['Ge8Yo32T'] = ('0', '0') if empty(r1) else (r1, i1)
+        # a sphere moved here from another unit comes off that unit; a row the server doesn't know
+        # (or that holds something else) becomes a free row of the same sphere
+        want = [(r1, i1)] + ([] if locked else [(r2, i2)])
+        for rid, _ in want:
+            if not empty(rid):
+                for other_id, o in pl['units'].items():
+                    if other_id == uid:
+                        continue
+                    for rf, itf in SPHERE_SLOTS:
+                        if str(o.get(rf)) == str(rid):
+                            log.info('%s taken off %s (moved to %s)', item_names_get(o.get(itf)),
+                                     o.get('pn16CNah'), u.get('pn16CNah'))
+                            o[rf], o[itf] = '0', '0'
+        taken = equipped_rows(pl) - {str(u.get('0R3qTPK9')), str(u.get('RXfC31FA'))}
+        out = []
+        for rid, item in want:
+            if empty(rid) or empty(item):
+                out.append(('0', '0'))
+                continue
+            good = _sphere_row_for(pl, rid, item, taken)
+            if good is None:                  # the server has no such sphere: keep what the game sent
+                log.warning('sphere %s (row %s) put on %s is not in storage', item_names_get(item), rid, u.get('pn16CNah'))
+                good = rid
+            if good != rid:
+                log.info('sphere row %s on %s is not in storage as %s - using row %s', rid, u.get('pn16CNah'),
+                         item_names_get(item), good)
+            taken.add(good)
+            out.append((good, item))
+        u['0R3qTPK9'], u['Ge8Yo32T'] = out[0]
         if not locked:
-            u['RXfC31FA'], u['mZA7fH2v'] = ('0', '0') if empty(r2) else (r2, i2)
+            u['RXfC31FA'], u['mZA7fH2v'] = out[1]
         log.info('spheres on %s: %s / %s', u.get('pn16CNah'), u['Ge8Yo32T'], u.get('mZA7fH2v'))
     return None
 
@@ -4084,6 +4146,10 @@ def handle_action(rid, req):
         fix_type_stats(pl)
         ensure_recipes(pl)
         split_stacks(pl)
+        try:
+            fix_sphere_links(pl)
+        except Exception:
+            log.exception('could not check sphere links')
         if pl.get('selector_fix') != 1:
             fix_selector_overwrites(pl)
             pl['selector_fix'] = 1
