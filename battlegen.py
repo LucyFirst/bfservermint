@@ -174,6 +174,12 @@ for _m in WIKI_LINEUPS.values():
     _m.setdefault('items', _HN_ITEMS)
 
 
+# Fixed capture chance per kill, by dungeon: {dungeon: {unit: chance}} (normal enemies and bosses alike)
+DUNGEON_CAPTURE = {
+    '800100': {u: 0.5 for u in ('810034', '820034', '830034', '840034', '850034', '860034', '870034')},  # Bulb Haven: bulbs 50%
+}
+
+
 def _chance(p, k):
     return min(0.95, p * SETTINGS.get(k, 1.0)) if p < 1 else p
 
@@ -907,10 +913,14 @@ class Battlegen:
             hero_rate = HERO_LEVEL_RATES[min(lv, len(HERO_LEVEL_RATES) - 1)]
         for bi, b in enumerate(battles):
             mons, unit_drops, chests = [], [], []
+            dun_caps = DUNGEON_CAPTURE.get(dun) or {}
             for pos, m in enumerate(b[:5]):
                 drop = None
                 if m.get('force_drop'):
                     drop = m['u']
+                elif m['u'] in dun_caps:
+                    if rng.random() < _chance(dun_caps[m['u']], 'drop'):
+                        drop = m['u']
                 elif m.get('boss') and hero_base and self.kind(m['u']) == '0' and m['u'] in self.U:
                     if rng.random() < _chance(hero_rate, 'drop'):
                         drop = hero_base
