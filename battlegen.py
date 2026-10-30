@@ -16,6 +16,7 @@ standing in for each other when a tier has no references of its own.
 import math
 import random
 import statistics
+import threading
 from collections import Counter, defaultdict
 
 FILLER = ('1000', '290', '50')          # bfrevive's placeholder enemies (hp, atk, def)
@@ -180,8 +181,21 @@ DUNGEON_CAPTURE = {
 }
 
 
+# this quest's Vortex area: its own drop / item multipliers and capture chances (admin page, per banner)
+_AREA = threading.local()
+
+
+def _area():
+    return getattr(_AREA, 'v', None) or {}
+
+
+def _mult(k):
+    """overall rate (admin page Rates) x this quest's area rate (admin page Vortex > Drops)"""
+    return SETTINGS.get(k, 1.0) * float(_area().get(k, 1.0))
+
+
 def _chance(p, k):
-    return min(0.95, p * SETTINGS.get(k, 1.0)) if p < 1 else p
+    return min(0.95, p * _mult(k)) if p < 1 else p
 
 class Battlegen:
     def __init__(self, recorded, datamine, wiki, missions, unit_mst, log=None, story_drops=None):
@@ -409,6 +423,22 @@ class Battlegen:
 
     def plan(self, mid, rng=random):
         mid = str(mid)
+        dun = str((self.M.get(mid) or {}).get('dungeon'))
+        _AREA.v = (SETTINGS.get('area') or {}).get(dun) or {}
+        try:
+            return self._plan(mid, rng)
+        finally:
+            _AREA.v = None
+
+    def area_captures(self, dun):
+        """Capture chance per kill (0-1) of units with a fixed one in this area: the built-in ones
+        (DUNGEON_CAPTURE) with the admin page's on top."""
+        out = dict(DUNGEON_CAPTURE.get(str(dun)) or {})
+        for u, pct in ((SETTINGS.get('area') or {}).get(str(dun), {}).get('caps') or {}).items():
+            out[str(u)] = max(0.0, min(100.0, float(pct))) / 100
+        return out
+
+    def _plan(self, mid, rng=random):
         wiki = self.W.get(mid) or {}
         if mid in GARDENS:
             return self._garden(mid, wiki, rng)
@@ -913,7 +943,7 @@ class Battlegen:
             hero_rate = HERO_LEVEL_RATES[min(lv, len(HERO_LEVEL_RATES) - 1)]
         for bi, b in enumerate(battles):
             mons, unit_drops, chests = [], [], []
-            dun_caps = DUNGEON_CAPTURE.get(dun) or {}
+            dun_caps = self.area_captures(dun)
             for pos, m in enumerate(b[:5]):
                 drop = None
                 if m.get('force_drop'):
@@ -966,7 +996,7 @@ class Battlegen:
                     p_seen = len(seen_b) / (len(seen_b) + OWN_VOLUME_PRIOR * t_b) if seen_b else 0.0
                     mix = self._chest_mix(mid, table)
                     items_mix = [x for x in mix if x[0][0] == 4]
-                    for _ in range(_poisson(rate * SETTINGS.get('item', 1.0), rng)):
+                    for _ in range(_poisson(rate * _mult('item'), rng)):
                         if rng.random() < p_seen:
                             c = rng.choice(seen_b)
                             # WHAT is in them: zel / karma chests as recorded; an item chest holds an
@@ -990,7 +1020,7 @@ class Battlegen:
                     chests.append(f'{rng.randrange(k)}/1/{kind}:25:{int(base * rng.uniform(.5, 1.5))}')
             elif chest_obs.get(bi) and n_runs.get(bi):
                 # recorded chests at this point of the quest: how often, and what they held
-                rate = len(chest_obs[bi]) / n_runs[bi] * SETTINGS.get('item', 1.0)
+                rate = len(chest_obs[bi]) / n_runs[bi] * _mult('item')
                 for _ in range(int(rate) + (1 if rng.random() < rate - int(rate) else 0)):
                     c = rng.choice(chest_obs[bi])
                     chests.append(f'{rng.randrange(k)}/{c}')

@@ -2315,6 +2315,7 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'off': {'areas': [], 'vortex': [], 'banners': [], 'units': [], 'trials': [], 'quests': []},
                     'schedule': {},
                     'boost': {},
+                    'area_drops': {},       # Vortex banner: {dungeon: {drop, item, caps: {unit: percent}}}
                     'gold_names': [],
                     'sell': {},
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
@@ -2359,6 +2360,14 @@ def admin_settings():
                 d['off'].update({k: [str(x) for x in v] for k, v in (f.get('off') or {}).items() if k in d['off']})
                 d['schedule'] = {str(k): v for k, v in (f.get('schedule') or {}).items() if isinstance(v, dict)}
                 d['boost'] = {str(k): v for k, v in (f.get('boost') or {}).items() if isinstance(v, dict)}
+                for did, v in (f.get('area_drops') or {}).items():
+                    if isinstance(v, dict):
+                        a = {k: float(v[k]) for k in ('drop', 'item') if k in v}
+                        caps = {str(u): float(p) for u, p in (v.get('caps') or {}).items()}
+                        if caps:
+                            a['caps'] = caps
+                        if a:
+                            d['area_drops'][str(did)] = a
                 d['gold_names'] = [str(x) for x in (f.get('gold_names') or [])]
                 if (f.get('fusion') or {}).get('label') in ('none', 'great', 'super'):
                     d['fusion']['label'] = f['fusion']['label']
@@ -2381,7 +2390,7 @@ def admin_settings():
                 log.exception('admin_settings.json could not be read - using normal rates')
         _ADMIN_SETTINGS.update(mtime=mt, data=d)
         battlegen.SETTINGS.update(drop=d['mult']['drop'], item=d['mult']['item'], off_units=set(d['off']['units']),
-                                  unit_drop=dict(d.get('unit_drop') or {}))
+                                  unit_drop=dict(d.get('unit_drop') or {}), area=dict(d['area_drops']))
     return _ADMIN_SETTINGS['data']
 
 def save_admin_settings(d):

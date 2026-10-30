@@ -316,7 +316,7 @@ class Admin:
             return {'tabs': tabs, 'closed': self.settings()['off'].get('banners', []),
                     'closed_quests': self.settings()['off'].get('quests', []),
                     'closed_tabs': self.settings()['off'].get('vortex', []), 'schedules': sched,
-                    'boosts': boosts,
+                    'boosts': boosts, 'area_drops': self.settings().get('area_drops') or {},
                     'today': time.localtime().tm_wday}
         if action == 'banner_schedule':
             did = str(data.get('id', ''))
@@ -482,6 +482,70 @@ class Admin:
             if until:
                 msg += ' until ' + time.strftime('%a %d %b', time.localtime(until))
             return {'ok': msg + '. Players see it after their next login.'}
+        if action == 'area_drops_get':
+            # one Vortex banner's own drop rates, and the units its quests can give
+            did = str(data.get('id', ''))
+            g = S.battle_generator()
+            mids = [m for m, v in S.MISSIONS.items() if str(v.get('dungeon')) == did]
+            units = []
+            for m in sorted(mids, key=int):
+                for u in (g.W.get(m) or {}).get('captures') or []:
+                    if u not in units:
+                        units.append(str(u))
+            base = {u: round(p * 100, 1) for u, p in S.battlegen.DUNGEON_CAPTURE.get(did, {}).items()}
+            for u in base:
+                if u not in units:
+                    units.append(u)
+            cur = (self.settings().get('area_drops') or {}).get(did) or {}
+            for u in cur.get('caps') or {}:
+                if u not in units:
+                    units.append(u)
+            names = {u: (g.U.get(u) or {}).get('utP1c0CD', u) for u in units}
+            return {'id': did, 'drop': cur.get('drop', 1.0), 'item': cur.get('item', 1.0),
+                    'caps': cur.get('caps') or {}, 'base': base,
+                    'units': [{'id': u, 'name': names[u]} for u in units],
+                    'overall': {'drop': self.settings()['mult']['drop'], 'item': self.settings()['mult']['item']}}
+        if action == 'area_drops':
+            did = str(data.get('id', ''))
+            if not did:
+                raise ValueError('No banner picked.')
+            s = self.settings()
+            ad = s.setdefault('area_drops', {})
+            if data.get('reset'):
+                ad.pop(did, None)
+                self.save_settings(s)
+                S.log.info('admin page: drop rates of banner %s back to normal', did)
+                return {'ok': 'Drop rates back to normal for this banner.'}
+            out = {}
+            for k, label in (('drop', 'Unit drop'), ('item', 'Item drop')):
+                try:
+                    v = float(data.get(k, 1))
+                except (TypeError, ValueError):
+                    raise ValueError(f'{label} must be a number, like 1.5.')
+                if not 0 <= v <= 20:
+                    raise ValueError(f'{label} must be from 0 to 20.')
+                if v != 1:
+                    out[k] = v
+            caps = {}
+            for u, p in (data.get('caps') or {}).items():
+                if p in ('', None):
+                    continue
+                try:
+                    p = float(p)
+                except (TypeError, ValueError):
+                    raise ValueError('Capture chances must be numbers from 0 to 100.')
+                if not 0 <= p <= 100:
+                    raise ValueError('Capture chances must be from 0 to 100.')
+                caps[str(u)] = p
+            if caps:
+                out['caps'] = caps
+            if out:
+                ad[did] = out
+            else:
+                ad.pop(did, None)
+            self.save_settings(s)
+            S.log.info('admin page: drop rates of banner %s: %s', did, out or 'normal')
+            return {'ok': 'Saved. The next quest started in this banner uses these rates.'}
         if action == 'banner_close':
             s = self.settings()
             key = 'vortex' if data.get('tab') else 'quests' if data.get('quest') else 'banners'

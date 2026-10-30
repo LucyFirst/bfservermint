@@ -426,6 +426,23 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
   <div class="msg" id="picmsg"></div>
 </dialog>
 
+<dialog id="drDlg" class="big">
+  <h2 style="margin:0 0 4px;font-size:17px" id="drTitle">Drop rates</h2>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0">Drop rates for this banner's quests only. They work on top of the overall rates (Rates tab), so with overall Unit drop x2 and x1.5 here, units drop x3 as often. 1 = normal, 0 = none.</p>
+  <div class="row" style="gap:12px">
+    <div style="flex:1 1 160px"><label>Unit drop multiplier</label><input type="number" id="drDrop" min="0" max="20" step="0.1"></div>
+    <div style="flex:1 1 160px"><label>Item drop multiplier (chests)</label><input type="number" id="drItem" min="0" max="20" step="0.1"></div>
+  </div>
+  <p class="hint" id="drOverall" style="color:var(--muted);font-size:12px;margin:6px 0 0"></p>
+  <label style="margin-top:12px">Capture chance per kill (%)</label>
+  <p class="hint" style="color:var(--muted);font-size:12px;margin:0 0 6px">The chance a unit is caught each time it is beaten, in normal battles and the boss battle. Empty = the usual rate. 100 = always caught. The unit drop multipliers above still apply on top.</p>
+  <div class="bolist" id="drCaps"></div>
+  <div class="row" style="gap:8px;margin-top:6px;align-items:center">
+    <input id="drAddId" placeholder="unit id" style="flex:0 1 120px"><button class="btn ghost sm" id="drAdd" style="flex:0 0 auto">Add</button>
+  </div>
+  <div class="row" style="margin-top:14px;gap:8px"><button class="btn" id="drSave" style="flex:0 0 auto">Save</button><button class="btn danger" id="drReset" style="flex:0 0 auto">Back to normal</button><button class="btn ghost" id="drCancel" style="flex:0 0 auto">Cancel</button></div>
+  <div class="msg" id="drmsg"></div>
+</dialog>
 <dialog id="boDlg" class="big">
   <h2 style="margin:0 0 4px;font-size:17px">Reward boosts</h2>
   <p class="hint" style="color:var(--muted);font-size:13px;margin:0">Multiply the EXP, Zel or Karma a Vortex banner's quests give. The game shows it on the banner (for example "XP Received x2"), and zel / karma dropped in battle are multiplied too. The game shows one boost per banner, so a banner holds one boost at a time. This is on top of the overall rates. Whole numbers only (2-99): the game's banner number has no decimal point.</p>
@@ -1208,7 +1225,7 @@ function drawVortex(){
   const offNow=b=>SC[b.id]&&SC[b.id].mode==='off'&&!(SC[b.id].until*1000>Date.now());
   const card=(b,c)=>`<div class="bn${c?' closed':''}">
         <div class="pic" style="background-image:url('${b.image?'/admin/img/banner/'+encodeURIComponent(b.image):''}')">${b.image?'':'no picture'}</div>
-        <div class="bd"><div class="t">${esc(b.name)}${b.custom?'<span class="tag c">custom</span>':''}${b.edited?'<span class="tag e">changed</span>':''}${closed.has(b.id)?'<span class="tag x">closed</span>':''}${BO[b.id]?`<span class="tag b">${esc(boText(BO[b.id]))}</span>`:''}</div>
+        <div class="bd"><div class="t">${esc(b.name)}${b.custom?'<span class="tag c">custom</span>':''}${b.edited?'<span class="tag e">changed</span>':''}${closed.has(b.id)?'<span class="tag x">closed</span>':''}${BO[b.id]?`<span class="tag b">${esc(boText(BO[b.id]))}</span>`:''}${(VX.area_drops||{})[b.id]?`<span class="tag b">${esc(drText(VX.area_drops[b.id]))}</span>`:''}</div>
         <div class="sub">banner #${b.id} · ${b.quests.length} quest${b.quests.length==1?'':'s'}${b.quests.filter(x=>cq.has(x.id)).length?` · <span style="color:var(--bad,#ff8a80)">${b.quests.filter(x=>cq.has(x.id)).length} closed${b.quests.every(x=>cq.has(x.id))?' (banner hidden)':''}</span>`:''}${b.listed?'':' · not listed in the game'}</div>
         ${SC[b.id]?`<div style="margin:-2px 0 8px"><span class="tag d${SC[b.id].open_now?'':' no'}" style="margin-left:0">${esc(schText(SC[b.id]))} · ${SC[b.id].open_now?'open today':'closed today'}</span></div>`:''}
         <div class="acts">
@@ -1217,6 +1234,7 @@ function drawVortex(){
           <button class="btn ghost sm" data-pic="${b.id}" data-name="${esc(b.name)}">Picture</button>
           <button class="btn ghost sm" data-sch="${b.id}" data-name="${esc(b.name)}">Days</button>
           <button class="btn ghost sm" data-boost="${b.id}">Boost</button>
+          <button class="btn ghost sm" data-drops="${b.id}" data-name="${esc(b.name)}">Drops</button>
           <select class="mv" data-mv="${b.id}" style="width:auto;padding:5px 8px;font-size:13px"><option value="">Move to tab…</option>${tabOpts}</select>
           ${b.edited?`<button class="btn ghost sm" data-restore="${b.id}">Restore original</button>`:''}
           ${b.custom?`<button class="btn danger sm" data-del="${b.id}">Delete</button>`:''}
@@ -1257,6 +1275,7 @@ $('#vTabs').onclick=async e=>{
     if(b.dataset.b){await api('banner_close',{ids:[b.dataset.b],close:b.dataset.close==='1'});return loadVortex()}
     if(b.dataset.sch) return openSchedule(b.dataset.sch,b.dataset.name);
     if(b.dataset.boost) return openBoost([b.dataset.boost]);
+    if(b.dataset.drops) return openDrops(b.dataset.drops,b.dataset.name);
     if(b.dataset.pic){picFor=b.dataset.pic;picImg=null;$('#picTitle').textContent='Picture for '+b.dataset.name;$('#picFile').value='';clearCanvas('#picCanvas');$('#picmsg').textContent='';return $('#picDlg').showModal()}
     if(b.dataset.restore){if(!confirm('Put this banner back to its original picture and tab?'))return;const r=await api('banner_restore',{id:b.dataset.restore});say('#vmsg',r.ok,true);return loadVortex()}
     if(b.dataset.del){if(!confirm('Delete this custom banner? Its copied quests disappear with it.'))return;const r=await api('banner_delete',{id:b.dataset.del});say('#vmsg',r.ok,true);return loadVortex()}
@@ -1302,6 +1321,27 @@ $('#nwFile').onchange=()=>{const f=$('#nwFile').files[0];if(!f)return;const img=
 $('#nwNoBanner').onclick=()=>{NW.banner='';$('#nwFile').value='';drawNews()};
 $('#nwSave').onclick=async()=>{nwRead();try{const r=await api('news_save',{banner:NW.banner,posts:NW.posts});NW={banner:r.banner||'',posts:r.posts||[]};drawNews();say('#nwmsg',r.ok,true)}catch(e){say('#nwmsg',e.message)}};
 
+// ---------- per-banner drop rates
+let DR=null;
+function drText(a){const t=[];if(a.drop!=null)t.push('Units x'+(+a.drop));if(a.item!=null)t.push('Items x'+(+a.item));const n=Object.keys(a.caps||{}).length;if(n)t.push(n+' capture'+(n>1?'s':'')+' set');return t.join(' · ')||'Drops'}
+function drawDrops(){
+  $('#drCaps').innerHTML=DR.units.map(u=>`<label style="display:flex;align-items:center;gap:8px"><span style="flex:1 1 auto">${esc(u.name)} <span style="color:var(--muted);font-size:12px">#${u.id}${DR.base[u.id]!=null?' · built-in '+DR.base[u.id]+'%':''}</span></span><input type="number" min="0" max="100" step="1" data-cap="${u.id}" value="${DR.caps[u.id]!=null?DR.caps[u.id]:''}" placeholder="${DR.base[u.id]!=null?DR.base[u.id]:'usual'}" style="flex:0 0 110px"></label>`).join('')||'<p class="hint" style="padding:6px 10px">No capture units listed for these quests - add one below.</p>';
+}
+function readCaps(){document.querySelectorAll('#drCaps input[data-cap]').forEach(i=>{const v=i.value.trim();if(v==='')delete DR.caps[i.dataset.cap];else DR.caps[i.dataset.cap]=v})}
+async function openDrops(id,name){
+  try{DR=await api('area_drops_get',{id})}catch(err){return say('#vmsg',err.message)}
+  $('#drTitle').textContent='Drop rates - '+name;$('#drDrop').value=DR.drop;$('#drItem').value=DR.item;$('#drAddId').value='';$('#drmsg').textContent='';
+  $('#drOverall').textContent=`Overall rates now: Unit drop x${+DR.overall.drop}, Item drop x${+DR.overall.item}.`;
+  drawDrops();$('#drDlg').showModal();
+}
+$('#drAdd').onclick=()=>{readCaps();const v=$('#drAddId').value.trim();if(!/^\d+$/.test(v))return say('#drmsg','Type a unit id (numbers only).');if(!DR.units.some(u=>u.id===v))DR.units.push({id:v,name:'Unit'});$('#drAddId').value='';drawDrops()};
+$('#drCancel').onclick=()=>$('#drDlg').close();
+$('#drSave').onclick=async()=>{readCaps();
+  try{const r=await api('area_drops',{id:DR.id,drop:$('#drDrop').value,item:$('#drItem').value,caps:DR.caps});$('#drDlg').close();say('#vmsg',r.ok,true);loadVortex()}
+  catch(err){say('#drmsg',err.message)}};
+$('#drReset').onclick=async()=>{
+  try{const r=await api('area_drops',{id:DR.id,reset:1});$('#drDlg').close();say('#vmsg',r.ok,true);loadVortex()}
+  catch(err){say('#drmsg',err.message)}};
 // ---------- reward boosts
 let BO={}, boT='exp', boR='2', boSel=new Set();
 const BON={exp:'EXP',zel:'Zel',karma:'Karma'};
