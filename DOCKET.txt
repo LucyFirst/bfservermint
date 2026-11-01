@@ -85,4 +85,8 @@ LDPLAYER ANDROID 14 FREEZES (2 Nov 2026)
     install) freezes after a while on any screen (Manage Squad at once), and a fresh install stays
     black after sign-in. Phones (Wi-Fi or mobile data) are fine; the server logs no errors and the
     game sends nothing before freezing (stuck in the game's own code under LDPlayer's ARM
-    translation). An LDPlayer Android 9 instance works - use that. Not yet known what changed.
+    translation). An LDPlayer Android 9 instance works - use that.
+    CONFIRMED: it is the date. Setting the emulator clock back to 31 Oct makes it work again.
+    The game's own Pacific-time code uses fixed offsets (gmtime), and the emulator is on Singapore
+    time (no daylight saving), so the exact moment it broke is being narrowed down with
+    CLOCK-TEST.bat (6 clock times, Komik's window) before patching the APK.
