@@ -79,3 +79,10 @@ Claude keeps this list up to date. Newest first.
     them). Risk: a missed reference leaves an empty squad slot or a loose sphere. Test on Komik with a
     cheap evolution, in and out of a squad, with spheres on, before releasing.
     Decided 30 Oct: leave it (cosmetic, nothing lost). Workaround for players: run a quest or restart.
+
+LDPLAYER ANDROID 14 FREEZES (2 Nov 2026)
+    From about 1 Nov, the game on LDPlayer's Android 14 instances (PC 14.0.29.2 and a clean laptop
+    install) freezes after a while on any screen (Manage Squad at once), and a fresh install stays
+    black after sign-in. Phones (Wi-Fi or mobile data) are fine; the server logs no errors and the
+    game sends nothing before freezing (stuck in the game's own code under LDPlayer's ARM
+    translation). An LDPlayer Android 9 instance works - use that. Not yet known what changed.
