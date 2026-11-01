@@ -109,4 +109,4 @@ LDPLAYER ANDROID 14 FREEZES (2 Nov 2026)
     libhoudini.so (LD14, 15 Sep 2026, 9.4 MB, saved on the PC as ld14_libhoudini.so) is
     obfuscated; it calls time() 3x to seed a random generator (minstd, time mod 2^31-1). The stuck
     thread sits in its translation-cache lookup. Can't be patched from our side.
-    DECISION: use the LDPlayer Android 9 instance; LDPlayer 14 only if LDPlayer ships a new image.
+    Suggested: use the LDPlayer Android 9 instance until LDPlayer ships a fixed Android 14 image.
