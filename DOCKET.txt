@@ -86,7 +86,10 @@ LDPLAYER ANDROID 14 FREEZES (2 Nov 2026)
     black after sign-in. Phones (Wi-Fi or mobile data) are fine; the server logs no errors and the
     game sends nothing before freezing (stuck in the game's own code under LDPlayer's ARM
     translation). An LDPlayer Android 9 instance works - use that.
-    CONFIRMED: it is the date. Setting the emulator clock back to 31 Oct makes it work again.
-    The game's own Pacific-time code uses fixed offsets (gmtime), and the emulator is on Singapore
-    time (no daylight saving), so the exact moment it broke is being narrowed down with
-    CLOCK-TEST.bat (6 clock times, Komik's window) before patching the APK.
+    CONFIRMED: it starts at a fixed moment, between 15:30 and 16:30 UTC on 1 Nov 2026 (midnight
+    Singapore time). Emulator clock 1 Nov 08:30/09:30/15:30 UTC = fine; 16:30 UTC, 8 Nov, now = freeze
+    (log in, Units / Manage Squad). Not the local date (Honolulu time zone, local 1 Nov, still froze),
+    not the US clock change, not Mondays. Server traffic identical in a good and a frozen run; nothing
+    in saves/admin_settings ends at that moment. Next: narrow to the minute (15:45/16:00/16:15 UTC),
+    then find the code in libgame that compares against it. Tools: SET-DATE.bat MMDDhhmmYYYY (UTC),
+    SET-CLOCK-NOW.bat (Komik's window, port 5559).
