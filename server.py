@@ -557,6 +557,11 @@ def town_refresh(pl):
         row = rows.get(loc) or {F_USERID: pl['user_id'], 'un80kW9Y': loc, 'qA7M9EjP': '1970-01-01 00:00:00',
                                 'mDaE3t6A': '0', 'eip3MS5L': ''}
         rows[loc] = row
+        e = [x for x in str(row.get('eip3MS5L') or '').split(',') if x]
+        left = _num(row.get('mDaE3t6A')) or 0
+        if left != len(e):                 # saved before the fix: keep only what is left on the spot
+            left = min(left, len(e))
+            row['mDaE3t6A'], row['eip3MS5L'] = str(left), ','.join(e[len(e) - left:])
         if not town_spot_open(pl, loc):
             continue
         if loc in filled and now - filled[loc] < TOWN_REFRESH_HOURS * 3600:
@@ -584,15 +589,17 @@ def town_harvest(pl, req):
                 continue
             e = [x for x in str(row.get('eip3MS5L') or '').split(',') if x]
             left = min(_num(row.get('mDaE3t6A')) or 0, len(e))
+            e = e[len(e) - left:]                  # what is still on the spot
             n = min(n, left)                       # can't take more than the spot has
-            start = len(e) - left
-            for x in e[start:start + n]:
+            for x in e[:n]:
                 it, z, k = (x.split(':') + ['0', '0', '0'])[:3]
                 zel += _num(z) or 0
                 karma += _num(k) or 0
                 if it not in ('', '0'):
                     items[it] += 1
-            row['mDaE3t6A'] = str(left - n)
+            # like the real server: the spot keeps only what is left, so its tap count and its list
+            # always match (a list longer than the count froze the game mid-collecting)
+            row['mDaE3t6A'], row['eip3MS5L'] = str(left - n), ','.join(e[n:])
     for it, n in items.items():
         add_item(pl, it, n)
     if zel or karma:
