@@ -100,3 +100,9 @@ LDPLAYER ANDROID 14 FREEZES (2 Nov 2026)
     reload_files list 3105-3134 (F_RELOAD_FILE_MST rows: layout csvs, unit cgg/cgs, 2020-21 banners).
     Still to find: what the 16:00 UTC moment changes in that pass. Then patch libgame (1.0.8).
     Tools: GET-ARM-PC-5.bat (40 snapshots), GET-GAME-PREFS.bat (copies the game's saved settings).
+    TRIED 1.0.7m (apktools/v24: memchr@plt -> own byte loop at 0xe63f00): did NOT fix it - a
+    restarted game then stuck at the black screen in libxml2 xmlNextChar (0x20262b4) instead.
+    So the hot spot moves (string search, XML parsing): looks like LDPlayer 14's ARM translator
+    (libhoudini) misbehaving after that moment, not one bad function in the game. Next: pull
+    /system/vendor/lib64/libhoudini.so and look for time-dependent behaviour; check whether other
+    ARM-only apps slow down after 1 Nov 16:00 UTC.
