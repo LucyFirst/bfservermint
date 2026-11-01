@@ -93,3 +93,10 @@ LDPLAYER ANDROID 14 FREEZES (2 Nov 2026)
     in saves/admin_settings ends at that moment. Next: narrow to the minute (15:45/16:00/16:15 UTC),
     then find the code in libgame that compares against it. Tools: SET-DATE.bat MMDDhhmmYYYY (UTC),
     SET-CLOCK-NOW.bat (Komik's window, port 5559).
+    FOUND (armpc5 snapshots, 2 Nov): the stuck thread loops in libgame FileLoader -
+    processSamAndCutSceneFile (0x1cd9bc0) -> downloadBundlePriority / addLoadFilePriority ->
+    specialSamHandler (0x1cd8168, string search memchr/memcmp in LDPlayer's ARM libc). It is the
+    per-frame "downloaded files to process" pass. Game prefs (gamedata.xml) hold a pending
+    reload_files list 3105-3134 (F_RELOAD_FILE_MST rows: layout csvs, unit cgg/cgs, 2020-21 banners).
+    Still to find: what the 16:00 UTC moment changes in that pass. Then patch libgame (1.0.8).
+    Tools: GET-ARM-PC-5.bat (40 snapshots), GET-GAME-PREFS.bat (copies the game's saved settings).
