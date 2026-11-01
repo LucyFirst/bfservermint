@@ -4562,6 +4562,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         u = urlparse(self.path)
         p, q = u.path, parse_qs(u.query)
+        if os.path.exists(os.path.join(SAVE_DIR, 'LOG_CONTENT')):
+            log.info('GET %s from %s', self.path[:200], self.client_address[0])
         try:
             if p == '/admin' or p.startswith('/admin/'):
                 code, ctype, body, hdr = admin_page().handle(self, 'GET', p, b'')
@@ -4627,6 +4629,8 @@ class Handler(BaseHTTPRequestHandler):
         u = urlparse(self.path)
         n = int(self.headers.get('Content-Length', 0))
         raw = self.rfile.read(n) if n else b''
+        if os.path.exists(os.path.join(SAVE_DIR, 'LOG_CONTENT')) and not u.path.startswith('/admin/'):
+            log.info('POST %s (%d bytes) from %s', self.path[:200], len(raw), self.client_address[0])
         try:
             if u.path.startswith('/admin/'):
                 code, ctype, body, hdr = admin_page().handle(self, 'POST', u.path, raw)
@@ -4695,8 +4699,8 @@ class Handler(BaseHTTPRequestHandler):
             ctype = {'.png': 'image/png', '.jpg': 'image/jpeg', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg',
                      '.json': 'application/json', '.zip': 'application/zip', '.html': 'text/html'}.get(ext, 'application/octet-stream')
             data = open(fp, 'rb').read()
-            if '/mst/' in p or 'sp_quest_banner_custom_' in p:
-                log.info('sent to the game: %s (%d bytes)', p, len(data))
+            if '/mst/' in p or 'sp_quest_banner_custom_' in p or os.path.exists(os.path.join(SAVE_DIR, 'LOG_CONTENT')):
+                log.info('sent to the game: %s (%d bytes) to %s', p, len(data), self.client_address[0])
             self.send_response(200)
             self.send_header('Content-Type', ctype)
             self.send_header('Content-Length', str(len(data)))
