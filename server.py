@@ -807,8 +807,11 @@ POOLS_FILE = os.path.join(HERE, 'data', 'gacha_pools.json')
 POOLS = json.load(open(POOLS_FILE)) if os.path.exists(POOLS_FILE) else {}
 UNIT_MST = {}
 G_OPE_UNIT = 'Km35HAXv'
+# Gate effects (Pf97SzVw: which door waits, what it changes into, how it opens). 229 / 901 start straight on
+# the black door (gacha/gWaitBlack.txt), which shows nothing but TOUCH on a black screen before the tap -
+# so 7 and 8 stars always use 228 / 900: the rainbow door that turns black when tapped.
 SUMMON_EFFECT = {1: ['1'], 2: ['2'], 3: ['8'], 4: ['10', '11'], 5: ['13', '15'], 6: ['19', '21'],
-                 7: ['228', '229'], 8: ['900', '901']}
+                 7: ['228'], 8: ['900']}
 
 def unit_mst():
     """Unit master rows (stats, skills) from the game's own data files."""
