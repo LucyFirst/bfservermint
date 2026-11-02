@@ -148,8 +148,24 @@ class Summons:
             return 'selector'
         return 'summon'
 
+    def window(self, gid):
+        """(show from, hide after) in seconds, 0 = not set. Set on the admin page ("Dates")."""
+        e = self.state.get(gid) or {}
+        return _i(e.get('from')), _i(e.get('until'))
+
+    def scheduled_off(self, gid, now=None):
+        """A summon with dates, outside them: not listed, and it cannot be used."""
+        f, u = self.window(gid)
+        if not (f or u):
+            return False
+        now = now or time.time()
+        return bool((f and now < f) or (u and now >= u))
+
     def hidden(self, gid):
         e = self.state.get(gid) or {}
+        f, u = self.window(gid)
+        if f or u:                       # dates decide: shown between them, hidden outside
+            return self.scheduled_off(gid)
         if 'hidden' in e:
             return bool(e['hidden'])
         return gid not in self.shown or self.kind(gid) == 'selector'
@@ -358,6 +374,7 @@ class Summons:
                 counts = {r_: len(v) for r_, v in p['units'].items()}
             out.append({'id': gid, 'name': r.get('4N27mkt1') or gid, 'kind': self.kind(gid),
                         'hidden': self.hidden(gid), 'gems': gems, 'honor': honor,
+                        'from': self.window(gid)[0], 'until': self.window(gid)[1],
                         'image': self.page_image(gid), 'edited': gid in self.state and not self.is_custom(gid),
                         'custom': self.is_custom(gid),
                         'copied_from': ((self.state.get(gid) or {}).get('custom') or {}).get('from'),
@@ -377,6 +394,24 @@ class Summons:
             e = dict(self.state.get(gid) or {})
             if 'hidden' in data:
                 e['hidden'] = bool(data['hidden'])
+                e.pop('from', None)      # Show / Hide by hand ends any dates
+                e.pop('until', None)
+            if 'from' in data or 'until' in data:
+                f = _i(data.get('from')) if data.get('from') not in (None, '') else 0
+                u = _i(data.get('until')) if data.get('until') not in (None, '') else 0
+                if f < 0 or u < 0:
+                    raise ValueError('Those dates are not right.')
+                if f and u and u <= f:
+                    raise ValueError('The end must be after the start.')
+                if u and u <= time.time():
+                    raise ValueError('The end is already in the past.')
+                for k, v in (('from', f), ('until', u)):
+                    if v:
+                        e[k] = v
+                    else:
+                        e.pop(k, None)
+                if f or u:
+                    e['hidden'] = True   # after the dates end it stays hidden
             for k in ('gems', 'honor'):
                 if k in data and data[k] not in (None, ''):
                     v = _i(data[k], -1)

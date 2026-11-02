@@ -563,6 +563,17 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
   <div class="msg" id="smPicMsg"></div>
 </dialog>
 
+<dialog id="smDtDlg">
+  <h2 style="margin:0 0 4px;font-size:17px" id="smDtTitle">Summon dates</h2>
+  <p class="hint" style="color:var(--muted);font-size:13px;margin:0">The summon shows in the game from the start until the end, then hides itself. Leave one empty for "from now" or "no end". Times are this device's clock. Pressing Show / Hide on the card later removes the dates.</p>
+  <label>Show from</label>
+  <div class="row" style="gap:8px;align-items:center"><input type="datetime-local" id="smDtFrom" style="flex:1 1 200px"><button class="btn ghost sm" id="smDtFromClear" style="flex:0 0 auto">From now</button></div>
+  <label>Hide after</label>
+  <div class="row" style="gap:8px;align-items:center"><input type="datetime-local" id="smDtUntil" style="flex:1 1 200px"><button class="btn ghost sm" id="smDtUntilClear" style="flex:0 0 auto">No end</button></div>
+  <div class="row" style="margin-top:14px;gap:8px"><button class="btn" id="smDtSave" style="flex:0 0 auto">Save dates</button><button class="btn ghost" id="smDtRemove" style="flex:0 0 auto">Remove dates</button><button class="btn ghost" id="smDtCancel" style="flex:0 0 auto">Cancel</button></div>
+  <div class="msg" id="smDtMsg"></div>
+</dialog>
+
 <dialog id="newDlg">
   <h2 style="margin:0 0 4px;font-size:17px">New Vortex banner</h2>
   <p class="hint" style="color:var(--muted);font-size:13px;margin:0">The quests are copies of existing ones (same battles and rewards); the originals stay where they are.</p>
@@ -1062,17 +1073,49 @@ function smCard(x){
   const cost=x.kind==='honor'||(x.honor&&!x.gems)?`${x.honor} honor pts`:`${x.gems} gem${x.gems==1?'':'s'}`;
   return `<div class="sm-card${x.hidden?' off':''}">
     <div class="pic" style="background-image:url('${x.image?'/admin/img/gacha/'+encodeURIComponent(x.image):''}')">${x.image?'':'no picture'}</div>
-    <div class="bd"><div class="t">${esc(x.name)}${x.edited?'<span class="tag e">changed</span>':''}${x.hidden?'<span class="tag x">hidden</span>':''}${x.kind==='selector'?'<span class="tag c">selector</span>':''}${x.custom?'<span class="tag c">my own</span>':''}</div>
+    <div class="bd"><div class="t">${esc(x.name)}${x.edited?'<span class="tag e">changed</span>':''}${x.hidden?'<span class="tag x">hidden</span>':''}${x.kind==='selector'?'<span class="tag c">selector</span>':''}${x.custom?'<span class="tag c">my own</span>':''}${smDtTag(x)}</div>
     <div class="sub">summon #${x.id} · ${cost} · ${x.units.length} unit${x.units.length==1?'':'s'}${x.default_pool?' (default pool)':''}${Object.keys(x.rateup||{}).length?` · <span style="color:#ff7ad9">${Object.keys(x.rateup).length} rated up</span>`:''}${(x.pity||{}).units&&x.pity.units.length?` · <span style="color:#ffd77a">guarantee every ${x.pity.every}</span>`:''}</div>
     ${x.kind==='selector'?'<div class="sub">Players pick one of its units.</div>':`<div class="rates">${rates}</div>`}
     <div class="acts">
       <button class="btn ghost sm" data-ed="${x.id}">Units, rates &amp; cost</button>
       <button class="btn ghost sm" data-smpic="${x.id}">Picture</button>
+      ${x.kind==='honor'?'':`<button class="btn ghost sm" data-smdt="${x.id}">Dates</button>`}
       ${x.kind==='honor'?'':`<button class="btn ${x.hidden?'':'danger'} sm" data-hide="${x.id}" data-v="${x.hidden?0:1}">${x.hidden?'Show in game':'Hide'}</button>`}
       ${x.edited?`<button class="btn ghost sm" data-smrest="${x.id}">Restore original</button>`:''}
       ${x.custom?`<button class="btn ghost sm" data-smname="${x.id}">Rename</button><button class="btn danger sm" data-smdel="${x.id}">Delete</button>`:''}
     </div></div></div>`;
 }
+function fmtDT(t){const d=new Date(t*1000);return d.toLocaleString(undefined,{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+function smDtTag(x){
+  if(!x.from&&!x.until)return '';
+  const now=Date.now()/1000;
+  if(x.from&&now<x.from)return `<span class="tag c">starts ${esc(fmtDT(x.from))}</span>`;
+  if(x.until&&now>=x.until)return `<span class="tag x">ended ${esc(fmtDT(x.until))}</span>`;
+  return `<span class="tag e">on${x.until?' until '+esc(fmtDT(x.until)):''}</span>`;
+}
+let smDtFor=null;
+function dtVal(t){if(!t)return '';const d=new Date(t*1000),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
+function openSmDates(id){
+  const x=SM.find(v=>v.id===id); smDtFor=id;
+  $('#smDtTitle').textContent='Dates for '+x.name;
+  $('#smDtFrom').value=dtVal(x.from); $('#smDtUntil').value=dtVal(x.until);
+  $('#smDtRemove').classList.toggle('hide',!x.from&&!x.until);
+  $('#smDtMsg').textContent=''; $('#smDtDlg').showModal();
+}
+$('#smDtFromClear').onclick=()=>{$('#smDtFrom').value=''};
+$('#smDtUntilClear').onclick=()=>{$('#smDtUntil').value=''};
+$('#smDtCancel').onclick=()=>$('#smDtDlg').close();
+$('#smDtSave').onclick=async()=>{
+  const f=$('#smDtFrom').value, u=$('#smDtUntil').value;
+  if(!f&&!u)return say('#smDtMsg','Pick a start, an end, or both.');
+  const ts=v=>v?Math.floor(new Date(v).getTime()/1000):0;
+  try{const r=await api('summon_save',{id:smDtFor,from:ts(f)||Math.floor(Date.now()/1000),until:ts(u)});$('#smDtDlg').close();say('#smmsg',r.ok,true);loadSummons(smView)}
+  catch(err){say('#smDtMsg',err.message)}
+};
+$('#smDtRemove').onclick=async()=>{
+  try{const r=await api('summon_save',{id:smDtFor,from:'',until:''});$('#smDtDlg').close();say('#smmsg','Dates removed - the summon is hidden. Press "Show in game" to show it again.',true);loadSummons(smView)}
+  catch(err){say('#smDtMsg',err.message)}
+};
 function drawSummons(){
   if(smView==='honor'){ $('#hnGrid').innerHTML=SM.filter(x=>x.kind==='honor').map(smCard).join('')||'<p class="hint">No honor summon found.</p>'; return; }
   const q=$('#smSearch').value.trim().toLowerCase(), sh=$('#smShow').value, k=$('#smKind').value;
@@ -1084,6 +1127,7 @@ async function smClick(e){
   const b=e.target.closest('button'); if(!b)return; const msg=smView==='honor'?'#hnmsg':'#smmsg';
   try{
     if(b.dataset.ed) return openSummon(b.dataset.ed);
+    if(b.dataset.smdt) return openSmDates(b.dataset.smdt);
     if(b.dataset.smpic){smPicFor=b.dataset.smpic;smPicImg=null;$('#smPicTitle').textContent='Picture for '+SM.find(x=>x.id===smPicFor).name;$('#smPicFile').value='';const c=$('#smPicCanvas');c.getContext('2d').clearRect(0,0,640,632);$('#smPicMsg').textContent='';return $('#smPicDlg').showModal()}
     if(b.dataset.hide){const r=await api('summon_save',{id:b.dataset.hide,hidden:b.dataset.v==='1'});say(msg,r.ok,true);return loadSummons(smView)}
     if(b.dataset.smdel){const x=SM.find(v=>v.id===b.dataset.smdel);if(!confirm(`Delete your summon "${x.name}"? Players who already summoned keep their units.`))return;const r=await api('summon_delete',{id:x.id});say(msg,r.ok,true);return loadSummons(smView)}

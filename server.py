@@ -713,11 +713,18 @@ def ensure_wallet(pl):
                     ov[f] = v
             log.info('admin: %s %s %s -> %s', op.get('op'), f, v, pl['wallet'].get(f, pl.get('overrides', {}).get(f)))
 
+def _gacha_row(req):
+    rows = [v for k, v in req.items() if k not in VOLATILE_GROUPS and isinstance(v, list)]
+    return next((r for v in rows for r in v if isinstance(r, dict) and '7Ffmi96v' in r), {})
+
+def summon_id(req):
+    """The summon a GachaActionRequest is for."""
+    return str(_gacha_row(req).get('7Ffmi96v', ''))
+
 def wallet_change(pl, cls, req, cap):
     """How this action changes the player's balances."""
     if cls == 'GachaActionRequest':
-        rows = [v for k, v in req.items() if k not in VOLATILE_GROUPS and isinstance(v, list)]
-        g = next((r for v in rows for r in v if isinstance(r, dict) and '7Ffmi96v' in r), {})
+        g = _gacha_row(req)
         gid, count = str(g.get('7Ffmi96v', '')), max(1, int(g.get('a329kbl8') or 1))
         if str(g.get('324b023k', '0')) == '1':
             return {'summontickets': -count}
@@ -4454,6 +4461,11 @@ def handle_action(rid, req):
                     save_player(pl)
                     log.info('evolution refused: %s (request %s %s)', err, req.get('8Z2NQrx1'), req.get('I82p0wCL'))
                     return error_response(err)
+            if cls == 'GachaActionRequest' and POOLS:
+                gid = summon_id(req)
+                if gid and summon_editor().scheduled_off(gid):
+                    log.info('summon %s refused: outside its dates', gid)
+                    return error_response('This summon is not on right now. Please go back to the Summon list.')
             err = check_and_apply(pl, wallet_change(pl, cls, req, cap))
             if err:
                 pl.pop('_evo', None)
