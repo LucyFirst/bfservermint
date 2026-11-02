@@ -2898,6 +2898,29 @@ def recorded_spec(mid):
             'ai': [a for a in r.get(G_AI) or [] if a.get('4eEVw5hL') != '1'],
             'skills': r.get('8aiBoHg5') or [], 'cgs': r.get('8hoyIF9Q') or [], 'names': names, 'src': 'bfrevive'}
 
+# The tutorial's first two quests are scripted lessons: at set points the game makes the squad lock on
+# to the enemy in a given slot, and crashes (PlayerParty::lockOn(null)) when a random wave has nobody
+# there. While the tutorial is running they use the tutorial's own enemy line-up (agreed exception, like
+# trials). The squad is the player's own - with the starter they picked.
+TUTORIAL_QUESTS = ('1', '2')
+
+def tutorial_battle(pl, mid):
+    ui = (_rows(pl['state'].get(G_USERINFO)) or [{}])[0]
+    return str(mid) in TUTORIAL_QUESTS and str(mid) in REC_START and str(ui.get(F_TUTO_END, '0')) != '1'
+
+def tutorial_mission_start(pl, mid, req):
+    resp = personalise(pl, BLOBS[REC_START[str(mid)]['resp']])
+    num = dict((resp.get(G_MNUM) or [{}])[0])
+    num['k9cxD7Ba'] = str(random.randint(1000000000, 1999999999))
+    resp[G_MNUM] = [num]
+    info = dict(((req.get(G_MSTART) or [{}])[0]))
+    resp[G_MSTART] = [{k: info.get(k, v) for k, v in ((resp.get(G_MSTART) or [{}])[0]).items()} | {'j28VNcUW': str(mid)}]
+    names = {m.get('o49dYfpH'): m.get('3evIn0zZ', '?') for m in resp.get(G_MON) or []}
+    log.info('quest battles for %s (tutorial line-up): %s', mid, ' / '.join(
+        ','.join(names.get(b.get('o49dYfpH'), '?') for b in resp.get(G_BMON) or [] if b.get('Qzhp8B40') == g.get('Qzhp8B40'))
+        for g in resp.get(G_BGROUP) or []))
+    return resp
+
 def generate_mission_start(pl, mid, req, base):
     spec = TRIAL_SPECS.get(str(mid)) or recorded_spec(mid)
     if spec and not str(mid).startswith('_'):
@@ -4260,7 +4283,10 @@ def handle_action(rid, req):
             mid = pl.get('current_mission') or ''
             # always a fresh run built from references - never a recorded battle replayed
             base = personalise(pl, BLOBS[next(iter(REC_START.values()))['resp']])
-            resp = generate_mission_start(pl, mid, req, base)
+            if tutorial_battle(pl, mid):
+                resp = tutorial_mission_start(pl, mid, req)
+            else:
+                resp = generate_mission_start(pl, mid, req, base)
             pl['last_battle'] = resp[G_MNUM][0]['LE6JkUp7']
             bst = mission_boost(mid)
             for row in _rows(resp.get(G_MNUM)):
