@@ -222,6 +222,7 @@ class Battlegen:
         for mid in missions:
             by_dun[missions[mid].get('dungeon')].append(mid)
         self.family = {mid: sorted(by_dun[missions[mid].get('dungeon')], key=int) for mid in missions}
+        self._prev = None
         # units the real game let you capture from ordinary enemies: the datamine's drop rates and
         # what recorded runs actually dropped, over every quest (Goblin 25%, Thief Leon 15%...)
         rates, seen, got = defaultdict(list), Counter(), Counter()
@@ -330,6 +331,24 @@ class Battlegen:
 
     def kind(self, u):
         return str((self.U.get(u) or {}).get('xP9oi5Z2', '0'))
+
+    def lowest_form(self, u):
+        """The first form of a unit's evolution line (Azrael -> Archangel), from data/evo_mst.json."""
+        if self._prev is None:
+            prev = {}
+            try:
+                import json, os
+                p = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'evo_mst.json')
+                for frm, rec in json.load(open(p, encoding='utf-8')).items():
+                    prev.setdefault(str(rec.get('to')), str(frm))
+            except Exception:
+                pass
+            self._prev = prev
+        u, seen = str(u), set()
+        while u in self._prev and u not in seen:
+            seen.add(u)
+            u = self._prev[u]
+        return u
 
     def may_drop_self(self, u, wiki):
         """Ordinary enemies drop as themselves when they are materials (crystals, frogs, imps, nymphs,
@@ -975,6 +994,9 @@ class Battlegen:
                     drop = m['u']
                 elif extra_caps and story and rng.random() < _chance(0.01, 'drop'):
                     drop = rng.choice(extra_caps)  # a wiki-listed rare drop now and then (one not fought here)
+                if drop and not m.get('force_drop') and m['u'] not in dun_caps and self.kind(drop) == '0':
+                    # a unit enemy drops as the first form of its line: Azrael drops Archangel
+                    drop = self.lowest_form(drop)
                 if drop and str(drop) in SETTINGS.get('off_units', ()):
                     drop = None                   # closed on the admin page
                 mons.append(dict(m, drop=drop))
