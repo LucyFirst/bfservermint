@@ -113,6 +113,12 @@ LDPLAYER ANDROID 14 FREEZES (2 Nov 2026)
     thread sits in its translation-cache lookup. Can't be patched from our side.
     Suggested: use the LDPlayer Android 9 instance until LDPlayer ships a fixed Android 14 image.
 
+APK 1.0.8 RELEASE (2 Nov 2026): fusion material stacks + evolution icon fix + Battle Report.
+  Battle Report = bfrevive V19's end-of-quest panel (per-unit damage %, sparks, crits; skipped on auto-repeat),
+  copied as-is: caves 0x16328e0-0x1633512 and 0x1e72200-0x1e726db, hooks 0x103bf10 0x103dec0 0x105c218
+  0x1119b44 0x18cb2bc 0x18d2310. Totals stored at 0x29c0a00 (past .bss end, inside the last RW page).
+  Version string 1.0.7 -> 1.0.8 in classes.dex. MD5 fab82c37c2a2907984cbccd9c256a2e0. Credit bfrevive.
+
 FUSION MATERIAL STACKS - APK 1.0.8 (test builds 1.0.8t1-t7, 2 Nov 2026)
     Source: /home/claude/apktools/v25 (caves.s at 0xefc380, patch.py on top of the 1.0.7 libgame).
     Copies of one material share a pedestal ("xN"), up to 5 different stacks; tapping a selected
