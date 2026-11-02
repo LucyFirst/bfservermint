@@ -91,6 +91,11 @@ class Arena:
         nxt = int(ORB_SECONDS - (now - pl['orb_time']))
         t['jp9s8IyY'] = '0' if orbs >= mx else str((mx - orbs - 1) * ORB_SECONDS + max(1, nxt))
 
+    @staticmethod
+    def _arena_info(p):
+        oi = (p.get('state') or {}).get('8jBJ7uKR')
+        return oi[0] if isinstance(oi, list) and oi else oi
+
     def position(self, pl, points):
         """Ranking place among everyone on this server."""
         better = 0
@@ -416,23 +421,40 @@ class Arena:
         return out
 
     def ranking(self, pl):
-        rows = []
+        """Both arena rankings in one list. The game files each row by NH65Wj0f (InfoType) and the screen
+        shows one kind: 1 = Overall Ranking (everyone on the server), 0 = Friend Ranking (your friends;
+        the game adds your own row to both itself). Every row used to be 0, so Overall showed nobody."""
+        mine = self._arena_info(pl)
+        my_pts = _i((mine or {}).get('U4pMNjy0'))
+        try:
+            friends = {u for u, st in (self.S.friend_engine().links.get(pl['user_id']) or {}).items()
+                       if str(st) == '1'}
+        except Exception:
+            friends = set()
+        people = []
         for o in self.S.all_players():
             if o.get('user_id') == pl['user_id']:
                 continue                 # the game adds your own row itself - listing you too made a twin
-            oi = o.get('state', {}).get('8jBJ7uKR')
-            oi = oi[0] if isinstance(oi, list) and oi else oi
+            oi = self._arena_info(o)
             if not isinstance(oi, dict):
                 continue
             sq = self.squad_units(o)
             lead = next((u for u, lead in sq if lead), sq[0][0] if sq else {})
             t = self.S.team_row(o['state']) or {}
-            rows.append({self.S.F_USERID: o['user_id'], 'B5JQyV8j': self.S.shown_name(o), '2Fh3J7ng': str(t.get('D9wXQI2V', '1')),
-                         'pn16CNah': str(lead.get('pn16CNah', '10011')), '4A6LzBxr': str(t.get('D9wXQI2V', '1')),
-                         'JmFn3g9t': str(oi.get('JmFn3g9t', '1')), 'U4pMNjy0': str(oi.get('U4pMNjy0', '0')),
-                         '69vnphig': str(oi.get('69vnphig', '0')), '8CEu9Kcm': str(oi.get('8CEu9Kcm', '0')),
-                         '20iEWRCV': str(oi.get('20iEWRCV', '0')), '0rAkzg7L': '0', 'NH65Wj0f': '0', '2pAyFjmZ': '0'})
-        rows.sort(key=lambda r: -_i(r['U4pMNjy0']))
-        for i, r in enumerate(rows, 1):
-            r['2rqxaZ6K'] = str(i)
-        return {'BYaF62TE': rows[:50]}
+            people.append({self.S.F_USERID: o['user_id'], 'B5JQyV8j': self.S.shown_name(o), '2Fh3J7ng': str(t.get('D9wXQI2V', '1')),
+                           'pn16CNah': str(lead.get('pn16CNah', '10011')), '4A6LzBxr': str(lead.get('D9wXQI2V') or t.get('D9wXQI2V', '1')),
+                           'JmFn3g9t': str(oi.get('JmFn3g9t', '1')), 'U4pMNjy0': str(oi.get('U4pMNjy0', '0')),
+                           '69vnphig': str(oi.get('69vnphig', '0')), '8CEu9Kcm': str(oi.get('8CEu9Kcm', '0')),
+                           '20iEWRCV': str(oi.get('20iEWRCV', '0')), '0rAkzg7L': '0', 'NH65Wj0f': '1', '2pAyFjmZ': '0'})
+        people.sort(key=lambda r: -_i(r['U4pMNjy0']))
+        rows, place, me_counted = [], 0, False
+        for r in people:                 # overall places count you too, so nobody shares your place
+            if not me_counted and my_pts >= _i(r['U4pMNjy0']):
+                place += 1
+                me_counted = True
+            place += 1
+            r['2rqxaZ6K'] = str(place)
+            if len(rows) < 50:
+                rows.append(r)
+        fr = [dict(r, NH65Wj0f='0') for r in people if r[self.S.F_USERID] in friends]
+        return {'BYaF62TE': rows + fr}
