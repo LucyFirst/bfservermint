@@ -361,6 +361,26 @@ def new_player(handle, gl_user, gl_token):
     ensure_wallet(pl)
     return pl
 
+# The tutorial's first-unit choice comes in CreateUserRequest as 9u45RGcV [{Kn51uR4Y: element}]
+# (1 fire .. 6 dark). The new-account template is the recorded account, which chose Eze (4).
+STARTERS = {'1': '10011', '2': '20011', '3': '30011', '4': '40011', '5': '50011', '6': '60011'}
+RECORDED_STARTER = '40011'
+
+def set_starter(pl, choice):
+    want = STARTERS.get(str(choice or ''))
+    if not want or want == RECORDED_STARTER:
+        return
+    for uuid, row in pl['units'].items():
+        if row.get('pn16CNah') == RECORDED_STARTER:
+            pl['units'][uuid] = new_unit_row(pl, row, want, uuid, unit_type=row.get('nBTx56W9'))
+            break
+    else:
+        return
+    d = pl['state'].get(G_DICT) or []
+    pl['state'][G_DICT] = [r for r in d if r.get('pn16CNah') != RECORDED_STARTER]
+    add_to_dictionary(pl, want)
+    log.info('starter unit: %s', unit_mst().get(want, {}).get('utP1c0CD', want))
+
 def rekey_units(pl, ids):
     """Give these units new ids of this player's own (and fix the squads that use them)."""
     remap = {}
@@ -4123,6 +4143,7 @@ def handle_action(rid, req):
             tok = ui.get(F_GL_TOKEN, '')
             acc = ACCOUNTS['by_token'].get(tok, {})
             pl = new_player(ui.get(F_HANDLE, 'Summoner'), ui.get(F_GL_USER, acc.get('gl_user', '')), tok)
+            set_starter(pl, (req.get('9u45RGcV') or [{}])[0].get(F_SIGNAL))
             highlight('joined', len(glob.glob(os.path.join(SAVE_DIR, 'player_*.json'))) + 1)
             acc['user_id'] = pl['user_id']
             ACCOUNTS['by_token'][tok] = acc
