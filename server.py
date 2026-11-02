@@ -4471,6 +4471,13 @@ def handle_action(rid, req):
                 ACCOUNTS['by_token'][tok] = {'gl_user': pl['gl_user'], 'user_id': pl['user_id']}
                 save_accounts()
             log.info('welcome back %s "%s"', pl['user_id'], pl['handle'])
+        elif cls == 'TutorialSkipRequest':
+            # "Skip tutorial" (never recorded). The game wants 2bD8ak3D [{3tWuc7de: 1}] = skip allowed;
+            # it then sets the tutorial chapter to 10 itself and goes on from there.
+            pl['state'].setdefault(G_USERINFO, [{}])[0][F_TUTO_CH] = '10'
+            save_player(pl)
+            log.info('tutorial skipped by %s', pl.get('handle'))
+            return {'2bD8ak3D': [{'3tWuc7de': '1'}]}
         else:
             cap = pick_capture(pl, rid, req)
             if cap is None:
