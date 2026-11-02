@@ -110,3 +110,12 @@ LDPLAYER ANDROID 14 FREEZES (2 Nov 2026)
     obfuscated; it calls time() 3x to seed a random generator (minstd, time mod 2^31-1). The stuck
     thread sits in its translation-cache lookup. Can't be patched from our side.
     Suggested: use the LDPlayer Android 9 instance until LDPlayer ships a fixed Android 14 image.
+
+FUSION MATERIAL STACKS - APK 1.0.8 (test builds 1.0.8t1-t7, 2 Nov 2026)
+    Source: /home/claude/apktools/v25 (caves.s at 0xefc380, patch.py on top of the 1.0.7 libgame).
+    Copies of one material share a pedestal ("xN"), up to 5 different stacks; tapping a selected
+    material does not take it off (Clear selection does); badges = pedestal number; fusion
+    animation shows one unit per pedestal. EXP-only materials (exp_ids list) stop once the
+    selection guarantees max level; imps refused only when every stat they raise is full (fusion
+    screen "maxed out" check removed - the server caps). t7 works in testing. Still to do: final
+    checks (99 "everything" mode, Clear selection, result stats), then version bump + release.
