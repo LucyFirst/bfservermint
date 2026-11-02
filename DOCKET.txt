@@ -113,6 +113,13 @@ LDPLAYER ANDROID 14 FREEZES (2 Nov 2026)
     thread sits in its translation-cache lookup. Can't be patched from our side.
     Suggested: use the LDPlayer Android 9 instance until LDPlayer ships a fixed Android 14 image.
 
+APK 1.0.9 (test 1.0.9t1, 3 Nov 2026): Bulb Haven (dungeon 800100) quests show their bulb + how many you own,
+  like the Totem Ruins (100300) / Mecha God Sanctums (100320). Game hard-codes those two in
+  MissionSelectScene2::setMissionList/setMissionListForGod; patched 0x1899d4c 0x189fb6c 0x189fc50 0x189ff70,
+  cave at 0xefcc80: quest 831X010 -> unit 8X0034, string kept at 0x29c0f00 (past .bss, same page as the
+  Battle Report totals). Script: apktools/v26/patch_bulb.py. Nymph/Spirit/Idol/Pot gardens: not wanted.
+  MD5 79ddafc6797865c73f52df2a7c09e54c (still says 1.0.8 inside).
+
 APK 1.0.8 RELEASE (2 Nov 2026): fusion material stacks + evolution icon fix + Battle Report.
   Battle Report = bfrevive V19's end-of-quest panel (per-unit damage %, sparks, crits; skipped on auto-repeat),
   copied as-is: caves 0x16328e0-0x1633512 and 0x1e72200-0x1e726db, hooks 0x103bf10 0x103dec0 0x105c218
