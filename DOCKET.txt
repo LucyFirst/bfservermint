@@ -57,7 +57,9 @@ Claude keeps this list up to date. Newest first.
 [ ] Offered, not decided: probe the ~28 bosses the wiki lists wrongly; fail2ban on the Droplet;
     a "Play on PC" guide.
 
-[ ] Evolution: the unit list icon stays on the old form until the next quest or a restart (added 30 Oct 2026)
+[x] Evolution: the unit list icon stays on the old form until the next quest or a restart (added 30 Oct 2026)
+    FIXED in APK 1.0.8 (test 1.0.8t8, confirmed 2 Nov): UnitEvoPlayScene::initialize now also calls
+    UnitCacheList::removeAllObjects (what MissionStartScene does), so list icons are rebuilt.
     Reported: Lucy evolved Boxer Nemia (2*) -> Brawler Nemia (3*); Komik evolved Fire Beast Zegar (4*)
     -> Beast King Zegar (5*). After the evolution the unit list / evolve list / fusion list icon still
     shows the OLD form. Everything else is right: the unit's info page, sprite and stats show the new
@@ -117,5 +119,6 @@ FUSION MATERIAL STACKS - APK 1.0.8 (test builds 1.0.8t1-t7, 2 Nov 2026)
     material does not take it off (Clear selection does); badges = pedestal number; fusion
     animation shows one unit per pedestal. EXP-only materials (exp_ids list) stop once the
     selection guarantees max level; imps refused only when every stat they raise is full (fusion
-    screen "maxed out" check removed - the server caps). t7 works in testing. Still to do: final
+    screen "maxed out" check removed - the server caps). t7 works in testing. t8 adds the evolution
+    icon fix. Still to do: final
     checks (99 "everything" mode, Clear selection, result stats), then version bump + release.
