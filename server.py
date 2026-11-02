@@ -421,6 +421,10 @@ def personalise(pl, obj):
             obj['Pj6zDW3m'] = news_engine().patch_notice(obj['Pj6zDW3m'])
         except Exception:
             log.exception('could not set the news page')
+    if '3aDk1xk7' in obj:
+        # The game's list of quests with no battle-speed button (Metal, Karma, Gold, Imp... Vortex
+        # dungeons). Replaced by one quest that does not exist, so every quest has the button.
+        obj['3aDk1xk7'] = [{'j28VNcUW': '0'}]
     if 'Md9gG3c0' in obj:
         try:
             obj['Md9gG3c0'] = fusion_label_events(obj['Md9gG3c0'])
