@@ -442,7 +442,7 @@ class Arena:
             lead = next((u for u, lead in sq if lead), sq[0][0] if sq else {})
             t = self.S.team_row(o['state']) or {}
             people.append({self.S.F_USERID: o['user_id'], 'B5JQyV8j': self.S.shown_name(o), '2Fh3J7ng': str(t.get('D9wXQI2V', '1')),
-                           'pn16CNah': str(lead.get('pn16CNah', '10011')), '4A6LzBxr': str(lead.get('D9wXQI2V') or t.get('D9wXQI2V', '1')),
+                           'pn16CNah': str(lead.get('pn16CNah', '10011')), '4A6LzBxr': str(t.get('D9wXQI2V', '1')),
                            'JmFn3g9t': str(oi.get('JmFn3g9t', '1')), 'U4pMNjy0': str(oi.get('U4pMNjy0', '0')),
                            '69vnphig': str(oi.get('69vnphig', '0')), '8CEu9Kcm': str(oi.get('8CEu9Kcm', '0')),
                            '20iEWRCV': str(oi.get('20iEWRCV', '0')), '0rAkzg7L': '0', 'NH65Wj0f': '1', '2pAyFjmZ': '0'})
