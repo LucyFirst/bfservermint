@@ -422,19 +422,20 @@ class Arena:
 
     def ranking(self, pl):
         """Both arena rankings in one list. The game files each row by NH65Wj0f (InfoType) and the screen
-        shows one kind: 1 = Overall Ranking (everyone on the server), 0 = Friend Ranking (your friends;
-        the game adds your own row to both itself). Every row used to be 0, so Overall showed nobody."""
-        mine = self._arena_info(pl)
-        my_pts = _i((mine or {}).get('U4pMNjy0'))
+        shows one kind: 1 = Overall Ranking, 0 = Friend Ranking.
+        Overall: everyone on the server INCLUDING you - the game numbers the list 1st, 2nd... in the
+        order sent and shows your own row again at the bottom (left out, the players below you moved
+        up a place). Friend: your friends only - the game adds your own row to that list itself."""
+        me = pl['user_id']
         try:
-            friends = {u for u, st in (self.S.friend_engine().links.get(pl['user_id']) or {}).items()
+            friends = {u for u, st in (self.S.friend_engine().links.get(me) or {}).items()
                        if str(st) in ('friend', '1')}     # friends.json keeps 'friend' / 'sent' / 'received'
         except Exception:
             friends = set()
         people = []
         for o in self.S.all_players():
-            if o.get('user_id') == pl['user_id']:
-                continue                 # the game adds your own row itself - listing you too made a twin
+            if not o.get('user_id'):
+                continue
             oi = self._arena_info(o)
             if not isinstance(oi, dict):
                 continue
@@ -446,15 +447,12 @@ class Arena:
                            'JmFn3g9t': str(oi.get('JmFn3g9t', '1')), 'U4pMNjy0': str(oi.get('U4pMNjy0', '0')),
                            '69vnphig': str(oi.get('69vnphig', '0')), '8CEu9Kcm': str(oi.get('8CEu9Kcm', '0')),
                            '20iEWRCV': str(oi.get('20iEWRCV', '0')), '0rAkzg7L': '0', 'NH65Wj0f': '1', '2pAyFjmZ': '0'})
-        people.sort(key=lambda r: -_i(r['U4pMNjy0']))
-        rows, place, me_counted = [], 0, False
-        for r in people:                 # overall places count you too, so nobody shares your place
-            if not me_counted and my_pts >= _i(r['U4pMNjy0']):
-                place += 1
-                me_counted = True
-            place += 1
-            r['2rqxaZ6K'] = str(place)
-            if len(rows) < 50:
-                rows.append(r)
+        # most points first; on equal points the one who joined the ranking with you stays below you
+        people.sort(key=lambda r: (-_i(r['U4pMNjy0']), r[self.S.F_USERID] != me))
+        for i, r in enumerate(people, 1):
+            r['2rqxaZ6K'] = str(i)
+        rows = people[:50]
+        if not any(r[self.S.F_USERID] == me for r in rows):      # outside the top 50: still your own place
+            rows += [r for r in people if r[self.S.F_USERID] == me]
         fr = [dict(r, NH65Wj0f='0') for r in people if r[self.S.F_USERID] in friends]
         return {'BYaF62TE': rows + fr}
