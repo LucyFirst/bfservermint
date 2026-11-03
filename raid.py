@@ -876,10 +876,29 @@ class Raid:
             return out
 
         if name == 'RoomList':
+            # ouU5H7qm = which search: 1 room search, 2 Friends (rooms your friends are in), 3 auto-enter,
+            # 4 guild. Rows carry the same number back - the Friends screen only lists rows marked 2
+            # (bfrevive: one row per friend in a room, with that friend's name and level).
+            kind = str(_row('8iBuZa3n', req).get('ouU5H7qm') or '1')
             mine = self.where.get(pl['user_id'])
-            rows = [self.room_row(rm) for rm in self.rooms.values()
-                    if rm['id'] != mine and rm['state'] == 0 and len(rm['members']) < min(MAX_MEMBERS, self.D['missions'][rm['mission']]['players'])
-                    and self.D['missions'][rm['mission']]['cls'] <= self.cls(pl)]
+
+            def open_room(rm):
+                return rm['state'] == 0 and len(rm['members']) < min(MAX_MEMBERS, self.D['missions'][rm['mission']]['players']) \
+                    and self.D['missions'][rm['mission']]['cls'] <= self.cls(pl)
+            if kind == '2':
+                links = S.friend_engine().links.get(pl['user_id']) or {}
+                rows = []
+                for fid, st in links.items():
+                    rm = self.rooms.get(self.where.get(fid) or '')
+                    if str(st) != 'friend' or not rm or rm['id'] == mine or not open_room(rm):
+                        continue
+                    f = self.prof.get(fid) or {}
+                    row = self.room_row(rm)
+                    row.update({'8ZK3w0Np': fid, 'IAfv98Wd': f.get('name', ''), 'usM7W3DS': str(f.get('level', '1')),
+                                '8Ix0Soup': str(f.get('leader_lv', '1')), 'ouU5H7qm': '2'})
+                    rows.append(row)
+                return {'8iBuZa3n': rows}
+            rows = [dict(self.room_row(rm), ouU5H7qm=kind) for rm in self.rooms.values() if rm['id'] != mine and open_room(rm)]
             return {'8iBuZa3n': rows}
 
         if name == 'Enter':
