@@ -1646,13 +1646,22 @@ def add_item(pl, item, n):
 # copy), so the storage, karma and zel are kept here: recipes from the game's recipe table (8f0bCciN:
 # kixHbe54 makes, wgV86x1q how many, HTVh8a65 karma, 75YV2q1i "item:count,..." materials), sell prices
 # from the item table.
+def mix_orders(req):
+    """What the game asked to make: 4HqhTf3a is "recipe:times", several joined with commas when
+    different things are made in one go ("3001:2,3005:1") - only the first was being made."""
+    out = []
+    for r in _rows(req.get('JTf2jY5o')):
+        for part in str((r or {}).get('4HqhTf3a') or '').split(','):
+            rid, _, n = part.strip().partition(':')
+            if rid:
+                out.append((rid, _num(n) or 1))
+    return out
+
 def item_mix(pl, req):
     recipes = {str(r.get('4HqhTf3a')): r for r in _town_mst('8f0bCciN') if isinstance(r, dict)}
     mine = {str(r.get('4HqhTf3a')): r for r in _rows(pl['state'].get(G_RECIPES)) if isinstance(r, dict)}
     jobs = []
-    for r in _rows(req.get('JTf2jY5o')):
-        rid, _, n = str((r or {}).get('4HqhTf3a') or '').partition(':')
-        n = _num(n) or 1
+    for rid, n in mix_orders(req):
         rec = recipes.get(rid)
         if not rec or rid not in mine:
             return 'That recipe is not open yet.'
@@ -4375,8 +4384,7 @@ def handle_action(rid, req):
                 return error_response(err)
             resp = {G_WAREHOUSE: _wh(pl), G_TEAM: [dict(team_row(pl['state']) or {})]}
             if cls == 'ItemMixRequest':
-                daily_engine().event(pl, 'craft', sum(_num(str(r.get('4HqhTf3a', '')).partition(':')[2]) or 1
-                                                      for r in _rows(req.get('JTf2jY5o')) if isinstance(r, dict)) or 1)
+                daily_engine().event(pl, 'craft', sum(n for _, n in mix_orders(req)) or 1)
                 save_player(pl)
                 resp[G_RECIPES] = list(_rows(pl['state'].get(G_RECIPES)))
                 resp['bd5Rj6pN'] = list(_rows(pl['state'].get('bd5Rj6pN')))
