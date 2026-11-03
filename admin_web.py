@@ -17,6 +17,7 @@ import hashlib
 import hmac
 import ipaddress
 import json
+import re
 import os
 import secrets
 import threading
@@ -114,6 +115,45 @@ class Admin:
 
     def item_name(self, iid):
         return (self.items.get(str(iid)) or [str(iid)])[0]
+
+    @staticmethod
+    def read_item_rates(raw):
+        """{item id: multiplier} from the page: empty or 1 = normal (left out), 0-20."""
+        out = {}
+        for i, x in (raw or {}).items():
+            if x in ('', None):
+                continue
+            try:
+                x = float(x)
+            except (TypeError, ValueError):
+                raise ValueError('Item drop rates must be numbers, like 2 or 0.5.')
+            if not 0 <= x <= 20:
+                raise ValueError('Item drop rates must be from 0 to 20.')
+            if str(i).isdigit() and x != 1:
+                out[str(i)] = round(x, 2)
+        return out
+
+    def item_drops(self, mids, cur, runs=150):
+        """Which items a banner's quests drop and about how many per run now (all its quests averaged),
+        from building the quests the way the server does."""
+        import random as _r
+        g = self.S.battle_generator()
+        count, n = {}, 0
+        rng = _r.Random(7)
+        for m in mids:
+            for _ in range(max(20, runs // max(1, len(mids)))):
+                try:
+                    p = g.plan(self.S.mission_alias(m), rng)
+                except Exception:
+                    break
+                n += 1
+                for b in p.get('battles') or []:
+                    for c in b.get('chests') or []:
+                        mm = re.match(r'^\d+/1/4:\d+:(\d+):\d+$', str(c))
+                        if mm:
+                            count[mm.group(1)] = count.get(mm.group(1), 0) + 1
+        ids = sorted(set(count) | set(cur), key=lambda i: -count.get(i, 0))
+        return [{'id': i, 'name': self.item_name(i), 'per_run': round(count.get(i, 0) / max(1, n), 3)} for i in ids]
 
     def reward(self, kind, target, count):
         """(present type, target, count, label) for a reward picked on the page."""
@@ -504,6 +544,7 @@ class Admin:
             return {'id': did, 'drop': cur.get('drop', 1.0), 'item': cur.get('item', 1.0),
                     'caps': cur.get('caps') or {}, 'base': base,
                     'units': [{'id': u, 'name': names[u]} for u in units],
+                    'items': self.item_drops(mids, cur.get('items') or {}), 'item_mult': cur.get('items') or {},
                     'overall': {'drop': self.settings()['mult']['drop'], 'item': self.settings()['mult']['item']}}
         if action == 'area_drops':
             did = str(data.get('id', ''))
@@ -539,6 +580,9 @@ class Admin:
                 caps[str(u)] = p
             if caps:
                 out['caps'] = caps
+            its = self.read_item_rates(data.get('items'))
+            if its:
+                out['items'] = its
             if out:
                 ad[did] = out
             else:
@@ -671,7 +715,14 @@ class Admin:
             um = S.unit_mst()
             units = [{'id': u, 'name': self.unit_name(u), 'rarity': int((um.get(u) or {}).get('7ofj5xa1') or 0)}
                      for u in s['off']['units']]
-            return {'settings': s, 'story_areas': st, 'vortex_areas': vx, 'off_units': units}
+            return {'settings': s, 'story_areas': st, 'vortex_areas': vx, 'off_units': units,
+                    'item_rates': [{'id': i, 'name': self.item_name(i), 'mult': m}
+                                   for i, m in (s.get('item_rates') or {}).items()]}
+        if action == 'item_lookup':
+            iid = str(data.get('id', '')).strip()
+            if not iid.isdigit() or iid not in self.items:
+                raise ValueError('No item with that id.')
+            return {'id': iid, 'name': self.item_name(iid)}
         if action == 'settings_save':
             s = self.settings()
             m = data.get('mult') or {}
@@ -681,6 +732,8 @@ class Admin:
                     if not 0 <= v <= 100:
                         raise ValueError(f'{k} must be between 0 and 100.')
                     s['mult'][k] = round(v, 2)
+            if 'item_rates' in data:
+                s['item_rates'] = self.read_item_rates(data.get('item_rates'))
             off = data.get('off') or {}
             for k in ('areas', 'vortex', 'banners', 'units'):
                 if k in off:

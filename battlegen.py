@@ -14,6 +14,7 @@ references. Vortex quests each get their own profile, with tiers of the same dun
 standing in for each other when a tier has no references of its own.
 """
 import math
+import re
 import random
 import statistics
 import threading
@@ -445,9 +446,35 @@ class Battlegen:
         dun = str((self.M.get(mid) or {}).get('dungeon'))
         _AREA.v = (SETTINGS.get('area') or {}).get(dun) or {}
         try:
-            return self._plan(mid, rng)
+            return self._item_rates(self._plan(mid, rng), rng)
         finally:
             _AREA.v = None
+
+    @staticmethod
+    def _item_rates(plan, rng):
+        """Per-item drop rates from the admin page (overall Rates > Item drop rates, and a Vortex banner's
+        Drops): x2 = that item comes out twice as often, 0 = never. Works on the finished chest list, so
+        it covers every way a chest is made; other items are left as they are."""
+        mults = dict(SETTINGS.get('item_rates') or {})
+        for it, m in (_area().get('items') or {}).items():
+            mults[it] = mults.get(it, 1.0) * float(m)
+        mults = {str(k): float(v) for k, v in mults.items() if float(v) != 1.0}
+        if not mults:
+            return plan
+        for b in plan.get('battles') or []:
+            k = max(1, len(b.get('mons') or []))
+            out = []
+            for c in b.get('chests') or []:
+                m = re.match(r'^(\d+)/1/4:(\d+):(\d+):(\d+)$', str(c))
+                mult = mults.get(m.group(3)) if m else None
+                if mult is None:
+                    out.append(c)
+                    continue
+                n = int(mult) + (1 if rng.random() < mult - int(mult) else 0)
+                for j in range(n):          # the first stays where it was; extra ones on any enemy
+                    out.append(c if j == 0 else f'{rng.randrange(k)}/1/4:{m.group(2)}:{m.group(3)}:{m.group(4)}')
+            b['chests'] = out
+        return plan
 
     def area_captures(self, dun):
         """Capture chance per kill (0-1) of units with a fixed one in this area: the built-in ones

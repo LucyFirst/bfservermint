@@ -2355,7 +2355,8 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'off': {'areas': [], 'vortex': [], 'banners': [], 'units': [], 'trials': [], 'quests': []},
                     'schedule': {},
                     'boost': {},
-                    'area_drops': {},       # Vortex banner: {dungeon: {drop, item, caps: {unit: percent}}}
+                    'area_drops': {},       # Vortex banner: {dungeon: {drop, item, caps: {unit: percent}, items: {item: x}}}
+                    'item_rates': {},       # every quest: {item id: multiplier} (Rates tab > Item drop rates)
                     'gold_names': [],
                     'sell': {},
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
@@ -2406,9 +2407,13 @@ def admin_settings():
                         caps = {str(u): float(p) for u, p in (v.get('caps') or {}).items()}
                         if caps:
                             a['caps'] = caps
+                        its = {str(i): float(x) for i, x in (v.get('items') or {}).items()}
+                        if its:
+                            a['items'] = its
                         if a:
                             d['area_drops'][str(did)] = a
                 d['gold_names'] = [str(x) for x in (f.get('gold_names') or [])]
+                d['item_rates'] = {str(i): float(x) for i, x in (f.get('item_rates') or {}).items()}
                 if (f.get('fusion') or {}).get('label') in ('none', 'great', 'super'):
                     d['fusion']['label'] = f['fusion']['label']
                 for kind, v in ((f.get('fusion') or {}).items()):
@@ -2430,7 +2435,8 @@ def admin_settings():
                 log.exception('admin_settings.json could not be read - using normal rates')
         _ADMIN_SETTINGS.update(mtime=mt, data=d)
         battlegen.SETTINGS.update(drop=d['mult']['drop'], item=d['mult']['item'], off_units=set(d['off']['units']),
-                                  unit_drop=dict(d.get('unit_drop') or {}), area=dict(d['area_drops']))
+                                  unit_drop=dict(d.get('unit_drop') or {}), area=dict(d['area_drops']),
+                                  item_rates=dict(d.get('item_rates') or {}))
     return _ADMIN_SETTINGS['data']
 
 def save_admin_settings(d):

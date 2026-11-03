@@ -440,6 +440,12 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
   <div class="row" style="gap:8px;margin-top:6px;align-items:center">
     <input id="drAddId" placeholder="unit id" style="flex:0 1 120px"><button class="btn ghost sm" id="drAdd" style="flex:0 0 auto">Add</button>
   </div>
+  <label style="margin-top:12px">Item drop rates (this banner)</label>
+  <p class="hint" style="color:var(--muted);font-size:12px;margin:0 0 6px">The items these quests drop, with about how many come per run now (all of the banner's quests averaged). A multiplier changes just that item: 2 = twice as often, 0 = never. Empty = as usual.</p>
+  <div class="bolist" id="drItems"></div>
+  <div class="row" style="gap:8px;margin-top:6px;align-items:center">
+    <input id="drItemAdd" placeholder="item id" style="flex:0 1 120px"><button class="btn ghost sm" id="drItemAddB" style="flex:0 0 auto">Add item</button>
+  </div>
   <div class="row" style="margin-top:14px;gap:8px"><button class="btn" id="drSave" style="flex:0 0 auto">Save</button><button class="btn danger" id="drReset" style="flex:0 0 auto">Back to normal</button><button class="btn ghost" id="drCancel" style="flex:0 0 auto">Cancel</button></div>
   <div class="msg" id="drmsg"></div>
 </dialog>
@@ -625,6 +631,12 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
       <div><label>Quest karma</label><input type="number" step="0.1" min="0" max="100" id="m-karma"></div>
       <div><label>Unit drop chance</label><input type="number" step="0.1" min="0" max="100" id="m-drop"></div>
       <div><label>Item chest chance</label><input type="number" step="0.1" min="0" max="100" id="m-item"></div>
+    </div>
+    <label style="margin-top:14px">Item drop rates (every quest)</label>
+    <p class="hint" style="margin:0 0 6px">One item, everywhere: 2 = that item comes out of chests twice as often, 0.5 = half, 0 = never. Other items stay as they are. A Vortex banner's own Drops can set it again for that banner (they multiply).</p>
+    <div class="bolist" id="irList"></div>
+    <div class="row" style="gap:8px;margin-top:6px;align-items:center">
+      <input id="irAddId" placeholder="item id" style="flex:0 1 120px"><button class="btn ghost sm" id="irAdd" style="flex:0 0 auto">Add item</button>
     </div>
     <div style="margin-top:14px" class="row" style="gap:8px"><button class="btn" id="rSave" style="flex:0 0 auto">Save rates</button><button class="btn ghost" id="rReset" style="flex:0 0 auto">Back to normal</button></div>
     <div class="msg" id="rmsg"></div>
@@ -914,6 +926,7 @@ async function loadSettings(){
   $('#storyGrid').innerHTML=r.story_areas.map(a=>`<label class="tog${S.off.areas.includes(a.id)?' closed':''}"><input type="checkbox" value="${a.id}"${S.off.areas.includes(a.id)?' checked':''}><span>${esc(a.name)} <span style="color:var(--muted);font-size:12px">#${a.id}</span></span></label>`).join('');
   $$('#storyGrid input').forEach(c=>c.onchange=()=>c.parentElement.classList.toggle('closed',c.checked));
   for(const k of ['exp','zel','karma','drop','item']) $('#m-'+k).value=S.mult[k];
+  IR=r.item_rates||[];drawIR();
   loadSell(); loadFusion(); loadUnitbox();
 }
 let SP=null;
@@ -1367,21 +1380,28 @@ $('#nwSave').onclick=async()=>{nwRead();try{const r=await api('news_save',{banne
 
 // ---------- per-banner drop rates
 let DR=null;
-function drText(a){const t=[];if(a.drop!=null)t.push('Units x'+(+a.drop));if(a.item!=null)t.push('Items x'+(+a.item));const n=Object.keys(a.caps||{}).length;if(n)t.push(n+' capture'+(n>1?'s':'')+' set');return t.join(' · ')||'Drops'}
+function drText(a){const t=[];if(a.drop!=null)t.push('Units x'+(+a.drop));if(a.item!=null)t.push('Items x'+(+a.item));const n=Object.keys(a.caps||{}).length;if(n)t.push(n+' capture'+(n>1?'s':'')+' set');const ni=Object.keys(a.items||{}).length;if(ni)t.push(ni+' item rate'+(ni>1?'s':''));return t.join(' · ')||'Drops'}
 function drawDrops(){
   $('#drCaps').innerHTML=DR.units.map(u=>`<label style="display:flex;align-items:center;gap:8px"><span style="flex:1 1 auto">${esc(u.name)} <span style="color:var(--muted);font-size:12px">#${u.id}${DR.base[u.id]!=null?' · built-in '+DR.base[u.id]+'%':''}</span></span><input type="number" min="0" max="100" step="1" data-cap="${u.id}" value="${DR.caps[u.id]!=null?DR.caps[u.id]:''}" placeholder="${DR.base[u.id]!=null?DR.base[u.id]:'usual'}" style="flex:0 0 110px"></label>`).join('')||'<p class="hint" style="padding:6px 10px">No capture units listed for these quests - add one below.</p>';
 }
+function drawDropItems(){
+  $('#drItems').innerHTML=DR.items.map(it=>`<label style="display:flex;align-items:center;gap:8px"><span style="flex:1 1 auto">${esc(it.name)} <span style="color:var(--muted);font-size:12px">#${it.id} · about ${it.per_run<0.01&&it.per_run>0?'<0.01':(+it.per_run).toFixed(2)} per run now</span></span><input type="number" min="0" max="20" step="0.1" data-dit="${it.id}" value="${DR.item_mult[it.id]!=null?DR.item_mult[it.id]:''}" placeholder="x1" style="flex:0 0 90px"></label>`).join('')||'<p class="hint" style="padding:6px 10px">These quests drop no items.</p>';
+}
+function readDropItems(){$$('#drItems input[data-dit]').forEach(i=>{const v=i.value.trim();if(v==='')delete DR.item_mult[i.dataset.dit];else DR.item_mult[i.dataset.dit]=v})}
+$('#drItemAddB').onclick=async()=>{readDropItems();const v=$('#drItemAdd').value.trim();
+  try{const r=await api('item_lookup',{id:v});if(!DR.items.some(x=>x.id===r.id))DR.items.push({id:r.id,name:r.name,per_run:0});$('#drItemAdd').value='';drawDropItems()}catch(e){say('#drmsg',e.message)}};
 function readCaps(){document.querySelectorAll('#drCaps input[data-cap]').forEach(i=>{const v=i.value.trim();if(v==='')delete DR.caps[i.dataset.cap];else DR.caps[i.dataset.cap]=v})}
 async function openDrops(id,name){
   try{DR=await api('area_drops_get',{id})}catch(err){return say('#vmsg',err.message)}
   $('#drTitle').textContent='Drop rates - '+name;$('#drDrop').value=DR.drop;$('#drItem').value=DR.item;$('#drAddId').value='';$('#drmsg').textContent='';
   $('#drOverall').textContent=`Overall rates now: Unit drop x${+DR.overall.drop}, Item drop x${+DR.overall.item}.`;
-  drawDrops();$('#drDlg').showModal();
+  DR.items=DR.items||[];DR.item_mult=DR.item_mult||{};
+  drawDrops();drawDropItems();$('#drDlg').showModal();
 }
 $('#drAdd').onclick=()=>{readCaps();const v=$('#drAddId').value.trim();if(!/^\d+$/.test(v))return say('#drmsg','Type a unit id (numbers only).');if(!DR.units.some(u=>u.id===v))DR.units.push({id:v,name:'Unit'});$('#drAddId').value='';drawDrops()};
 $('#drCancel').onclick=()=>$('#drDlg').close();
-$('#drSave').onclick=async()=>{readCaps();
-  try{const r=await api('area_drops',{id:DR.id,drop:$('#drDrop').value,item:$('#drItem').value,caps:DR.caps});$('#drDlg').close();say('#vmsg',r.ok,true);loadVortex()}
+$('#drSave').onclick=async()=>{readCaps();readDropItems();
+  try{const r=await api('area_drops',{id:DR.id,drop:$('#drDrop').value,item:$('#drItem').value,caps:DR.caps,items:DR.item_mult});$('#drDlg').close();say('#vmsg',r.ok,true);loadVortex()}
   catch(err){say('#drmsg',err.message)}};
 $('#drReset').onclick=async()=>{
   try{const r=await api('area_drops',{id:DR.id,reset:1});$('#drDlg').close();say('#vmsg',r.ok,true);loadVortex()}
@@ -1499,11 +1519,20 @@ $('#nSave').onclick=async()=>{
   try{$('#nSave').disabled=true;const r=await api('banner_create',{name:$('#nName').value,tab:$('#nTab').value,quests:nQuests.map(q=>q.id),png:nImg});$('#newDlg').close();say('#vmsg',r.ok,true);loadVortex()}
   catch(e){say('#nmsg',e.message)}finally{$('#nSave').disabled=false}
 };
-$('#rSave').onclick=async()=>{
+let IR=[];
+function drawIR(){
+  $('#irList').innerHTML=IR.map((x,i)=>`<label style="display:flex;align-items:center;gap:8px"><span style="flex:1 1 auto">${esc(x.name)} <span style="color:var(--muted);font-size:12px">#${x.id}</span></span><input type="number" min="0" max="20" step="0.1" data-ir="${i}" value="${x.mult}" style="flex:0 0 90px"><button class="btn ghost sm" data-irx="${i}" title="Remove" style="flex:0 0 auto">×</button></label>`).join('')||'<p class="hint" style="padding:6px 10px">No item has its own rate - every item drops as usual.</p>';
+}
+function readIR(){$$('#irList input[data-ir]').forEach(i=>{IR[+i.dataset.ir].mult=i.value})}
+$('#irList').onclick=e=>{const b=e.target.closest('button[data-irx]');if(!b)return;e.preventDefault();readIR();IR.splice(+b.dataset.irx,1);drawIR()};
+$('#irAdd').onclick=async()=>{readIR();const v=$('#irAddId').value.trim();
+  try{const r=await api('item_lookup',{id:v});if(!IR.some(x=>x.id===r.id))IR.push({id:r.id,name:r.name,mult:2});$('#irAddId').value='';drawIR()}catch(e){say('#rmsg',e.message)}};
+$('#rSave').onclick=async()=>{readIR();
   const mult={};for(const k of ['exp','zel','karma','drop','item'])mult[k]=+$('#m-'+k).value;
-  try{const r=await api('settings_save',{mult});say('#rmsg',r.ok,true)}catch(e){say('#rmsg',e.message)}
+  const item_rates={};IR.forEach(x=>item_rates[x.id]=x.mult);
+  try{const r=await api('settings_save',{mult,item_rates});say('#rmsg',r.ok,true);loadSettings()}catch(e){say('#rmsg',e.message)}
 };
-$('#rReset').onclick=()=>{for(const k of ['exp','zel','karma','drop','item'])$('#m-'+k).value=1};
+$('#rReset').onclick=()=>{for(const k of ['exp','zel','karma','drop','item'])$('#m-'+k).value=1;IR=[];drawIR()};
 boot().catch(e=>{document.body.innerHTML='<p style="padding:20px">Could not reach the server: '+esc(e.message)+'</p>'});
 </script>
 </body>
