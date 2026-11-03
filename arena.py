@@ -428,7 +428,7 @@ class Arena:
         my_pts = _i((mine or {}).get('U4pMNjy0'))
         try:
             friends = {u for u, st in (self.S.friend_engine().links.get(pl['user_id']) or {}).items()
-                       if str(st) == '1'}
+                       if str(st) in ('friend', '1')}     # friends.json keeps 'friend' / 'sent' / 'received'
         except Exception:
             friends = set()
         people = []
