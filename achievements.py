@@ -16,8 +16,8 @@ import time
 DAY = 86400
 DAILY_COUNT = 5
 MERIT_DAILY = 20000              # zel / karma trades a day (the game's own limit, shown on the trade screen)
-# Exchange Hall: evolution materials and spheres restock every week (Monday 00:00 UTC, like the day's
-# reset); everything else keeps its lifetime limit. Evolution materials = evolution units (Nymphs,
+# Exchange Hall: EVERY offer restocks every week (Monday 00:00 UTC, like the day's reset). Before,
+# only these did and everything else kept its lifetime limit: Evolution materials = evolution units (Nymphs,
 # Spirits, Idols, Totems, Pots, Bulbs, Mecha Gods, Mimics), Legend Stone / Shards / Elementum Tome
 # and Rainbow Crystal (as joppe2001/bf-private-server's Merit Shop).
 WEEK = 7 * DAY
@@ -63,7 +63,7 @@ class Achievements:
                 break
         self.by_id = {r['M7SXoc31']: r for r in self.master}
         self.trades = {r['Mdgsh04u']: r for r in (self.base or {}).get('82CcMZhp') or []}
-        self.weekly = self._weekly_offers()
+        self.weekly = set(self.trades)       # every offer restocks weekly (was: _weekly_offers() only)
 
     def _weekly_offers(self):
         try:
