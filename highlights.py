@@ -124,6 +124,8 @@ class Highlights:
     def summon(self, pl, uid):
         if not self._ok(pl):
             return
+        if str((self.S.unit_mst().get(str(uid)) or {}).get('xP9oi5Z2', '0')) != '0':
+            return              # materials (gods, crystals, frogs, imps...) are never highlighted
         name, stars = self._unit(uid)
         if stars >= self.summon_min:
             self._add(f"🌟 {self._who(pl)} summoned **{_esc(name)}** ({stars}★)!")
