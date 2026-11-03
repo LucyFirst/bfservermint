@@ -51,6 +51,14 @@ CAMP_TICK, CAMP_HEAL = 4, 10             # resting heals 10% of max HP every 4 s
 SHOP_ENTRIES, SHOP_LIVES = 100, 101      # Raid gem shop: refill entries / refill hearts
 SHOP_GEMS = 1                            # gems per refill (as continuing a quest costs here)
 BAG_STACKS = 50                          # picked-up items the Raid bag holds (game: raid_bag_cnt)
+# One-time first-clear rewards (the wiki's Raid X2-X4 trophies, the key items of Randall's Sphere list)
+RAID_FIRST_CLEAR = {'80106': [('880100', 1), ('880101', 1)],     # Uprising (RC3): Plasma Fragment, Obsidian Quartz
+                    '80110': [('880111', 1), ('880112', 1)],     # Relics of a Forgotten Era (RC4): Cyclaw's Rage, Hydraloid's Wrath
+                    '80207': [('880211', 1), ('880212', 1)],     # The Coin Toss (RC5): Fury of the Destroyer, Scorn of the Ice Queen
+                    '80306': [('880213', 1), ('880214', 1)]}     # He Who Sold the World (RC5): Bond of the Monster Hunter, Grief of the Storm Champion
+# Extra map-search finds, chance per search (wiki: Kielazar X5 and Zael X6, Raid Class 6)
+HARVEST_EXTRA = {'80406': [('880302', 0.25), ('880301', 0.25)],  # A Black Bargain: Weathered Bell, Corroded Token
+                 '80505': [('880302', 0.25)]}                    # A Small Victory: Weathered Bell
 
 # the map enemies bfrevive uses in every Raid quest (Moize Plains' fire set), and how often
 SMALL_ENEMIES = {'12300': 3, '11600': 3, '14550': 3, '11550': 3, '60550': 1, '10650': 1}
@@ -760,6 +768,10 @@ class Raid:
                 rewards.append(('4', item, n, '2'))
             if first:
                 st['cleared'].append(q['mission'])
+                for item, n in RAID_FIRST_CLEAR.get(q['mission'], ()):
+                    S.add_item(pl, item, n)
+                    rewards.append(('4', item, n, '1'))
+                    S.log.info('raid: %s first clear of %s: %s x%d', pl.get('handle'), m['name'], S.item_names_get(item), n)
             if m.get('class_up') and m['cls'] == st['cls'] and st['cls'] < min(MAX_CLASS, self.max_class()):
                 st['cls'] += 1
                 class_up = True
@@ -1031,6 +1043,12 @@ class Raid:
             if not spot.get('drops') or done >= max(1, spot.get('times') or 0):
                 raise RaidError(HARVEST_EMPTY)
             rate, item, n = random.choices(spot['drops'], [max(1, d[0]) for d in spot['drops']])[0]
+            x = random.random()
+            for extra, chance in HARVEST_EXTRA.get(q['mission'], ()):      # Weathered Bell / Corroded Token
+                if x < chance:
+                    item, n = extra, 1
+                    break
+                x -= chance
             ps['visited'][point] = done + 1
             self.add_got(ps, item, n)
             return self.quest_groups(pl, room, q)
