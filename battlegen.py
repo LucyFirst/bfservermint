@@ -100,6 +100,10 @@ HERO_BOSS_DROP = {'100700': '50141', '100800': '60151', '100900': '10141', '1010
                   '101200': '40141'}       # dungeon -> base form (Alma, Oboro, Galant, Stya, Nemia, Zeln)
 HERO_LEVEL_RATES = [0.05, 0.10, 0.15, 0.20]
 
+# story bosses that are drawn with a plain boss picture (no unit of their own), but in the real game
+# the unit they stand for was caught from them: quest -> (unit caught, chance)
+QUEST_BOSS_DROP = {'565': ('60233', 0.10)}     # The Mad God Descends: Demon Zebra -> Disciple Zebra
+
 # Ruins of Fire/Water/Earth/Thunder/Light/Dark Lv. 3: built on the Ruins of Miracles' original battle
 # list (the only one known), but the boss is that ruin's own totem - the Lv. 3 totem fight the Miracles
 # run has as its middle battle (150,000 HP) - and no other totem turns up.
@@ -1011,8 +1015,12 @@ class Battlegen:
             dun_caps = self.area_captures(dun)
             for pos, m in enumerate(b[:5]):
                 drop = None
+                qb = QUEST_BOSS_DROP.get(str(mid))
                 if m.get('force_drop'):
                     drop = m['u']
+                elif qb and m.get('boss'):
+                    if rng.random() < _chance(unit_drop_override(qb[0]) or qb[1], 'drop'):
+                        drop = qb[0]
                 elif m['u'] in dun_caps:
                     if rng.random() < _chance(dun_caps[m['u']], 'drop'):
                         drop = m['u']
@@ -1040,6 +1048,8 @@ class Battlegen:
                     drop = m['u']
                 elif extra_caps and story and rng.random() < _chance(0.01, 'drop'):
                     drop = rng.choice(extra_caps)  # a wiki-listed rare drop now and then (one not fought here)
+                    if qb and drop == qb[0]:
+                        drop = None               # this one comes from the boss
                 if drop and not m.get('force_drop') and m['u'] not in dun_caps and self.kind(drop) == '0':
                     # a unit enemy drops as the first form of its line: Azrael drops Archangel
                     drop = self.lowest_form(drop)
