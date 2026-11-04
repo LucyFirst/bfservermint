@@ -3020,6 +3020,10 @@ def generate_mission_start(pl, mid, req, base):
     log.info('quest battles for %s (%s): %s', mid, plan['label'],
              ' / '.join(','.join(m.get('name') or unit_mst().get(m['u'], {}).get('utP1c0CD', m['u']) for m in b['mons'])
                         for b in plan['battles']))
+    caught = [f"{bi}:{unit_mst().get(m['drop'], {}).get('utP1c0CD', m['drop'])}"
+              for bi, b in enumerate(plan['battles'], 1) for m in b['mons'] if m.get('drop')]
+    if caught:
+        log.info('quest %s unit drops (battle:unit): %s', mid, ', '.join(caught))
     return resp
 
 def mission_result(req):
