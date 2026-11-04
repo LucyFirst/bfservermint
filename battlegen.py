@@ -193,6 +193,8 @@ MATERIAL_ONLY_DUNGEONS = {
 
 # ...and these drop no units at all (karma / zel farms)
 NO_UNIT_DUNGEONS = {'100050'}      # Souls Training Ground (karma)
+# ...and these drop only these units
+ONLY_UNITS = {'100200': {'60142', '60143', '60144', '60224'}}   # Cave of Greed (The Box of Desires): the 4 Mimics
 
 # Fixed capture chance per kill, by dungeon: {dungeon: {unit: chance}} (normal enemies and bosses alike)
 DUNGEON_CAPTURE = {
@@ -1042,7 +1044,8 @@ class Battlegen:
                 if drop and not m.get('force_drop') and m['u'] not in dun_caps and self.kind(drop) == '0':
                     # a unit enemy drops as the first form of its line: Azrael drops Archangel
                     drop = self.lowest_form(drop)
-                if drop and (dun in NO_UNIT_DUNGEONS or (dun in MATERIAL_ONLY_DUNGEONS and self.kind(drop) == '0')):
+                if drop and (dun in NO_UNIT_DUNGEONS or (dun in MATERIAL_ONLY_DUNGEONS and self.kind(drop) == '0')
+                             or (dun in ONLY_UNITS and str(drop) not in ONLY_UNITS[dun])):
                     drop = None                   # evolution-material dungeons give only material units
                 if drop and str(drop) in SETTINGS.get('off_units', ()):
                     drop = None                   # closed on the admin page
