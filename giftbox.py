@@ -116,6 +116,7 @@ class GiftBox:
                                            'count': int(m.get('wgV86x1q') or 0), 'time': time.time(),
                                            'name': pl.get('handle', '')})
                 sent.append(other)
+            pl['_gift_counts'] = (len(got), len(sent))      # for the player's records (records.py)
             if got or sent:
                 self.save()
                 self.S.log.info('friend gifts: %s took %s; sent to %s', pl.get('handle'),

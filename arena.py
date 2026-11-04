@@ -330,34 +330,51 @@ class Arena:
     RARITY_KEYS = ['uXrLT17C', '8dzSxWA2', '8TL5Zmuw', '0XocvSM2', 'Ivk81jQh', '7Su2qZFv', 'mCDR82iQ', 'u9d8ye9H']
 
     def count_records(self, row, o, res, win, gained):
-        """Arena Record totals: ABP gained, enemy units defeated (all / by element / by rarity),
-        all-knockdown, timeout and perfect wins. chy3HnIm = each enemy unit's 'HP left:max HP' in
-        squad order, WDYR11jJ = the same for your own units."""
+        """Arena Record totals from the game's own end-of-battle report (ArenaBattleEndRequest yTEvm85f):
+        sQ2aMk8B = the enemy units defeated, mFID53JZ how many, hoG2ieT5 / 6PLsn8xo BC / HC picked up,
+        5NRJQ1LU best turn damage, XP06YWdT best turn sparks, U8uZLA34 sparks, rZQJF5G9 Brave Bursts,
+        GRCVD1i8 / Uy15wSJd BB / SBB knockdowns, hI68VzHu damage, F32xJzsH healing, Wnc6A31E overkills.
+        WDYR11jJ / chy3HnIm (each unit's 'HP left:max HP') decide perfect / knockout / timeout wins."""
         def add(k, n=1):
-            row[k] = str(_i(row.get(k)) + n)
+            if n:
+                row[k] = str(_i(row.get(k)) + int(n))
+
+        def best(k, v):
+            if _i(v) > _i(row.get(k)):
+                row[k] = str(_i(v))
         if gained > 0:
             add('T57M1AvV', gained)                                   # Total ABP Acquired
         def hp(text):
             return [(_i(a), _i(b)) for a, _, b in (p.partition(':') for p in str(text or '').split(',') if p)]
         foe, mine = hp(res.get('chy3HnIm')), hp(res.get('WDYR11jJ'))
-        units = o.get('units') or []
         mst = self.S.unit_mst()
-        down = 0
-        for i, (now, mx) in enumerate(foe):
-            if mx <= 0 or now > 0:
-                continue
-            down += 1
-            m = mst.get(str(units[i].get('P_UNIT_ID')) if i < len(units) else '', {})
+        downs = [u.strip() for u in str(res.get('sQ2aMk8B') or '').split(',') if u.strip()]
+        if not downs:                     # no list in the report: the enemy squad's units at 0 HP
+            units = o.get('units') or []
+            downs = [str(units[i].get('P_UNIT_ID')) for i, (now, mx) in enumerate(foe)
+                     if mx > 0 and now <= 0 and i < len(units)]
+        for u in downs:
+            m = mst.get(u, {})
             ek = self.ELEMENT_KEYS.get(str(m.get('iNy0ZU5M')))
             if ek:
                 add(ek)
             r = _i(m.get('7ofj5xa1'))
             if 1 <= r <= len(self.RARITY_KEYS):
                 add(self.RARITY_KEYS[r - 1])
-        if down:
-            add('mFID53JZ', down)                                     # Total Units Defeated
+        add('mFID53JZ', max(_i(res.get('mFID53JZ')), len(downs)))      # Total Units Defeated
+        add('8bAdgn37', max(0, _i(res.get('hoG2ieT5'))))
+        add('I5Uin24C', max(0, _i(res.get('6PLsn8xo'))))
+        add('kHbYZ9w1', max(0, _i(res.get('U8uZLA34'))))
+        add('4vx39EIB', max(0, _i(res.get('rZQJF5G9'))))
+        add('Ut8sN0oM', max(0, _i(res.get('GRCVD1i8'))) + max(0, _i(res.get('Uy15wSJd'))))
+        add('Wnc6A31E', max(0, _i(res.get('Wnc6A31E'))))
+        add('hI68VzHu', max(0, _i(res.get('hI68VzHu'))))
+        add('F32xJzsH', max(0, _i(res.get('F32xJzsH'))))
+        best('0p8BtREA', res.get('5NRJQ1LU'))
+        best('R7eJ1Tfv', res.get('XP06YWdT'))
         if win:
-            if foe and down == len([1 for _, mx in foe if mx > 0]):
+            alive = [1 for now, mx in foe if mx > 0 and now > 0]
+            if foe and not alive:
                 add('Gj4zJIB3')                                       # won by knocking out every unit
             elif foe:
                 add('Z0X7BVdF')                                       # won on time

@@ -2317,6 +2317,14 @@ def raid_engine():
         _RAID = raid.Raid(sys.modules[__name__])
     return _RAID
 
+_REC = None
+def records_engine():
+    global _REC
+    if _REC is None:
+        import records as _records
+        _REC = _records.Records(sys.modules[__name__])
+    return _REC
+
 def achievement_engine():
     global _ACH
     if _ACH is None:
@@ -4172,7 +4180,24 @@ FRIEND_ACTIONS = {'FriendGetRequest': None, 'FriendGetAgreeRequest': None,
 
 WHO = threading.local()           # which player the request being handled belongs to (for the log)
 
+_CUR = threading.local()
+
 def handle_action(rid, req):
+    """Every request, then the player's records (records.py) from what it changed."""
+    with LOCK:
+        _CUR.pl = _CUR.snap = None
+        resp = _handle_action(rid, req)
+        pl, snap = _CUR.pl, _CUR.snap
+        _CUR.pl = _CUR.snap = None
+        if pl is not None and snap is not None:
+            try:
+                if records_engine().after(pl, snap, req, resp):
+                    save_player(pl)
+            except Exception:
+                log.exception('could not update player records')
+        return resp
+
+def _handle_action(rid, req):
     info = REQS.get(rid)
     cls = info['cls'] if info else f'unknown:{rid}'
     apply_account_ops()
@@ -4253,6 +4278,10 @@ def handle_action(rid, req):
             pl['units']['81947'].update({'5gXxT7LZ': 1, 'RXfC31FA': '0'}) if str(pl['units']['81947'].get('RXfC31FA')) == '-1' else None
             pl['frog_fix_81947'] = 1
         deliver_server_gifts(pl)
+        try:
+            _CUR.pl, _CUR.snap = pl, records_engine().before(pl, cls, req)
+        except Exception:
+            log.exception('could not note the player records')
         try:
             achievement_engine().level_campaign(pl)
         except Exception:
