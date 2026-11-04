@@ -176,6 +176,22 @@ for _m in WIKI_LINEUPS.values():
     _m.setdefault('items', _HN_ITEMS)
 
 
+# Vortex material dungeons: only material units drop here (evolution materials, Jewels, Metals, Imps, Frogs,
+# Bulbs, Mimics...) - the ordinary units fought alongside them (Lilin, Rantoul, Skeleton...) never do.
+MATERIAL_ONLY_DUNGEONS = {
+    '100050',                      # Souls Training Ground (karma)
+    '100100',                      # Faerie Paradise: Nymphs, Spirits, Idols, Phantom Pots
+    '100300', '100310', '100400',  # Totem ruins
+    '100320',                      # The Mecha Gods Awaken
+    '100500',                      # Golden Slumberland (gold)
+    '100600', '100650',            # Metal Parade, Jewel Parade
+    '102660', '102670', '102680', '102690', '102700', '102710', '102720',   # Heavenly Paradise / Garden of Imps
+    '110000', '110001', '110002', '110003', '110004', '110005', '110006', '110007', '110008', '110009',
+    '110010', '110011',            # Celestial Garden / Garden of Imps
+    '800100',                      # Bulb Haven
+    '800180', '25530004',          # Treasure Paradise, Treasure Keeper (Mimics, Spirits)
+}
+
 # Fixed capture chance per kill, by dungeon: {dungeon: {unit: chance}} (normal enemies and bosses alike)
 DUNGEON_CAPTURE = {
     '800100': {u: 0.5 for u in ('810034', '820034', '830034', '840034', '850034', '860034', '870034')},  # Bulb Haven: bulbs 50%
@@ -1024,6 +1040,8 @@ class Battlegen:
                 if drop and not m.get('force_drop') and m['u'] not in dun_caps and self.kind(drop) == '0':
                     # a unit enemy drops as the first form of its line: Azrael drops Archangel
                     drop = self.lowest_form(drop)
+                if drop and dun in MATERIAL_ONLY_DUNGEONS and self.kind(drop) == '0':
+                    drop = None                   # evolution-material dungeons give only material units
                 if drop and str(drop) in SETTINGS.get('off_units', ()):
                     drop = None                   # closed on the admin page
                 mons.append(dict(m, drop=drop))
