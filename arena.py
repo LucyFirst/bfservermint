@@ -325,6 +325,68 @@ class Arena:
         dealt = 1 - sum(now for now, _ in foe) / sum(m for _, m in foe)
         return max(0.0, min(1.0, (alive + left + dealt) / 3))
 
+    # PQ56vbkI keys (UserTeamArenaArchive) for the Arena Record screen
+    ELEMENT_KEYS = {'1': 'nRms5i9J', '2': 'Cvp53GKJ', '3': 'T2qI34Rm', '4': 'Ff6g3CNv', '5': '3EmVG6Ts', '6': '3uUIPEj5'}
+    RARITY_KEYS = ['uXrLT17C', '8dzSxWA2', '8TL5Zmuw', '0XocvSM2', 'Ivk81jQh', '7Su2qZFv', 'mCDR82iQ', 'u9d8ye9H']
+
+    def count_records(self, row, o, res, win, gained):
+        """Arena Record totals: ABP gained, enemy units defeated (all / by element / by rarity),
+        all-knockdown, timeout and perfect wins. chy3HnIm = each enemy unit's 'HP left:max HP' in
+        squad order, WDYR11jJ = the same for your own units."""
+        def add(k, n=1):
+            row[k] = str(_i(row.get(k)) + n)
+        if gained > 0:
+            add('T57M1AvV', gained)                                   # Total ABP Acquired
+        def hp(text):
+            return [(_i(a), _i(b)) for a, _, b in (p.partition(':') for p in str(text or '').split(',') if p)]
+        foe, mine = hp(res.get('chy3HnIm')), hp(res.get('WDYR11jJ'))
+        units = o.get('units') or []
+        mst = self.S.unit_mst()
+        down = 0
+        for i, (now, mx) in enumerate(foe):
+            if mx <= 0 or now > 0:
+                continue
+            down += 1
+            m = mst.get(str(units[i].get('P_UNIT_ID')) if i < len(units) else '', {})
+            ek = self.ELEMENT_KEYS.get(str(m.get('iNy0ZU5M')))
+            if ek:
+                add(ek)
+            r = _i(m.get('7ofj5xa1'))
+            if 1 <= r <= len(self.RARITY_KEYS):
+                add(self.RARITY_KEYS[r - 1])
+        if down:
+            add('mFID53JZ', down)                                     # Total Units Defeated
+        if win:
+            if foe and down == len([1 for _, mx in foe if mx > 0]):
+                add('Gj4zJIB3')                                       # won by knocking out every unit
+            elif foe:
+                add('Z0X7BVdF')                                       # won on time
+            if mine and all(now > 0 for now, mx in mine if mx > 0):
+                add('J7u8prxX')                                       # nobody on your side fell
+
+    def count_defense(self, o, attacker_won):
+        """A real player's squad was fought: it counts as a defense for them (Defense Entries /
+        Defense Wins on their Arena Record, 20iEWRCV / 0rAkzg7L, and their defense win streak)."""
+        if not o.get('real') or not o.get('id'):
+            return
+        d = self.S.load_player(str(o['id']))
+        if not d:
+            return
+        st = d.setdefault('state', {})
+        oi = self.info(d)
+        oi['20iEWRCV'] = str(_i(oi.get('20iEWRCV')) + 1)
+        if attacker_won:
+            d['arena_def_streak'] = 0
+        else:
+            oi['0rAkzg7L'] = str(_i(oi.get('0rAkzg7L')) + 1)
+            d['arena_def_streak'] = d.get('arena_def_streak', 0) + 1
+        arch = st.get('PQ56vbkI')
+        row = arch[0] if isinstance(arch, list) and arch and isinstance(arch[0], dict) else \
+            (arch if isinstance(arch, dict) else {self.S.F_USERID: d['user_id']})
+        row['72sMkn1N'] = str(max(_i(row.get('72sMkn1N')), d['arena_def_streak']))
+        st['PQ56vbkI'] = [row]
+        self.S.save_player(d)
+
     @staticmethod
     def streak_bonus(streak):
         return next((b for n, b in STREAK_BONUS if streak >= n), 0)
@@ -414,7 +476,15 @@ class Arena:
             (arch if isinstance(arch, dict) else {self.S.F_USERID: pl['user_id']})
         row['7sXWfE8j'] = str(streak)
         row['KuZ6k5Vp'] = str(max(_i(row.get('KuZ6k5Vp')), pl['arena_best_streak']))
+        try:
+            self.count_records(row, o, res, win, after - before)
+        except Exception:
+            self.S.log.exception('could not count arena records')
         pl['state']['PQ56vbkI'] = [row]
+        try:
+            self.count_defense(o, win)
+        except Exception:
+            self.S.log.exception('could not count the defender\'s arena record')
         out['PQ56vbkI'] = [row]
         if badge is not None:
             out[self.S.G_BADGE] = badge
