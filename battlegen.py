@@ -177,7 +177,7 @@ for _m in WIKI_LINEUPS.values():
 
 
 # Vortex material dungeons: only material units drop here (evolution materials, Jewels, Metals, Imps, Frogs,
-# Bulbs, Mimics...) - the ordinary units fought alongside them (Lilin, Rantoul, Skeleton...) never do.
+# Bulbs...) - the ordinary units fought alongside them (Lilin, Rantoul, Skeleton...) never do.
 MATERIAL_ONLY_DUNGEONS = {
     '100100',                      # Faerie Paradise: Nymphs, Spirits, Idols, Phantom Pots
     '100300', '100310', '100400',  # Totem ruins
@@ -188,7 +188,6 @@ MATERIAL_ONLY_DUNGEONS = {
     '110000', '110001', '110002', '110003', '110004', '110005', '110006', '110007', '110008', '110009',
     '110010', '110011',            # Celestial Garden / Garden of Imps
     '800100',                      # Bulb Haven
-    '800180', '25530004',          # Treasure Paradise, Treasure Keeper (Mimics, Spirits)
 }
 
 # ...and these drop no units at all (karma / zel farms)
