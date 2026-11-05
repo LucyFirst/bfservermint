@@ -2131,6 +2131,8 @@ def start_mission(pl, req):
     if (pl.get('fh_run') or {}).get('mission') == mid:
         log.info('quest start: %s "%s" (Frontier Hunter)', mid, m['name'])
         return None                  # a Frontier Hunter survey: paid with Survey energy already
+    if str(m.get('dungeon')) in fh_engine().dungeons():
+        return 'Frontier Hunter surveys start from the Survey Office in Randall.'
     if mission_closed(mid):
         return 'This quest is closed right now.'
     if str(mid) in EXTRA_FIGHTS and str(mid) not in admin_settings()['on_extra']:
@@ -2379,6 +2381,7 @@ def fh_engine():
         _FH = _fh.FrontierHunter(sys.modules[__name__])
     return _FH
 
+FH_AREAS = {'1000010'}         # the Frontier Hunter tab in the game's area table (not a Vortex tab here)
 FH_REQUESTS = {'ChallengeBaseRequest', 'ChallengeUserInfoRequest', 'ChallengeStartRequest', 'ChallengeMissionStartRequest',
                'ChallengeRankingRequest', 'ChallengeRankRewardRequest'}
 
@@ -3442,6 +3445,10 @@ def sp_permits(pl):
         out = add_boosts(out)
     except Exception:
         log.exception('could not add the Vortex reward boosts')
+    try:
+        out = fh_engine().permit_rows(out)       # Frontier Hunter: only this season's survey area
+    except Exception:
+        log.exception('could not add the Frontier Hunter survey area')
     return out
 
 def drop_empty_tabs(before, after):
@@ -3488,7 +3495,8 @@ def hide_closed_tabs(rows):
     """GetUserInfo 3SG2wX0R: the game draws a folder's tabs (Travellers...) from these rows, not
     from the Vortex list - so closed and emptied Vortex tabs are taken out here as well."""
     return [r for r in rows if not (isinstance(r, dict) and str(r.get('9C64Qwe0')) == '99'
-                                    and (area_closed(str(r.get('VjCY7rX4'))) or str(r.get('VjCY7rX4')) in HIDDEN_TABS))]
+                                    and (area_closed(str(r.get('VjCY7rX4'))) or str(r.get('VjCY7rX4')) in HIDDEN_TABS
+                                         or str(r.get('VjCY7rX4')) in FH_AREAS))]     # Frontier Hunter: never a Vortex tab
 
 def use_key(pl, req):
     """DungeonKeyUse: the game sends xki65BPq {16KMNJLb: key, phe9Ta54: how many keys}. That many

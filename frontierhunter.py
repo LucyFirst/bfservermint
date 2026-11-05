@@ -150,6 +150,22 @@ class FrontierHunter:
             r.update({'qA7M9EjP': _ts(s0), 'SzV0Nps7': _ts(e0 - 1), '7S5tL21M': _ts(e0 - 1),
                       '6dWR3qrQ': _ts(e0), '1JZuvmo7': _ts(e0 + p), '4nq0Zoau': _ts(e0 + p)})
 
+    def dungeons(self):
+        return {r.get('MHx05sXt') for r in self.seasons.values() if r.get('MHx05sXt')}
+
+    def permit_rows(self, rows):
+        """The Vortex permit list (Y73tHKS8): every survey area out, then this season's back in with
+        the seconds left (as bfrevive sent its survey: C1vG0iKh 1, qY49LBjw seconds) - only while
+        Frontier Hunter is switched on."""
+        fh = self.dungeons()
+        rows = [r for r in rows if not (isinstance(r, dict) and str(r.get('MHx05sXt')) in fh)]
+        if self.settings()['on']:
+            n, season, st, en = self.run_at()
+            d = self.seasons[season].get('MHx05sXt')
+            if d:
+                rows.append({'MHx05sXt': d, 'C1vG0iKh': '1', 'qY49LBjw': str(max(1, int(en - time.time())))})
+        return rows
+
     # ------------------------------------------------------------------ the player's side
     def me(self, pl):
         f = pl.setdefault('fh', {})

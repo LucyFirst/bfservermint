@@ -288,6 +288,12 @@ class VortexEditor:
         c = self.state['custom'].get(did)
         return c['name'] if c else self.dnames.get(did) or f'Banner {did}'
 
+    def _fh_dungeons(self):
+        try:
+            return self.S.fh_engine().dungeons()
+        except Exception:
+            return set()
+
     def overview(self):
         areas, dungeons, missions = self.tables()
         tabs = {r['VjCY7rX4']: r for r in areas if r.get('9C64Qwe0') == '99'}
@@ -302,6 +308,8 @@ class VortexEditor:
             tab = d.get('VjCY7rX4')
             if did == self.S.TRIAL_DUNGEON or tab == self.S.TRIAL_DUNGEON:
                 continue                 # the Research Lab trials have their own section (Trials)
+            if str(tab) in getattr(self.S, 'FH_AREAS', ()) or did in self._fh_dungeons():
+                continue                 # Frontier Hunter's survey areas: Game areas > Frontier Hunter
             qs = sorted(by_dun.get(did, []), key=lambda m: int(m.get('XuJL4pc5') or 0))
             out.setdefault(tab, []).append({
                 'id': did, 'name': self.name(did), 'image': d.get('21VKZo0E') or '',
