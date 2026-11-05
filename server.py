@@ -3494,9 +3494,16 @@ HIDDEN_TABS = set()          # Vortex tabs left empty by the admin page (last Vo
 def hide_closed_tabs(rows):
     """GetUserInfo 3SG2wX0R: the game draws a folder's tabs (Travellers...) from these rows, not
     from the Vortex list - so closed and emptied Vortex tabs are taken out here as well."""
-    return [r for r in rows if not (isinstance(r, dict) and str(r.get('9C64Qwe0')) == '99'
-                                    and (area_closed(str(r.get('VjCY7rX4'))) or str(r.get('VjCY7rX4')) in HIDDEN_TABS
-                                         or str(r.get('VjCY7rX4')) in FH_AREAS))]     # Frontier Hunter: never a Vortex tab
+    # Frontier Hunter's area row (1000010) is what the Survey Office lists its survey from - kept while
+    # Frontier Hunter is on (whatever the Vortex settings say), gone while it is off
+    fh_on = bool(admin_settings()['features'].get('frontierhunter'))
+
+    def gone(r):
+        a = str(r.get('VjCY7rX4'))
+        if a in FH_AREAS:
+            return not fh_on
+        return area_closed(a) or a in HIDDEN_TABS
+    return [r for r in rows if not (isinstance(r, dict) and str(r.get('9C64Qwe0')) == '99' and gone(r))]
 
 def use_key(pl, req):
     """DungeonKeyUse: the game sends xki65BPq {16KMNJLb: key, phe9Ta54: how many keys}. That many
