@@ -34,6 +34,12 @@ SEASON_DAYS = 7                  # default length of a season (admin page: fh_da
 STRENGTH = 2.5                   # enemies' HP / ATK / DEF against the story references (admin: fh_strength)
 SEARCH_DIV = 100                 # survey points a run gives = its score / this
 TOP = 30                         # rows per ranking list (as the game's)
+# Hunter Rank by overall place at the end of a season (this server's, for every season - instead of the
+# game's 1-500 / 501-3000 / ... brackets, made for millions of players): (from, to (0 = and below), +HR, comment)
+HR_TIERS = [(1, 1, 7, "You're in first place! Hold on to it and your Hunter Rank goes up by 7!"),
+            (2, 4, 3, "You're in the top 4! Keep this up and your Hunter Rank goes up by 3. First place gets 7!"),
+            (5, 8, 2, "You're in the top 8! Keep this up and your Hunter Rank goes up by 2. Can you reach the top 4?"),
+            (9, 0, 1, "Every Summoner who scores gets a Hunter Rank! Climb into the top 8 for more!")]
 INTRO = 'You\'re here! The area to be surveyed this time is full of tough enemies, but I\'m sure you can take care of them!'
 
 
@@ -201,11 +207,14 @@ class FrontierHunter:
         rr = [r for r in self.rank_rewards.get(season, []) if r.get('9w5e3ZJB') == '1']
         if not search:
             return next((r['WDUyI85C'] for r in rr if r.get('u7Ijep5o') == '0'), INTRO)
-        for r in rr:
-            lo, hi = _i(r.get('u7Ijep5o')), _i(r.get('4BtYr6Eg'))
-            if lo and place >= lo and (not hi or place <= hi):
-                return r.get('WDUyI85C') or INTRO
+        for lo, hi, up, text in HR_TIERS:
+            if place >= lo and (not hi or place <= hi):
+                return text
         return INTRO
+
+    @staticmethod
+    def hr_up(place):
+        return next((up for lo, hi, up, _ in HR_TIERS if place >= lo and (not hi or place <= hi)), 0)
 
     def user_info(self, pl):
         n, season, st, en = self.run_at()
@@ -425,10 +434,15 @@ class FrontierHunter:
             mission = m.get('j28VNcUW') if m.get('j28VNcUW') not in ('', '0') else None
             kinds[m['9w5e3ZJB']] = self.ranked(n, m['9w5e3ZJB'], mission)
         wins = {}
+        for place, (uid, _) in enumerate(kinds['1'], 1):      # Hunter Rank: this server's tiers
+            up = self.hr_up(place)
+            if up:
+                wins.setdefault(uid, []).append(('1', place, {'30Kw4WBa': '10', 'TdDHf59J': '0', 'wJsB35iH': str(up),
+                                                              '37moriMq': '0', 'j28VNcUW': '0'}))
         for kind, rows in kinds.items():
             for place, (uid, _) in enumerate(rows, 1):
                 for r in rr:
-                    if r.get('9w5e3ZJB') != kind:
+                    if r.get('9w5e3ZJB') != kind or str(r.get('30Kw4WBa')) == '10':
                         continue
                     lo, hi = _i(r.get('u7Ijep5o')), _i(r.get('4BtYr6Eg'))
                     if lo and place >= lo and (not hi or place <= hi):
