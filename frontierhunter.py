@@ -149,6 +149,14 @@ class FrontierHunter:
             e0 = s0 + p
             r.update({'qA7M9EjP': _ts(s0), 'SzV0Nps7': _ts(e0 - 1), '7S5tL21M': _ts(e0 - 1),
                       '6dWR3qrQ': _ts(e0), '1JZuvmo7': _ts(e0 + p), '4nq0Zoau': _ts(e0 + p)})
+        # Seasons 1-18 were made before the game had score limits, so their surveys have no gNEbgjmh
+        # (score limit) or RlFWcCqN (fixed points). The game reads the limit as "a,b" without checking and
+        # crashes on an empty one, so those surveys get the later seasons' "no limit" values.
+        for r in resp.get('5M8jI4cP') or []:
+            if isinstance(r, dict):
+                if not str(r.get('gNEbgjmh') or '').strip():
+                    r['gNEbgjmh'] = '-1,-1'
+                r.setdefault('RlFWcCqN', '')
 
     def dungeons(self):
         return {r.get('MHx05sXt') for r in self.seasons.values() if r.get('MHx05sXt')}
@@ -176,6 +184,10 @@ class FrontierHunter:
         f.setdefault('hr', 1)
         f.setdefault('energy', self.max_energy)
         f.setdefault('energy_t', 0)
+        if not f.get('orbs_back_1'):
+            # once: the Hunter Orbs spent on surveys that crashed before the score-limit fix come back
+            f['orbs_back_1'] = 1
+            f['energy'], f['energy_t'] = max(f['energy'], self.max_energy), 0
         if f['energy'] < self.max_energy and f['energy_t']:
             k = int((time.time() - f['energy_t']) // self.energy_time)
             if k > 0:
