@@ -116,6 +116,10 @@ RUINS_REF, RUINS_BOSS_LIKE = '100304', '50123'
 # Plain attacks (no special moves) until a recording of the real fight exists.
 EXTRA_MONSTERS = {
     'grand jelly': {'like': 'grantos', 'anime': '0025', 'el': '3', 'name': 'Grand Jelly'},   # The Amorphus Being
+    # Frontier Hunter Terminus bosses that are monsters only (no unit, never recorded)
+    'calamity demon amu yunos': {'like': 'demon zebra', 'anime': '0051', 'el': '6', 'name': 'Calamity Demon Amu Yunos'},
+    'heresy demon kalon': {'like': 'demon zebra', 'anime': '0052', 'el': '6', 'name': 'Heresy Demon Kalon'},
+    'frontier demon': {'like': 'demon zebra', 'anime': '0053', 'el': '6', 'name': 'Frontier Demon'},
 }
 
 def unit_drop_override(u):
@@ -464,14 +468,18 @@ class Battlegen:
     def category(self, mid):
         return 'story' if int(mid) < 100000 else 'vortex'
 
-    def plan(self, mid, rng=random):
+    def plan(self, mid, rng=random, lineup=None):
+        """lineup (Frontier Hunter): {'rounds': [[group, ...] per round], 'diff': x} - each round is one group
+        rolled from that round's list (a group: unit ids, or {'name': ...} for a monster-only enemy)."""
         mid = str(mid)
         dun = str((self.M.get(mid) or {}).get('dungeon'))
         _AREA.v = (SETTINGS.get('area') or {}).get(dun) or {}
+        self._lineup = lineup
         try:
             return self._item_rates(self._plan(mid, rng), rng)
         finally:
             _AREA.v = None
+            self._lineup = None
 
     @staticmethod
     def _item_rates(plan, rng):
@@ -738,12 +746,43 @@ class Battlegen:
                 return max(0.15, seen_n[u] / common)
             return RARE_ENEMY_WEIGHT if (self.kind(u) != '0' or u in caps) else 1.0
         weights = [weight(u) for u in pool]
+        lineup = getattr(self, '_lineup', None)
+        if lineup and lineup.get('rounds'):
+            return self._finish(mid, wiki, self._lineup_battles(lineup, lvl, zel, karma, by_unit, rng), runs, rng, story=False)
         battles = []
         for _ in range(n - 1):
             k = max(1, min(5, rng.choice(sizes)))
             battles.append([enemy(u, lvl) for u in rng.choices(pool, weights=weights, k=k)])
         battles.append(self._story_boss(mid, wiki, runs, pool, enemy, lvl, blvl, rng))
         return self._finish(mid, wiki, battles, runs, rng, story=True)
+
+    def _lineup_battles(self, lineup, lvl, zel, karma, by_unit, rng):
+        """Frontier Hunter rounds from the encounter tables: one group per round, rolled each run. An
+        enemy's strength follows the unit it is (its max HP / ATK / DEF against a 1-star unit's), the round
+        (later rounds tougher, the last one the boss round) and the survey (lineup diff)."""
+        rounds = lineup['rounds']
+        diff = float(lineup.get('diff') or 1)
+        ref = {'hp': 1700.0, 'atk': 450.0, 'def': 450.0}          # a 1-star unit at max level
+        keys = {'hp': '3WMz78t6', 'atk': 'omuyP54D', 'def': '32INDST4'}
+        battles = []
+        for i, groups in enumerate(rounds):
+            last = i == len(rounds) - 1
+            k = diff * (1 + 0.25 * i) * (3.0 if last and len(rounds) > 1 else 1.0)
+            out = []
+            for e in rng.choice(groups):
+                name = e.get('name') if isinstance(e, dict) else None
+                u = '0' if name else str(e)
+                row = self.U.get(u) or {}
+                f = {st: max(0.5, min(8.0, _i(row.get(keys[st])) / ref[st])) if row else 2.5 for st in ref}
+                m = {st: max(1, int(lvl[st] * f[st] * k * rng.uniform(0.95, 1.05))) for st in ref}
+                r = by_unit.get(u) or {}
+                m.update(u=u, ai=r.get('ai', '1'), act=r.get('act', [1, 1]), row=r.get('row'), name=name or r.get('name'),
+                         zel=int(zel * rng.uniform(.8, 1.2)), karma=int(karma * rng.uniform(.8, 1.2)), drop=None)
+                if last:
+                    m['boss'] = True
+                out.append(m)
+            battles.append(out[:6])
+        return battles
 
     def _story_boss(self, mid, wiki, runs, pool, enemy, lvl, blvl, rng):
         own = [run for ref, run in runs if ref == mid and self._real_boss(run)]

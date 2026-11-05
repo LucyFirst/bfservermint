@@ -158,6 +158,29 @@ class FrontierHunter:
                     r['gNEbgjmh'] = '-1,-1'
                 r.setdefault('RlFWcCqN', '')
 
+    # how tough each kind of survey is (on top of Enemy strength on the admin page)
+    SURVEY_DIFF = {'entrance': 1.0, 'middle': 1.5, 'end': 2.2, 'terminus': 3.5}
+    _ENC = None
+
+    def encounters(self):
+        """data/fh_encounters.json: the wiki's encounter tables (FH:Season2 onwards), survey id -> rounds."""
+        if FrontierHunter._ENC is None:
+            try:
+                FrontierHunter._ENC = json.load(open(os.path.join(self.S.HERE, 'data', 'fh_encounters.json'), encoding='utf-8'))
+            except Exception:
+                FrontierHunter._ENC = {}
+        return FrontierHunter._ENC
+
+    def lineup(self, mid):
+        """A survey's encounter table for the battle generator, or None (season 1 and surveys the wiki
+        has no table for keep the generated battles, the same all season)."""
+        e = self.encounters().get(str(mid))
+        if not e or str(e.get('season')) == '1':
+            return None
+        t = (e.get('wiki') or '').lower()
+        diff = next((v for k, v in self.SURVEY_DIFF.items() if k in t), 3.5)
+        return {'rounds': e['rounds'], 'diff': diff}
+
     def dungeons(self):
         return {r.get('MHx05sXt') for r in self.seasons.values() if r.get('MHx05sXt')}
 
