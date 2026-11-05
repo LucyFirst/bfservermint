@@ -25,6 +25,7 @@ points), ZSC3t4Fv rewards, ZYSWU9V1 result.
 """
 import datetime
 import json
+import re
 import os
 import threading
 import time
@@ -36,6 +37,7 @@ SEARCH_DIV = 100                 # survey points a run gives = its score / this
 TOP = 30                         # rows per ranking list (as the game's)
 # Hunter Rank by overall place at the end of a season (this server's, for every season - instead of the
 # game's 1-500 / 501-3000 / ... brackets, made for millions of players): (from, to (0 = and below), +HR, comment)
+LAST_SEASON = 78
 HR_TIERS = [(1, 1, 7, "You're in first place! Hold on to it and your Hunter Rank goes up by 7!"),
             (2, 4, 3, "You're in the top 4! Keep this up and your Hunter Rank goes up by 3. First place gets 7!"),
             (5, 8, 2, "You're in the top 8! Keep this up and your Hunter Rank goes up by 2. Can you reach the top 4?"),
@@ -68,7 +70,8 @@ class FrontierHunter:
         m = srv.BLOBS[cap['resp']]
         rows = lambda g: [r for r in (m.get(g) or []) if isinstance(r, dict)]
         self.seasons = {r['c5yZnpB4']: r for r in rows('mQC4s5ka')}
-        self.order = sorted(self.seasons, key=int)
+        # this server runs seasons 1-78 and then starts again from 1 (79-97 are left out)
+        self.order = sorted((x for x in self.seasons if _i(x) <= LAST_SEASON), key=int)
         self.missions = {}
         for r in rows('5M8jI4cP'):
             self.missions.setdefault(r['c5yZnpB4'], []).append(r)
@@ -144,6 +147,11 @@ class FrontierHunter:
         for r in rows:
             if not isinstance(r, dict) or r.get('c5yZnpB4') not in self.seasons:
                 continue
+            if r['c5yZnpB4'] not in self.order:        # a season this server doesn't run: long over
+                r.update({'qA7M9EjP': '2014-01-01 00:00:00', 'SzV0Nps7': '2014-01-02 00:00:00',
+                          '7S5tL21M': '2014-01-02 00:00:00', '6dWR3qrQ': '2014-01-03 00:00:00',
+                          '1JZuvmo7': '2014-01-04 00:00:00', '4nq0Zoau': '2014-01-04 00:00:00'})
+                continue
             k = cycle * len(self.order) + self.order.index(r['c5yZnpB4'])
             s0 = self.start() + k * p
             e0 = s0 + p
@@ -177,8 +185,10 @@ class FrontierHunter:
         e = self.encounters().get(str(mid))
         if not e or str(e.get('season')) == '1':
             return None
-        t = (e.get('wiki') or '').lower()
-        diff = next((v for k, v in self.SURVEY_DIFF.items() if k in t), 3.5)
+        t = (e.get('wiki') or '').lower() + ' ' + str((self.S.MISSIONS.get(str(mid)) or {}).get('name', ''))
+        for jp, en in (('序地', 'entrance'), ('中部', 'middle'), ('奥地', 'end'), ('極地', 'terminus')):
+            t = t.replace(jp, en)
+        diff = next((v for k, v in self.SURVEY_DIFF.items() if re.search(r'\b%s\b' % k, t)), 3.5)
         return {'rounds': e['rounds'], 'diff': diff}
 
     def dungeons(self):

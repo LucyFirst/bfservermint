@@ -56,6 +56,7 @@ for s in fh.order:
                         if nm in bg.by_name: ids.append({'name': nm}); continue
                         unres[('anime', v)] += 1; continue
                     if kind == 'id':
+                        v = {'20272': '20172', '30272': '30172', '40272': '40172'}.get(v, v)   # wiki typo (Season 6 End, round 2: Ogre group)
                         if v in U: ids.append(v); continue
                         unres[('id', v)] += 1; continue
                     if v.lower() in ('element', 'curse', ''): continue
@@ -78,6 +79,38 @@ for s in fh.order:
         out[mid] = {'season': s, 'title': title, 'rounds': rr}
     for i, (t, _) in enumerate(secs):
         if i not in used: problems.append(f'season {s}: wiki table {t!r} not matched to a survey')
+# surveys the wiki has no table for (seasons up to 78): an in-between of the same survey the
+# season before and after - each round's groups from both
+KINDS = ['entrance', 'middle', 'end', 'terminus']
+def kind_of(mid):
+    nm = S.MISSIONS.get(mid, {}).get('name', '')
+    jp = {'序地': 'entrance', '中部': 'middle', '奥地': 'end', '極地': 'terminus'}
+    return next((k for k in KINDS if re.search(r'\b%s\b' % k, nm.lower())), None) or next((v for k, v in jp.items() if k in nm), None)
+have = {mid: v for mid, v in out.items() if v['rounds'] and all(v['rounds'])}
+by_kind = defaultdict(dict)
+for mid, v in have.items():
+    by_kind[kind_of(mid)][int(v['season'])] = mid
+for s in fh.order:
+    si = int(s)
+    if si < 2 or si > 78: continue
+    for m in fh.missions.get(s, []):
+        mid = m['j28VNcUW']
+        if mid in have: continue
+        k = kind_of(mid); seasons = sorted(by_kind[k])
+        prev = max([x for x in seasons if x < si], default=None); nxt = min([x for x in seasons if x > si], default=None)
+        a = have[by_kind[k][prev]]['rounds'] if prev else None
+        b2 = have[by_kind[k][nxt]]['rounds'] if nxt else None
+        base = a or b2
+        rounds = []
+        for r in range(len(base)):
+            g = []
+            for src in (a, b2):
+                if src and r < len(src):
+                    for grp in src[r]:
+                        if grp not in g: g.append(grp)
+            rounds.append(g)
+        out[mid] = {'season': s, 'title': f'{S.MISSIONS.get(mid, {}).get("name", mid)} (made from seasons {prev} and {nxt})', 'rounds': rounds, 'made': True}
+        print('made', s, k, mid, 'from', prev, nxt, [len(x) for x in rounds])
 json.dump(out, open('/tmp/claude-0/fhwiki/fh_encounters.json', 'w'), ensure_ascii=False, indent=0)
 print(len(out), 'surveys')
 print('\n'.join(problems))
