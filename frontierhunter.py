@@ -158,12 +158,16 @@ class FrontierHunter:
         the seconds left (as bfrevive sent its survey: C1vG0iKh 1, qY49LBjw seconds) - only while
         Frontier Hunter is switched on."""
         fh = self.dungeons()
-        rows = [r for r in rows if not (isinstance(r, dict) and str(r.get('MHx05sXt')) in fh)]
+        rows = [r for r in rows if not (isinstance(r, dict) and (str(r.get('MHx05sXt')) in fh
+                                                                 or str(r.get('j28VNcUW')) in self.mis))]
         if self.settings()['on']:
             n, season, st, en = self.run_at()
             d = self.seasons[season].get('MHx05sXt')
             if d:
                 rows.append({'MHx05sXt': d, 'C1vG0iKh': '1', 'qY49LBjw': str(max(1, int(en - time.time())))})
+                # and the season's surveys themselves (the game lists only permitted quests)
+                have = {str(r.get('j28VNcUW')) for r in rows if isinstance(r, dict)}
+                rows += [{'j28VNcUW': m['j28VNcUW']} for m in self.missions.get(season, []) if m['j28VNcUW'] not in have]
         return rows
 
     # ------------------------------------------------------------------ the player's side
