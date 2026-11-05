@@ -4473,10 +4473,15 @@ def _handle_action(rid, req):
             fh = (req.get('cvg8hzp9') or [{}])[0] or {}
             mid_req = str(((req.get('9Q1Lq5FS') or [{}])[0]).get('j28VNcUW', ''))
             pl.pop('fh_ctx', None)
-            if not fh.get('c5yZnpB4') or (pl.get('fh_run') or {}).get('mission') != mid_req:
-                pl.pop('fh_run', None)          # an ordinary quest
-            else:
+            if fh.get('c5yZnpB4') and str((MISSIONS.get(mid_req) or {}).get('dungeon')) in fh_engine().dungeons():
+                err = fh_engine().start_run(pl, mid_req)     # a Frontier Hunter survey: Hunter Orbs
+                if err:
+                    save_player(pl)
+                    return error_response(err)
+                pl['fh_run']['fought'] = 1
                 pl['fh_helper'] = str(((req.get('9Q1Lq5FS') or [{}])[0]).get(F_USERID) or '')
+            else:
+                pl.pop('fh_run', None)          # an ordinary quest
             err = start_mission(pl, req)
             if err:
                 save_player(pl)

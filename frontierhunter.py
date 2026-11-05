@@ -274,24 +274,12 @@ class FrontierHunter:
             pl.pop('fh_run', None)          # back in the office: a survey started and left is over
             return self.lobby(pl)
         if cls == 'ChallengeMissionStartRequest':
-            n, season, _, _ = self.run_at()
-            mid = str(row.get('j28VNcUW') or '')
-            m = self.mis.get(mid)
-            if not m or m['c5yZnpB4'] != season:
-                return S.error_response('This survey is over. Go back to the Survey Office for the new one.')
-            f = self.me(pl)
-            cost = max(0, _i(m.get('d9RLTqo7'), 1))
-            if f['energy'] < cost:
-                return S.error_response('You have no Survey energy left. Wait for it to come back, or refill it.')
-            if f['energy'] >= self.max_energy:
-                f['energy_t'] = time.time()
-            f['energy'] -= cost
-            pl['fh_run'] = {'n': n, 'season': season, 'mission': mid, 't': time.time()}
-            u = self.entry(pl, n)
-            S.log.info('Frontier Hunter: %s starts %s (season %s) - energy left %s', pl.get('handle'),
-                       (S.MISSIONS.get(mid) or {}).get('name', mid), season, f['energy'])
+            err = self.start_run(pl, str(row.get('j28VNcUW') or ''))
+            if err:
+                return S.error_response(err)
             out = self.lobby(pl)
-            out['7B5Ue9kH'] = {'TPR79fyI': str(_i(u['best'].get(mid)))}
+            u = self.entry(pl, pl['fh_run']['n'])
+            out['7B5Ue9kH'] = {'TPR79fyI': str(_i(u['best'].get(pl['fh_run']['mission'])))}
             return out
         if cls == 'ChallengeRankingRequest':
             return {'Hmiwj75u': self.ranking_rows(pl)}
@@ -302,6 +290,34 @@ class FrontierHunter:
             out['p73SJiWv'] = rows
             return out
         return self.lobby(pl)
+
+    def start_run(self, pl, mid):
+        """A survey starts: pay its Survey energy and remember the run. The game goes straight from the
+        survey list to MissionStart (carrying cvg8hzp9), as bfrevive's recordings show - or through
+        ChallengeMissionStart first; either way it is paid once. Returns an error text or None."""
+        with self.mu:
+            n, season, _, _ = self.run_at()
+            run = pl.get('fh_run') or {}
+            if run.get('mission') == mid and _i(run.get('n')) == n and time.time() - run.get('t', 0) < 600 and not run.get('fought'):
+                return None                           # already paid (ChallengeMissionStart, then MissionStart)
+            m = self.mis.get(mid)
+            if not self.settings()['on']:
+                return 'The Survey Office is closed right now.'
+            if not m or m['c5yZnpB4'] != season:
+                return 'This survey is over. Go back to the Survey Office for the new one.'
+            f = self.me(pl)
+            cost = max(0, _i(m.get('d9RLTqo7'), 1))
+            if f['energy'] < cost:
+                return 'You have no Hunter Orbs left. Wait for them to come back, or refill them.'
+            if f['energy'] >= self.max_energy:
+                f['energy_t'] = time.time()
+            f['energy'] -= cost
+            pl['fh_run'] = {'n': n, 'season': season, 'mission': mid, 't': time.time()}
+            self.entry(pl, n)
+            self.save()
+            self.S.log.info('Frontier Hunter: %s starts %s (season %s) - Hunter Orbs left %s', pl.get('handle'),
+                            (self.S.MISSIONS.get(mid) or {}).get('name', mid), season, f['energy'])
+            return None
 
     def refill(self, pl, gems):
         """ShopUse type 5 in the Survey Office: energy back to full."""
@@ -508,7 +524,7 @@ class FrontierHunter:
             left = max(0, en - time.time())
             body = (f"<h2>Frontier Hunter - Season {season}</h2><p>{self.term_text(st, en)} · ends in "
                     f"{int(left // 86400)}d {int(left % 86400 // 3600)}h</p><h3>Survey areas</h3><ul>{names}</ul>"
-                    f"<h3>How it works</h3><ul><li>Each survey costs 1 Survey energy ({self.max_energy} max, one comes back every "
+                    f"<h3>How it works</h3><ul><li>Each survey costs 1 Hunter Orb ({self.max_energy} max, one comes back every "
                     f"{self.energy_time // 3600} hours). You fight with the survey's own item set.</li>"
                     f"<li>Your score in a survey adds Survey points. The overall ranking is by Survey points; each survey and "
                     f"each MVP category (sparks, overkills, multi-kills, BB kills, one-turn kills, times played, times helped) "
