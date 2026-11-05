@@ -52,11 +52,10 @@ for s in fh.order:
                     if kind == 'anime':
                         hit = next((nm for nm, r in bg.by_name.items() if (r.get('row') or {}).get('2EF0d6ue') == f'monster_anime_{v}.png'), None)
                         if hit: ids.append({'name': hit}); continue
-                        nm = {'0051': 'calamity demon amu yunos', '0052': 'heresy demon kalon', '0053': 'frontier demon'}.get(v)
+                        nm = {'0051': 'calamity demon amu yunos', '0052': 'heresy demon kalon'}.get(v)
                         if nm in bg.by_name: ids.append({'name': nm}); continue
                         unres[('anime', v)] += 1; continue
                     if kind == 'id':
-                        v = {'20272': '20172', '30272': '30172', '40272': '40172'}.get(v, v)   # wiki typo (Season 6 End, round 2: Ogre group)
                         if v in U: ids.append(v); continue
                         unres[('id', v)] += 1; continue
                     if v.lower() in ('element', 'curse', ''): continue
@@ -79,6 +78,11 @@ for s in fh.order:
         out[mid] = {'season': s, 'title': title, 'rounds': rr}
     for i, (t, _) in enumerate(secs):
         if i not in used: problems.append(f'season {s}: wiki table {t!r} not matched to a survey')
+# corrections checked by hand against the wiki's pictures
+FIXES = {('1000062', 1, 2): ['10172'],                  # Season 6 End, round 2: Ogre alone (the ids next to it are wiki typos)
+         ('1000363', 2, 0): ['61125', '10946']}         # Season 36 Terminus, round 3: Disciple Liomerg + Dragon Warrior Lyonesse
+for (mid, r, g), grp in FIXES.items():
+    out[mid]['rounds'][r][g] = grp
 # surveys the wiki has no table for (seasons up to 78): an in-between of the same survey the
 # season before and after - each round's groups from both
 KINDS = ['entrance', 'middle', 'end', 'terminus']

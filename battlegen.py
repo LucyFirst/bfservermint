@@ -119,7 +119,6 @@ EXTRA_MONSTERS = {
     # Frontier Hunter Terminus bosses that are monsters only (no unit, never recorded)
     'calamity demon amu yunos': {'like': 'demon zebra', 'anime': '0051', 'el': '6', 'name': 'Calamity Demon Amu Yunos'},
     'heresy demon kalon': {'like': 'demon zebra', 'anime': '0052', 'el': '6', 'name': 'Heresy Demon Kalon'},
-    'frontier demon': {'like': 'demon zebra', 'anime': '0053', 'el': '6', 'name': 'Frontier Demon'},
 }
 
 def unit_drop_override(u):
