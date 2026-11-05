@@ -450,6 +450,12 @@ def personalise(pl, obj):
             obj['Md9gG3c0'] = fusion_label_events(obj['Md9gG3c0'])
         except Exception:
             log.exception('could not set the Fusion button label')
+        # Survey Office list: the Frontier Rift / Frontier Spire banners are these event rows
+        # (b4D63uav 3000 / 3001) - without its row the game doesn't draw the banner
+        feats = admin_settings().get('features', {})
+        gone = {k for k, f in (('3000', 'frontier_rift'), ('3001', 'frontier_spire')) if not feats.get(f, 1)}
+        if gone and isinstance(obj['Md9gG3c0'], list):
+            obj['Md9gG3c0'] = [r for r in obj['Md9gG3c0'] if not (isinstance(r, dict) and str(r.get('b4D63uav')) in gone)]
     return obj
 
 def absorb(pl, resp, full=False):
@@ -2437,7 +2443,8 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'sell': {},
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
                                'super': {'on': 0, 'chance': 3.0, 'mult': 2.0}, 'label': 'none'},
-                    'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0, 'colosseum_enable': 0},
+                    'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0, 'colosseum_enable': 0,
+                                 'frontier_gate': 1, 'frontier_rift': 1, 'frontier_spire': 1, 'sandbag_enable': 1},
                     'raid_max_class': 3,    # Raid Battle: highest Raid Class open (quests and class-ups)
                     'unitbox': 300,
                     'sphere_on': [],        # event / raid Sphere House recipes switched on         # base unit box size every player has (the game starts at 300)
@@ -2454,6 +2461,11 @@ GAME_FEATURES = [
      'Stays in the home screen list with its closed picture, and cannot be tapped.'),
     ('colosseum_enable', 'Colosseum', 'Arena',
      'Not open: its banner cannot be entered and the Colosseum shortcut in the Arena is not drawn.'),
+    ('frontier_gate', 'Frontier Gate (Summoner Training Program)', 'Survey Office list',
+     'The game always draws its banner; tapping it says it is closed.'),
+    ('frontier_rift', 'Frontier Rift', 'Survey Office list', 'Banner not drawn.'),
+    ('frontier_spire', 'Frontier Spire', 'Survey Office list', 'Banner not drawn.'),
+    ('sandbag_enable', "Summoners' Training Ground", 'Survey Office list', 'Banner not drawn.'),
 ]
 
 def admin_page():
@@ -4381,6 +4393,9 @@ def _handle_action(rid, req):
             achievement_engine().level_campaign(pl)
         except Exception:
             log.exception('could not check the Level Up Campaign')
+        if cls.startswith('FrontierGate') and not admin_settings()['features'].get('frontier_gate', 1):
+            save_player(pl)
+            return error_response('Frontier Gate is closed right now.')
         if cls in FH_REQUESTS:
             resp = fh_engine().handle(pl, cls, req)
             apply_wallet(pl, resp)
