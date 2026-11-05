@@ -247,6 +247,23 @@ class Admin:
         return None, None
 
     # ------------------------------------------------------------------ API
+    def fh_info(self):
+        S = self.S
+        st = self.settings()
+        out = {'days': int(st.get('fh_days') or 7), 'strength': float(st.get('fh_strength') or 2.5)}
+        try:
+            E = S.fh_engine()
+            if not E.data.get('start'):
+                out['info'] = 'Season 1 starts the first time a player opens the Survey Office with Frontier Hunter switched on.'
+            else:
+                n, season, a, b = E.run_at()
+                left = max(0, b - time.time())
+                out['info'] = (f'Now: season {season} (run {n + 1}), ends in {int(left // 86400)}d {int(left % 86400 // 3600)}h. '
+                               f'{len(E.run(n)["users"])} player(s) have played it. Rewards go to the gift box when a season ends.')
+        except Exception as e:
+            out['info'] = f'Frontier Hunter: {e}'
+        return out
+
     def api(self, action, data, ip):
         S = self.S
         if action.startswith('pe_'):
@@ -275,7 +292,16 @@ class Admin:
             cur = self.settings().get('features', {})
             return {'features': [{'id': k, 'name': n, 'where': w, 'off_effect': e, 'on': bool(cur.get(k, 1))}
                                  for k, n, w, e in S.GAME_FEATURES],
-                    'raid_max_class': self.settings().get('raid_max_class', 3)}
+                    'raid_max_class': self.settings().get('raid_max_class', 3), 'fh': self.fh_info()}
+        if action == 'fh_set':
+            days, k = int(data.get('days') or 0), float(data.get('strength') or 0)
+            if not 1 <= days <= 30 or not 0.5 <= k <= 20:
+                raise ValueError('Season length 1-30 days, enemy strength 0.5-20.')
+            s = self.settings()
+            s['fh_days'], s['fh_strength'] = days, k
+            self.save_settings(s)
+            S.log.info('admin page: Frontier Hunter seasons %d days, enemy strength x%s', days, k)
+            return {'ok': f'Frontier Hunter: {days}-day seasons, enemies x{k}. Changing the length moves where the current season falls - best done between seasons.'}
         if action == 'raid_class_set':
             n = int(data.get('n') or 0)
             if not 1 <= n <= 7:

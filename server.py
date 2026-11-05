@@ -2122,6 +2122,9 @@ def start_mission(pl, req):
         return None
     t = team_row(pl['state'])
     cost = _num(m.get('energy')) or 0
+    if (pl.get('fh_run') or {}).get('mission') == mid:
+        log.info('quest start: %s "%s" (Frontier Hunter)', mid, m['name'])
+        return None                  # a Frontier Hunter survey: paid with Survey energy already
     if mission_closed(mid):
         return 'This quest is closed right now.'
     if str(mid) in EXTRA_FIGHTS and str(mid) not in admin_settings()['on_extra']:
@@ -2362,6 +2365,17 @@ def raid_engine():
         _RAID = raid.Raid(sys.modules[__name__])
     return _RAID
 
+_FH = None
+def fh_engine():
+    global _FH
+    if _FH is None:
+        import frontierhunter as _fh
+        _FH = _fh.FrontierHunter(sys.modules[__name__])
+    return _FH
+
+FH_REQUESTS = {'ChallengeBaseRequest', 'ChallengeUserInfoRequest', 'ChallengeStartRequest', 'ChallengeMissionStartRequest',
+               'ChallengeRankingRequest', 'ChallengeRankRewardRequest'}
+
 _REC = None
 def records_engine():
     global _REC
@@ -2488,6 +2502,12 @@ def admin_settings():
                 d['features'].update({str(k): 1 if v else 0 for k, v in (f.get('features') or {}).items()
                                       if str(k) in d['features']})
                 d['on_extra'] = [str(x) for x in (f.get('on_extra') or [])]
+                for k in ('fh_days', 'fh_strength'):
+                    if k in f:
+                        try:
+                            d[k] = float(f[k]) if k == 'fh_strength' else int(f[k])
+                        except (TypeError, ValueError):
+                            pass
                 if str(f.get('raid_max_class', '')).isdigit():
                     d['raid_max_class'] = max(1, min(7, int(f['raid_max_class'])))
                 d['sphere_on'] = [str(x) for x in (f.get('sphere_on') or [])]
@@ -2996,6 +3016,11 @@ def generate_mission_start(pl, mid, req, base):
     if spec and not str(mid).startswith('_'):
         return trial_mission_start(str(mid), req, base, spec)
     plan = battle_generator().plan(mission_alias(mid))
+    if pl.get('fh_run'):
+        try:
+            plan = fh_engine().adjust_plan(pl, mid, plan)
+        except Exception:
+            log.exception('could not set up the Frontier Hunter battles')
     groups, bmon, mons = [], [], []
     drops = []
     seq = [0]
@@ -3101,7 +3126,7 @@ def mission_drops(pl, req, resp):
         g = next((a for a in T['action'] if a['cls'] == 'GachaActionRequest' and G_UNITS_ADD in BLOBS[a['resp']]), None)
         tmpl = personalise(pl, BLOBS[g['resp']])[G_UNITS_ADD][0] if g else {}
     new = []
-    for uid, n in _pairs(res.get('3MAT6quo')):
+    for uid, n in ([] if pl.get('fh_run') else _pairs(res.get('3MAT6quo'))):     # surveys drop no units
         for _ in range(max(1, n)):
             if uid in unit_mst():
                 u = new_unit_row(pl, tmpl, uid, fresh_unit_id(pl))
@@ -3120,7 +3145,7 @@ def mission_drops(pl, req, resp):
         for item, n in chest_items(pl.pop('last_battle', '') or ''):     # once per run
             shown += warehouse_add(pl, item, n)
     used = []
-    for item, n in _pairs(res.get('47cJBUxz')):
+    for item, n in ([] if pl.get('fh_run') else _pairs(res.get('47cJBUxz'))):   # a survey uses its own item set
         k = min(n, item_count(pl, item, free_only=True))
         if k > 0:
             warehouse_take(pl, item, k)
@@ -4238,6 +4263,11 @@ def handle_action(rid, req):
     with LOCK:
         _CUR.pl = _CUR.snap = None
         resp = _handle_action(rid, req)
+        if isinstance(resp, dict) and resp.get('mQC4s5ka'):
+            try:
+                fh_engine().patch_master(resp)      # Frontier Hunter seasons on this server's schedule
+            except Exception:
+                log.exception('could not set the Frontier Hunter season dates')
         if isinstance(resp, dict) and resp.get('VkoZ5t3K'):
             try:
                 patch_define_mst(resp)      # every copy of the game settings (some replies replay one)
@@ -4338,6 +4368,11 @@ def _handle_action(rid, req):
             pl['units']['81947'].update({'5gXxT7LZ': 1, 'RXfC31FA': '0'}) if str(pl['units']['81947'].get('RXfC31FA')) == '-1' else None
             pl['frog_fix_81947'] = 1
         deliver_server_gifts(pl)
+        if admin_settings()['features'].get('frontierhunter') and fh_engine().data.get('start'):
+            try:
+                fh_engine().settle(pl)       # a Frontier Hunter season that just ended: its rewards
+            except Exception:
+                log.exception('could not settle Frontier Hunter')
         try:
             _CUR.pl, _CUR.snap = pl, records_engine().before(pl, cls, req)
         except Exception:
@@ -4346,6 +4381,25 @@ def _handle_action(rid, req):
             achievement_engine().level_campaign(pl)
         except Exception:
             log.exception('could not check the Level Up Campaign')
+        if cls in FH_REQUESTS:
+            resp = fh_engine().handle(pl, cls, req)
+            apply_wallet(pl, resp)
+            apply_overrides(pl, resp)
+            save_player(pl)
+            return resp
+        if cls == 'ShopUseRequest' and str(((req.get('32ibWjFG') or [{}])[0]).get('60IsqxDt')) == '5' \
+                and time.time() - (pl.get('fh_ctx') or 0) < 3600:      # in the Survey Office
+            gems = _num(((req.get('32ibWjFG') or [{}])[0]).get('03UGMHxF')) or 1
+            err = check_and_apply(pl, {'gems': -max(0, gems)})
+            if err:
+                save_player(pl)
+                return error_response(err)
+            resp = fh_engine().refill(pl, gems)
+            resp[G_TEAM] = [dict(team_row(pl['state']) or {})]
+            apply_wallet(pl, resp)
+            apply_overrides(pl, resp)
+            save_player(pl)
+            return resp
         if cls.startswith('Raid'):
             resp = raid_engine().handle(pl, cls, req)
             apply_wallet(pl, resp)
@@ -4386,6 +4440,13 @@ def _handle_action(rid, req):
             save_player(pl)
             return resp
         if cls == 'MissionStartRequest':
+            fh = (req.get('cvg8hzp9') or [{}])[0] or {}
+            mid_req = str(((req.get('9Q1Lq5FS') or [{}])[0]).get('j28VNcUW', ''))
+            pl.pop('fh_ctx', None)
+            if not fh.get('c5yZnpB4') or (pl.get('fh_run') or {}).get('mission') != mid_req:
+                pl.pop('fh_run', None)          # an ordinary quest
+            else:
+                pl['fh_helper'] = str(((req.get('9Q1Lq5FS') or [{}])[0]).get(F_USERID) or '')
             err = start_mission(pl, req)
             if err:
                 save_player(pl)
@@ -4649,6 +4710,11 @@ def _handle_action(rid, req):
             else:
                 REQ_NOW['req'] = req
                 resp = merge_replay(pl, cls, cap, resp)
+        if cls == 'MissionEndRequest' and pl.get('fh_run'):
+            try:
+                fh_engine().mission_end(pl, req, resp)
+            except Exception:
+                log.exception('could not score the Frontier Hunter run')
         apply_wallet(pl, resp)
         apply_overrides(pl, resp)
         save_player(pl)
@@ -4793,6 +4859,8 @@ class Handler(BaseHTTPRequestHandler):
             if p.startswith('/bf/web/slots/'):
                 log.info('Brave Slots prize page opened')
                 return self._send(200, slot_prizes_page(), 'text/html; charset=utf-8')
+            if '/web/frontier_hunter/' in p:
+                return self._send(200, fh_engine().info_page(), 'text/html; charset=utf-8')
             if '/web/notice/' in p:
                 return self._send(200, news_engine().page(), 'text/html; charset=utf-8')
             if p.startswith('/bf/web/') or p.startswith('/views/'):
