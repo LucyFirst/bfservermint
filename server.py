@@ -1054,9 +1054,48 @@ def ensure_recipes(pl):
         pl['state'][G_RECIPES] = mine + add
         log.info('crafting recipes for %s: %d opened, %d hidden, %d back', pl['user_id'], len(add), moved, len(back))
 
+_MOCK = None
+def mock_units():
+    """The Mock Units batch (data/mock_units.json): story characters that are always Lord, however
+    they're obtained (summon, capture, reward or admin gift)."""
+    global _MOCK
+    if _MOCK is None:
+        try:
+            _MOCK = set(json.load(open(os.path.join(HERE, 'data', 'mock_units.json'), encoding='utf-8'))['units'])
+        except Exception:
+            _MOCK = set()
+    return _MOCK
+
+def mock_to_lord(pl):
+    """Mock units someone already has that aren't Lord become Lord, with Lord stats for their level.
+    A copy of the save goes to saves/backups/old first."""
+    mock = mock_units()
+    change = [u for u in pl['units'].values() if str(u.get('pn16CNah')) in mock and str(u.get('nBTx56W9') or LORD) != LORD]
+    if not change:
+        return
+    if not pl.get('mock_lord'):
+        try:
+            import shutil
+            d = os.path.join(SAVE_DIR, 'backups', 'old')
+            os.makedirs(d, exist_ok=True)
+            dst = os.path.join(d, f"player_{pl['user_id']}_before_lord_mock_units.json")
+            if os.path.exists(player_path(pl['user_id'])) and not os.path.exists(dst):
+                shutil.copy2(player_path(pl['user_id']), dst)
+        except Exception:
+            log.exception('could not back up %s before turning mock units into Lord', pl['user_id'])
+            return
+        pl['mock_lord'] = 1
+    um = unit_mst()
+    for u in change:
+        u['nBTx56W9'] = LORD
+        m = um.get(str(u.get('pn16CNah')))
+        if m:
+            u.update(unit_row_stats(u, m, _num(u.get('D9wXQI2V')) or 1))
+    log.info('%d mock unit(s) of %s are now Lord', len(change), pl['user_id'])
+
 def new_unit_row(pl, template, unit_id, uuid, unit_type=None):
     m = unit_mst().get(unit_id, {})
-    if is_material(unit_id):
+    if is_material(unit_id) or str(unit_id) in mock_units():
         unit_type = LORD
     row = dict(template)
     sk, ex = m.get('nj9Lw7mV', '0'), m.get('iEFZ6H19', '0')
@@ -4072,7 +4111,7 @@ def do_evo(pl, plan, resp):
                 'nj9Lw7mV': sk if sk not in ('0', '') else '', '3NbeC8AB': '1' if sk not in ('0', '') else '0',
                 'iEFZ6H19': ex if ex not in ('0', '') else '0',
                 'iNy0ZU5M': ELEMENTS.get(str(m.get('iNy0ZU5M')), base.get('iNy0ZU5M', ''))}, **unit_stats(m, 1))
-    if is_material(new):
+    if is_material(new) or str(new) in mock_units():
         row['nBTx56W9'] = LORD
     pl['units'][plan['base']] = row
     add_to_dictionary(pl, new)
@@ -4268,6 +4307,10 @@ def _handle_action(rid, req):
         fix_unitbox(pl)
         fix_progress(pl)
         materials_to_lord(pl)
+        try:
+            mock_to_lord(pl)
+        except Exception:
+            log.exception('could not make mock units Lord')
         fix_type_stats(pl)
         ensure_recipes(pl)
         split_stacks(pl)

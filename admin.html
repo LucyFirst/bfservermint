@@ -117,6 +117,7 @@ main.wide{max-width:1180px}
 .minigrid .ut{padding:4px 2px} .minigrid .ut img{width:48px;height:48px}
 .minigrid .ut .nm{font-size:10.5px}
 .ut.up{border-color:#ff7ad9;box-shadow:0 0 0 1px #ff7ad9 inset}
+.ut .mk{position:absolute;top:2px;left:50%;transform:translateX(-50%);background:#2f8f6a;color:#fff;font-size:10px;font-weight:bold;border-radius:6px;padding:0 4px;line-height:15px}
 .ut .pg{position:absolute;top:2px;right:2px;background:#e0a800;color:#201500;font-size:10px;font-weight:bold;border-radius:6px;padding:0 4px;line-height:15px}
 .ut.pity{border-color:#ffd77a}
 .ut .ru{position:absolute;top:2px;left:2px;background:#ff3fb4;color:#fff;font-size:10px;font-weight:bold;border-radius:6px;padding:0 4px;line-height:15px}
@@ -400,7 +401,7 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
     <div class="toolbar" style="margin-bottom:6px">
       <input id="uSearch" placeholder="Search name or number">
       <select id="uRarity"><option value="">All rarities</option></select>
-      <select id="uElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option></select>
+      <select id="uElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option><option value="mock">Mock units</option></select>
       <select id="uShow"><option value="">Open and closed</option><option value="closed">Closed only</option><option value="open">Open only</option></select>
     </div>
     <div class="toolbar" style="margin:0">
@@ -514,7 +515,7 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
   <div class="toolbar" style="margin:0">
     <input id="suSearch" placeholder="Find in this summon">
     <select id="suRarity"><option value="">All rarities</option></select>
-    <select id="suElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option></select>
+    <select id="suElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option><option value="mock">Mock units</option></select>
     <button class="btn ghost sm" id="suAll">Select all shown</button>
     <button class="btn ghost sm" id="suNone">Clear selection</button>
   </div>
@@ -541,7 +542,7 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
     <div class="toolbar" style="margin-bottom:4px">
       <input id="spSearch" placeholder="Search units to add">
       <select id="spRarity"><option value="">All rarities</option></select>
-      <select id="spElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option></select>
+      <select id="spElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option><option value="mock">Mock units</option></select>
       <button class="btn ghost sm" id="spAll">Select all shown</button>
       <button class="btn sm" id="spAdd">Add selected</button>
     </div>
@@ -1007,7 +1008,7 @@ const ELEM=['','Fire','Water','Earth','Thunder','Light','Dark'];
 let U=[], uSel=new Set(), uShown=[], uLimit=240;
 async function loadUnits(){
   if(!U.length){
-    const r=await api('units'); U=r.units.map(([id,name,rar,el,off])=>({id,name,rar,el,off:!!off}));
+    const r=await api('units'); U=r.units.map(([id,name,rar,el,off,mock])=>({id,name,rar,el,off:!!off,mock:!!mock}));
     const rs=[...new Set(U.map(u=>u.rar))].sort((a,b)=>b-a);
     $('#uRarity').innerHTML='<option value="">All rarities</option>'+rs.map(r=>`<option value="${r}">${r}★</option>`).join('');
   }
@@ -1015,14 +1016,14 @@ async function loadUnits(){
 }
 function filtered(){
   const q=$('#uSearch').value.trim().toLowerCase(), r=$('#uRarity').value, e=$('#uElem').value, sh=$('#uShow').value;
-  return U.filter(u=>(!q||u.name.toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!e||u.el==e)&&(!sh||(sh==='closed')===u.off))
+  return U.filter(u=>(!q||u.name.toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!e||(e==='mock'?u.mock:u.el==e))&&(!sh||(sh==='closed')===u.off))
           .sort((a,b)=>b.rar-a.rar||(+a.id)-(+b.id));
 }
 function drawUnitGrid(reset){
   if(reset) uLimit=240;
   uShown=filtered();
   const list=uShown.slice(0,uLimit);
-  $('#uGrid').innerHTML=list.map(u=>`<div class="ut${u.off?' closed':''}${uSel.has(u.id)?' sel':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★ ${ELEM[u.el]||''}</div></div>`).join('')||'<p style="color:var(--muted)">No units match.</p>';
+  $('#uGrid').innerHTML=list.map(u=>`<div class="ut${u.off?' closed':''}${uSel.has(u.id)?' sel':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★ ${ELEM[u.el]||''}</div>${u.mock?'<span class="mk">Mock</span>':''}</div>`).join('')||'<p style="color:var(--muted)">No units match.</p>';
   $('#uMore').classList.toggle('hide',uShown.length<=uLimit);
   $('#uMore').textContent=`Show more (${uShown.length-uLimit} left)`;
   uCount();
@@ -1198,7 +1199,7 @@ function smChances(){
 }
 function smShownUnits(){
   const q=$('#suSearch').value.trim().toLowerCase(), r=$('#suRarity').value, el=$('#suElem').value;
-  return smUnits.map(unitById).filter(u=>(!q||String(u.name).toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!el||u.el==el)).sort((a,b)=>b.rar-a.rar||(+a.id)-(+b.id));
+  return smUnits.map(unitById).filter(u=>(!q||String(u.name).toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!el||(el==='mock'?u.mock:u.el==el))).sort((a,b)=>b.rar-a.rar||(+a.id)-(+b.id));
 }
 function drawSmUnits(){
   const rs=[...new Set(smUnits.map(id=>unitById(id).rar))].sort((a,b)=>b-a), cur=$('#suRarity').value;
@@ -1207,7 +1208,7 @@ function drawSmUnits(){
   Object.keys(smRU).forEach(id=>{if(!smUnits.includes(id))delete smRU[id]});
   smPity.units=smPity.units.filter(id=>smUnits.includes(id)); const pset=new Set(smPity.units);
   $('#smPityInfo').textContent=smPity.units.length?`${smPity.units.length} unit${smPity.units.length==1?'':'s'} guaranteed within every ${smPity.every} summons`:'No guarantee';
-  $('#smUnits').innerHTML=list.map(u=>{const x=smRU[u.id];return `<div class="ut${smSel.has(u.id)?' sel':''}${u.off?' closed':''}${x?' up':''}${pset.has(u.id)?' pity':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}${ch[u.id]!=null?' - '+ch[u.id].toFixed(3)+'% per summon':''}${pset.has(u.id)?' - guaranteed':''}">${x?`<span class="ru">×${x}</span>`:''}${pset.has(u.id)?'<span class="pg">G</span>':''}<img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★</div>${x&&ch[u.id]!=null?`<div class="pct">${ch[u.id].toFixed(3)}%</div>`:''}</div>`}).join('')||'<p class="hint">No units yet.</p>';
+  $('#smUnits').innerHTML=list.map(u=>{const x=smRU[u.id];return `<div class="ut${smSel.has(u.id)?' sel':''}${u.off?' closed':''}${x?' up':''}${pset.has(u.id)?' pity':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}${ch[u.id]!=null?' - '+ch[u.id].toFixed(3)+'% per summon':''}${pset.has(u.id)?' - guaranteed':''}">${x?`<span class="ru">×${x}</span>`:''}${pset.has(u.id)?'<span class="pg">G</span>':''}<img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★</div>${u.mock?'<span class="mk">Mock</span>':''}${x&&ch[u.id]!=null?`<div class="pct">${ch[u.id].toFixed(3)}%</div>`:''}</div>`}).join('')||'<p class="hint">No units yet.</p>';
   const nRU=Object.keys(smRU).length; $('#smRuInfo').textContent=nRU?`${nRU} unit${nRU==1?'':'s'} rated up`:'';
   const c=rarCounts(), nOff=smUnits.filter(id=>unitById(id).off).length; $('#smUnitCount').textContent=`${smUnits.length} units${nOff?` (${nOff} switched off - never given)`:''} · `+Object.keys(c).sort((a,b)=>b-a).map(r=>`${r}★ ${c[r]}`).join(', ')+(list.length!==smUnits.length?` · ${list.length} shown`:'')+(smSel.size?` · ${smSel.size} selected`:'');
   $('#smClearSel').textContent=smSel.size?`Remove ${smSel.size} selected`:'Remove selected';
@@ -1219,9 +1220,9 @@ $('#suNone').onclick=()=>{smSel.clear();drawSmUnits()};
 $('#smClearSel').onclick=()=>{if(!smSel.size)return;smUnits=smUnits.filter(id=>!smSel.has(id));smSel.clear();drawSmUnits();drawRates()};
 $('#smAddBtn').onclick=()=>{$('#smPicker').classList.toggle('hide');drawPicker()};
 function pickerList(){const q=$('#spSearch').value.trim().toLowerCase(),r=$('#spRarity').value,el=$('#spElem').value,have=new Set(smUnits);
-  return U.filter(u=>!have.has(u.id)&&!u.off&&(!q||u.name.toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!el||u.el==el)).sort((a,b)=>b.rar-a.rar||(+a.id)-(+b.id))}
+  return U.filter(u=>!have.has(u.id)&&!u.off&&(!q||u.name.toLowerCase().includes(q)||u.id===q)&&(!r||u.rar==r)&&(!el||(el==='mock'?u.mock:u.el==el))).sort((a,b)=>b.rar-a.rar||(+a.id)-(+b.id))}
 function drawPicker(){const l=pickerList().slice(0,300);
-  $('#spGrid').innerHTML=l.map(u=>`<div class="ut${spSel.has(u.id)?' sel':''}${u.off?' closed':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★</div></div>`).join('')||'<p class="hint">No units match.</p>';
+  $('#spGrid').innerHTML=l.map(u=>`<div class="ut${spSel.has(u.id)?' sel':''}${u.off?' closed':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★</div>${u.mock?'<span class="mk">Mock</span>':''}</div>`).join('')||'<p class="hint">No units match.</p>';
   $('#spAdd').textContent=spSel.size?`Add ${spSel.size} selected`:'Add selected'}
 ['#spSearch','#spRarity','#spElem'].forEach(x=>$(x).addEventListener(x==='#spSearch'?'input':'change',drawPicker));
 $('#spGrid').onclick=e=>{const t=e.target.closest('.ut');if(!t)return;const id=t.dataset.id;spSel.has(id)?spSel.delete(id):spSel.add(id);drawPicker()};

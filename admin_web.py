@@ -257,8 +257,9 @@ class Admin:
         if action == 'units':
             um = S.unit_mst()
             off = set(self.settings()['off']['units'])
+            mock = S.mock_units()
             return {'units': [[i, u.get('utP1c0CD') or i, int(u.get('7ofj5xa1') or 0), int(u.get('iNy0ZU5M') or 0),
-                               1 if i in off else 0] for i, u in sorted(um.items(), key=lambda x: int(x[0]))]}
+                               1 if i in off else 0, 1 if i in mock else 0] for i, u in sorted(um.items(), key=lambda x: int(x[0]))]}
         if action == 'units_set':
             ids = [str(x) for x in data.get('ids') or [] if str(x) in S.unit_mst()]
             s = self.settings()
