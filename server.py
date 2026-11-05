@@ -4217,6 +4217,14 @@ def pick_capture(pl, rid, req):
     pl['cursor'][k] = i + 1
     return ties[min(i, len(ties) - 1)] if CFG.get('replay_stick_last', True) else ties[i % len(ties)]
 
+def close_frontier_gate(resp):
+    """Frontier Gate switched off on the admin page: its info reply still goes out (refusing it leaves the
+    player stuck on a connection error), but every gate in it is shown as over, so none can be entered."""
+    for r in resp.get('dPM7oJDl') or []:
+        if isinstance(r, dict):
+            r.update({'qA7M9EjP': '2014-01-01 00:00:00', 'SzV0Nps7': '2014-01-02 00:00:00', 'j0Uszek2': '0'})
+
+
 def error_response(msg):
     return {G_ERROR: [{F_ERRMSG: msg}]}
 
@@ -4310,6 +4318,8 @@ def handle_action(rid, req):
                 patch_define_mst(resp)      # every copy of the game settings (some replies replay one)
             except Exception:
                 log.exception('could not patch the game settings')
+        if isinstance(resp, dict) and resp.get('dPM7oJDl') and not admin_settings()['features'].get('frontier_gate', 1):
+            close_frontier_gate(resp)
         pl, snap = _CUR.pl, _CUR.snap
         _CUR.pl = _CUR.snap = None
         if pl is not None and snap is not None:
@@ -4418,7 +4428,8 @@ def _handle_action(rid, req):
             achievement_engine().level_campaign(pl)
         except Exception:
             log.exception('could not check the Level Up Campaign')
-        if cls.startswith('FrontierGate') and not admin_settings()['features'].get('frontier_gate', 1):
+        if cls.startswith('FrontierGate') and cls != 'FrontierGateInfoRequest' \
+                and not admin_settings()['features'].get('frontier_gate', 1):
             save_player(pl)
             return error_response('Frontier Gate is closed right now.')
         if cls in FH_REQUESTS:
