@@ -35314,6 +35314,7 @@
    "map": "1",
    "medal": "1:0",
    "name": "Fire Eater",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Edelma",
    "time": 1800,
@@ -35337,6 +35338,7 @@
    "map": "7",
    "medal": "1:0",
    "name": "Two Decades of Rancor",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Dalmogia",
    "time": 1800,
@@ -35360,6 +35362,7 @@
    "map": "10",
    "medal": "1:0",
    "name": "Snarling Woods Survey",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Meru-Meru",
    "time": 1800,
@@ -35375,6 +35378,7 @@
    "map": "2",
    "medal": "1:0",
    "name": "Underground Loiterer",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Granomos",
    "time": 1800,
@@ -35398,6 +35402,11 @@
    "map": "5",
    "medal": "1:0",
    "name": "Blazing Tongue",
+   "need": [
+    "2000",
+    "2001",
+    "2002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Edelma",
    "time": 1800,
@@ -35421,6 +35430,11 @@
    "map": "11",
    "medal": "1:0",
    "name": "Solidifying Ice",
+   "need": [
+    "2000",
+    "2001",
+    "2002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Dalmogia",
    "time": 1800,
@@ -35444,6 +35458,11 @@
    "map": "8",
    "medal": "1:0",
    "name": "Twelve Years Before",
+   "need": [
+    "2000",
+    "2001",
+    "2002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Meru-Meru",
    "time": 1800,
@@ -35467,6 +35486,7 @@
    "map": "5",
    "medal": "1:1",
    "name": "Ruler of Twilight",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Reduhark",
    "time": 1800,
@@ -35490,6 +35510,7 @@
    "map": "102",
    "medal": "1:5",
    "name": "Medal Rush Lv. 1",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Medanche",
    "time": 1800,
@@ -35513,6 +35534,7 @@
    "map": "111",
    "medal": "1:1",
    "name": "A Killer Appears",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Barbatos",
    "time": 1800,
@@ -35528,6 +35550,7 @@
    "map": "8",
    "medal": "1:2",
    "name": "Subzero Vagrant",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Medronomus",
    "time": 1800,
@@ -35551,6 +35574,7 @@
    "map": "2",
    "medal": "1:2",
    "name": "Broken Request",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Bruzebia",
    "time": 1800,
@@ -35574,6 +35598,7 @@
    "map": "11",
    "medal": "1:2",
    "name": "The Cornered Dragon",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Laguna Rex",
    "time": 1800,
@@ -35590,6 +35615,9 @@
    "map": "8",
    "medal": "1:2",
    "name": "Ambush Pincer Attack!",
+   "need": [
+    "3000"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Granomos and Others",
    "time": 1800,
@@ -35620,6 +35648,9 @@
    "map": "2",
    "medal": "1:2",
    "name": "Hiding Behind Shadows",
+   "need": [
+    "3001"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Edelma and Others",
    "time": 1800,
@@ -35650,6 +35681,9 @@
    "map": "12",
    "medal": "1:2",
    "name": "Demon Fusion Survey",
+   "need": [
+    "3001"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Dalmogia and Others",
    "time": 1800,
@@ -35673,6 +35707,10 @@
    "map": "12",
    "medal": "1:3",
    "name": "Demonic Appearance",
+   "need": [
+    "3001",
+    "3002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Van Lucy",
    "time": 1800,
@@ -35696,6 +35734,10 @@
    "map": "6",
    "medal": "1:3",
    "name": "Inviting a Demon",
+   "need": [
+    "3001",
+    "3002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Van Nader",
    "time": 1800,
@@ -35719,6 +35761,9 @@
    "map": "6",
    "medal": "1:3",
    "name": "Eight Years Before",
+   "need": [
+    "3001"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Bruzebia",
    "time": 1800,
@@ -35742,6 +35787,9 @@
    "map": "3",
    "medal": "1:3",
    "name": "Demanding Vengeance",
+   "need": [
+    "3002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Laguna Rex",
    "time": 1800,
@@ -35765,6 +35813,10 @@
    "map": "9",
    "medal": "1:3",
    "name": "Accomplishing Goals",
+   "need": [
+    "3006",
+    "3007"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Reduhark",
    "time": 1800,
@@ -35788,6 +35840,7 @@
    "map": "6",
    "medal": "1:3",
    "name": "The Fury of the Empress",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Melion",
    "time": 1800,
@@ -35811,6 +35864,20 @@
    "map": "101",
    "medal": "1:1",
    "name": "I Will Reveal My Secret",
+   "need": [
+    "3000",
+    "3001",
+    "3002",
+    "3003",
+    "3004",
+    "3005",
+    "3006",
+    "3007",
+    "3008",
+    "3009",
+    "3010",
+    "3011"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Meru-Meru",
    "time": 1800,
@@ -35834,6 +35901,7 @@
    "map": "103",
    "medal": "1:10",
    "name": "Medal Rush Lv. 2",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Medanche",
    "time": 1800,
@@ -35857,6 +35925,7 @@
    "map": "6",
    "medal": "1:4",
    "name": "Scorching Tongue",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Flaming Clardas",
    "time": 1800,
@@ -35901,6 +35970,9 @@
    "map": "3",
    "medal": "1:4",
    "name": "A Special Lecture",
+   "need": [
+    "4000"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Edelma and Others",
    "time": 1800,
@@ -35917,6 +35989,9 @@
    "map": "12",
    "medal": "1:4",
    "name": "Please Save Him!",
+   "need": [
+    "4000"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Granomos and Others",
    "time": 1800,
@@ -35947,6 +36022,9 @@
    "map": "3",
    "medal": "1:4",
    "name": "The Snare of the Devil",
+   "need": [
+    "4001"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Van Lucy and Others",
    "time": 1800,
@@ -35970,6 +36048,9 @@
    "map": "9",
    "medal": "1:4",
    "name": "Five Years From Then",
+   "need": [
+    "4003"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Laguna Rex",
    "time": 1800,
@@ -35993,6 +36074,9 @@
    "map": "6",
    "medal": "1:4",
    "name": "Crater Death Match",
+   "need": [
+    "4003"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Reduhark",
    "time": 1800,
@@ -36016,6 +36100,9 @@
    "map": "9",
    "medal": "1:5",
    "name": "Give Me Back My Son!",
+   "need": [
+    "4003"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Melion",
    "time": 1800,
@@ -36039,6 +36126,9 @@
    "map": "9",
    "medal": "1:5",
    "name": "Invitation to Hades",
+   "need": [
+    "4006"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Nalda Delia",
    "time": 1800,
@@ -36062,6 +36152,9 @@
    "map": "12",
    "medal": "1:5",
    "name": "Deadly Fire Breath",
+   "need": [
+    "4007"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Flaming Clardas",
    "time": 1800,
@@ -36092,6 +36185,9 @@
    "map": "3",
    "medal": "1:5",
    "name": "Desperate Measures",
+   "need": [
+    "4007"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Reduhark and Others",
    "time": 1800,
@@ -36129,6 +36225,9 @@
    "map": "12",
    "medal": "1:5",
    "name": "The End of Hades",
+   "need": [
+    "4009"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Flaming Clardas and Others",
    "time": 1800,
@@ -36152,6 +36251,7 @@
    "map": "6",
    "medal": "1:6",
    "name": "The God of Ruin",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Mistzug",
    "time": 1800,
@@ -36175,6 +36275,7 @@
    "map": "104",
    "medal": "1:18",
    "name": "Medal Rush Lv. 3",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Medanche",
    "time": 1800,
@@ -36198,6 +36299,7 @@
    "map": "112",
    "medal": "1:6",
    "name": "The Assassin Rises",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Barbatos",
    "time": 1800,
@@ -36221,6 +36323,7 @@
    "map": "12",
    "medal": "1:7",
    "name": "Roaring Thunder",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Golvorg",
    "time": 1800,
@@ -36244,6 +36347,9 @@
    "map": "3",
    "medal": "1:7",
    "name": "An Aquatic Fire God?",
+   "need": [
+    "5000"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Yugreia",
    "time": 1800,
@@ -36274,6 +36380,9 @@
    "map": "6",
    "medal": "1:7",
    "name": "Two Beast Tango",
+   "need": [
+    "5001"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Van Lucy and Others",
    "time": 1800,
@@ -36289,6 +36398,9 @@
    "map": "6",
    "medal": "1:7",
    "name": "Granomos Party",
+   "need": [
+    "5002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Granomos",
    "time": 1800,
@@ -36312,6 +36424,9 @@
    "map": "9",
    "medal": "1:7",
    "name": "Echoing Howl",
+   "need": [
+    "5003"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Balmedia",
    "time": 1800,
@@ -36335,6 +36450,9 @@
    "map": "12",
    "medal": "1:7",
    "name": "Underworld Messenger",
+   "need": [
+    "5004"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Nalda Delia",
    "time": 1800,
@@ -36358,6 +36476,9 @@
    "map": "6",
    "medal": "1:8",
    "name": "Real-Life Nightmare",
+   "need": [
+    "5005"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Grudkia",
    "time": 1800,
@@ -36388,6 +36509,9 @@
    "map": "9",
    "medal": "1:8",
    "name": "Letter from Deadlands",
+   "need": [
+    "5006"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Mistzug and Others",
    "time": 1800,
@@ -36411,6 +36535,7 @@
    "map": "3",
    "medal": "1:9",
    "name": "Bash the Real One!",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Real Yugreia",
    "time": 1800,
@@ -36434,6 +36559,7 @@
    "map": "104",
    "medal": "1:28",
    "name": "Medal Rush Lv. 4",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Medanche",
    "time": 1800,
@@ -36478,6 +36604,7 @@
    "map": "12",
    "medal": "1:9",
    "name": "From Forest to Bog",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Meru-Meru",
    "time": 1800,
@@ -36501,6 +36628,9 @@
    "map": "6",
    "medal": "1:9",
    "name": "Dragon at Dawn",
+   "need": [
+    "6000"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Jirayen",
    "time": 1800,
@@ -36531,6 +36661,9 @@
    "map": "3",
    "medal": "1:9",
    "name": "Waxing Danger",
+   "need": [
+    "6001"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Golvorg and Others",
    "time": 1800,
@@ -36561,6 +36694,9 @@
    "map": "9",
    "medal": "1:9",
    "name": "Pro Integrity",
+   "need": [
+    "6002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Grudkia and Others",
    "time": 1800,
@@ -36591,6 +36727,9 @@
    "map": "13",
    "medal": "1:9",
    "name": "Vindication",
+   "need": [
+    "6003"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Real Yugreia and Others",
    "time": 1800,
@@ -36614,6 +36753,9 @@
    "map": "12",
    "medal": "1:9",
    "name": "Mystery of the Swamp",
+   "need": [
+    "6004"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Queen Sipla",
    "time": 1800,
@@ -36644,6 +36786,9 @@
    "map": "3",
    "medal": "1:9",
    "name": "Fate Changing Battle",
+   "need": [
+    "6005"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Jirayen and Others",
    "time": 1800,
@@ -36667,6 +36812,9 @@
    "map": "9",
    "medal": "1:9",
    "name": "On to the Snow Field",
+   "need": [
+    "6006"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Estoreit",
    "time": 1800,
@@ -36690,6 +36838,9 @@
    "map": "13",
    "medal": "1:9",
    "name": "Demon Counterattack",
+   "need": [
+    "6007"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Arkem",
    "time": 1800,
@@ -36727,6 +36878,20 @@
    "map": "14",
    "medal": "1:10",
    "name": "A Nightmare Anew",
+   "need": [
+    "2003",
+    "3000",
+    "3003",
+    "3004",
+    "3005",
+    "3008",
+    "3009",
+    "4002",
+    "4004",
+    "4005",
+    "4008",
+    "6008"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Arkem and Others",
    "time": 1800,
@@ -36750,6 +36915,7 @@
    "map": "13",
    "medal": "1:5",
    "name": "Obstructing War Demon",
+   "need": [],
    "players": 1,
    "target": "<color=242:215:145>Target:</color> War Demon Shusui",
    "time": 1800,
@@ -36794,6 +36960,9 @@
    "map": "6",
    "medal": "1:10",
    "name": "Shadow Over Mt. Ziland",
+   "need": [
+    "6010"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Nalda Delia and Others",
    "time": 1800,
@@ -36817,6 +36986,7 @@
    "map": "113",
    "medal": "1:9",
    "name": "The Killer of Heroes",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Barbatos",
    "time": 1800,
@@ -36840,6 +37010,7 @@
    "map": "14",
    "medal": "1:10",
    "name": "War Demon's Trial",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> War Demon Shusui",
    "time": 1800,
@@ -36863,6 +37034,7 @@
    "map": "14",
    "medal": "1:10",
    "name": "Electric Menace",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target: </color>Tech Armor Beiorg",
    "time": 1800,
@@ -36886,6 +37058,7 @@
    "map": "14",
    "medal": "1:10",
    "name": "Dragon's Challenge",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Demon Dragon Barion",
    "time": 1800,
@@ -36909,6 +37082,7 @@
    "map": "14",
    "medal": "1:10",
    "name": "Scary Story Mission",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>Calamity Demon Amu Yunos",
    "time": 1800,
@@ -36932,6 +37106,7 @@
    "map": "14",
    "medal": "1:10",
    "name": "Encroaching Tree Line",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>Nature Demon Mordlim",
    "time": 1800,
@@ -36955,6 +37130,7 @@
    "map": "14",
    "medal": "1:10",
    "name": "Masterless Quest",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Guile Demon Mora",
    "time": 1800,
@@ -36978,6 +37154,7 @@
    "map": "14",
    "medal": "1:10",
    "name": "Trap of Reprisal",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Decay Demon Melord",
    "time": 1800,
@@ -37001,6 +37178,7 @@
    "map": "14",
    "medal": "1:10",
    "name": "New Territory's Seal",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Heresy Demon Kalon",
    "time": 1800,
@@ -37038,6 +37216,7 @@
    "map": "14",
    "medal": "1:11",
    "name": "Carnage Manifested",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target: </color>War Demon Shusui and Others",
    "time": 1800,
@@ -37068,6 +37247,7 @@
    "map": "14",
    "medal": "1:11",
    "name": "Clash of Rivals",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target: </color>Tech Armor Beiorg and Others",
    "time": 1800,
@@ -37105,6 +37285,7 @@
    "map": "14",
    "medal": "1:11",
    "name": "Elusive Mitsudomoe",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target: </color>Calamity Demon Amu Yunos and Others",
    "time": 1800,
@@ -37128,6 +37309,7 @@
    "map": "8001",
    "medal": "1:1",
    "name": "Kingdom on Fire",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Edelma",
    "time": 1800,
@@ -37151,6 +37333,9 @@
    "map": "8001",
    "medal": "1:1",
    "name": "Trial by Combat",
+   "need": [
+    "80000"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Dalmogia",
    "time": 1800,
@@ -37174,6 +37359,9 @@
    "map": "8002",
    "medal": "1:2",
    "name": "God, Demon or Machine? ",
+   "need": [
+    "80001"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Van Lucy",
    "time": 1800,
@@ -37211,6 +37399,9 @@
    "map": "8002",
    "medal": "1:2",
    "name": "Sweet Doppelganger",
+   "need": [
+    "80002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color> Edelma and others",
    "time": 1800,
@@ -37234,6 +37425,9 @@
    "map": "8003",
    "medal": "1:4",
    "name": "The Armored Pursuer",
+   "need": [
+    "80003"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color>　Draegar",
    "time": 1800,
@@ -37278,6 +37472,9 @@
    "map": "8003",
    "medal": "1:4",
    "name": "Unleash the Horde",
+   "need": [
+    "80004"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color>　Medronomus and others",
    "time": 1800,
@@ -37308,6 +37505,9 @@
    "map": "8004",
    "medal": "1:7",
    "name": "Dark Wings, Dark Work",
+   "need": [
+    "80005"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color>　Reduhark and Melion",
    "time": 1800,
@@ -37338,6 +37538,9 @@
    "map": "8004",
    "medal": "1:7",
    "name": "Draegar the Demi-God",
+   "need": [
+    "80006"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color>　Nalda Delia and Draegar",
    "time": 1800,
@@ -37353,6 +37556,9 @@
    "map": "8004",
    "medal": "1:5",
    "name": "Remnants of Hope",
+   "need": [
+    "80007"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target:</color>　Medronomus",
    "time": 1800,
@@ -37383,6 +37589,7 @@
    "map": "8011",
    "medal": "1:1",
    "name": "An Ancient Land",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Dalmogia and Meru-Meru",
    "time": 1800,
@@ -37420,6 +37627,9 @@
    "map": "8011",
    "medal": "1:1",
    "name": "War Never Ends",
+   "need": [
+    "80100"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Phaeton and others",
    "time": 1800,
@@ -37435,6 +37645,9 @@
    "map": "8011",
    "medal": "1:1",
    "name": "Get to the Gate!",
+   "need": [
+    "80100"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Medronomus",
    "time": 1800,
@@ -37465,6 +37678,9 @@
    "map": "8011",
    "medal": "1:2",
    "name": "A Chance Encounter",
+   "need": [
+    "80101"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Reduhark and Zenia",
    "time": 1800,
@@ -37488,6 +37704,9 @@
    "map": "8011",
    "medal": "1:2",
    "name": "What Lies Above",
+   "need": [
+    "80103"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Laguna Rex",
    "time": 1800,
@@ -37518,6 +37737,9 @@
    "map": "8012",
    "medal": "1:4",
    "name": "The Land of Demi-Gods",
+   "need": [
+    "80104"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Bruzebia and Nalda Delia",
    "time": 1800,
@@ -37555,6 +37777,9 @@
    "map": "8012",
    "medal": "1:4",
    "name": "Uprising",
+   "need": [
+    "80105"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Phaeton and others",
    "time": 1800,
@@ -37592,6 +37817,9 @@
    "map": "8012",
    "medal": "1:7",
    "name": "Memoirs of a Valkyrie",
+   "need": [
+    "80106"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Grudkia and others",
    "time": 1800,
@@ -37615,6 +37843,9 @@
    "map": "8012",
    "medal": "1:7",
    "name": "Exodus",
+   "need": [
+    "80107"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Centurion",
    "time": 1800,
@@ -37630,6 +37861,9 @@
    "map": "8012",
    "medal": "1:5",
    "name": "Who Let the Bulbs Out?",
+   "need": [
+    "80108"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Miracle Bulbs",
    "time": 1800,
@@ -37660,6 +37894,9 @@
    "map": "8012",
    "medal": "1:5",
    "name": "Relics of a Forgotten Era",
+   "need": [
+    "80108"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Centurion and Mistzug",
    "time": 1800,
@@ -37683,6 +37920,7 @@
    "map": "8021",
    "medal": "1:4",
    "name": "Of Wings and Horns",
+   "need": [],
    "players": 1,
    "target": "<color=242:215:145>Target</color>　Korzan",
    "time": 1800,
@@ -37713,6 +37951,9 @@
    "map": "8021",
    "medal": "1:4",
    "name": "Inner Daemons",
+   "need": [
+    "80200"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Van Lucy and Van Nader",
    "time": 1800,
@@ -37750,6 +37991,9 @@
    "map": "8021",
    "medal": "1:7",
    "name": "Crowd Control",
+   "need": [
+    "80201"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Laguna and others",
    "time": 1800,
@@ -37773,6 +38017,9 @@
    "map": "8022",
    "medal": "1:7",
    "name": "White Rabbit",
+   "need": [
+    "80202"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Lesnik",
    "time": 1800,
@@ -37803,6 +38050,9 @@
    "map": "8022",
    "medal": "1:5",
    "name": "Hot and Hotter",
+   "need": [
+    "80203"
+   ],
    "players": 2,
    "target": "<color=242:215:145>Target</color>　Balmedia and Haile",
    "time": 1800,
@@ -37833,6 +38083,9 @@
    "map": "8022",
    "medal": "1:5",
    "name": "Dazzle in the Dark",
+   "need": [
+    "80204"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Nalda Delia and others",
    "time": 1800,
@@ -37870,6 +38123,9 @@
    "map": "8021",
    "medal": "1:9",
    "name": "Queen for a Day",
+   "need": [
+    "80205"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Grudkia and others",
    "time": 1800,
@@ -37907,6 +38163,9 @@
    "map": "8022",
    "medal": "1:9",
    "name": "The Coin Toss",
+   "need": [
+    "80206"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Jirayen and others",
    "time": 1800,
@@ -37930,6 +38189,7 @@
    "map": "8032",
    "medal": "1:4",
    "name": "Long and Lost",
+   "need": [],
    "players": 1,
    "target": "<color=242:215:145>Target</color>　Mikael",
    "time": 1800,
@@ -37960,6 +38220,9 @@
    "map": "8031",
    "medal": "1:4",
    "name": "Wild is the Wind",
+   "need": [
+    "80300"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Edelma and Claudalus",
    "time": 1800,
@@ -37990,6 +38253,9 @@
    "map": "8031",
    "medal": "1:7",
    "name": "Flesh and Bone",
+   "need": [
+    "80301"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Melion and Balmedia",
    "time": 1800,
@@ -38027,6 +38293,9 @@
    "map": "8031",
    "medal": "1:7",
    "name": "Battle Born",
+   "need": [
+    "80302"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Golvorg and others",
    "time": 1800,
@@ -38064,6 +38333,9 @@
    "map": "8031",
    "medal": "1:5",
    "name": "Third Eye",
+   "need": [
+    "80303"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Van Lucy and others",
    "time": 1800,
@@ -38094,6 +38366,9 @@
    "map": "8031",
    "medal": "1:9",
    "name": "The Rising Tide",
+   "need": [
+    "80304"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Balmedia and Jirayen",
    "time": 1800,
@@ -38131,6 +38406,9 @@
    "map": "8031",
    "medal": "1:9",
    "name": "He Who Sold the World",
+   "need": [
+    "80305"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Kamekichi",
    "time": 1800,
@@ -38161,6 +38439,7 @@
    "map": "8041",
    "medal": "1:4",
    "name": "Setting the Stage",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Grudkia and Phaeton",
    "time": 1800,
@@ -38191,6 +38470,9 @@
    "map": "8041",
    "medal": "1:4",
    "name": "Sunrise of Despair",
+   "need": [
+    "80400"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Laguna Rex and Reduhark",
    "time": 1800,
@@ -38228,6 +38510,9 @@
    "map": "8041",
    "medal": "1:7",
    "name": "Roadside Conversation",
+   "need": [
+    "80401"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Dalmogia and others",
    "time": 1800,
@@ -38258,6 +38543,9 @@
    "map": "8041",
    "medal": "1:7",
    "name": "A Reason for Rest",
+   "need": [
+    "80402"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Centurion and Lesnik",
    "time": 1800,
@@ -38288,6 +38576,9 @@
    "map": "8041",
    "medal": "1:5",
    "name": "An Odd Passion",
+   "need": [
+    "80403"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Arstallie and Queen Sipla",
    "time": 1800,
@@ -38318,6 +38609,9 @@
    "map": "8041",
    "medal": "1:9",
    "name": "Half-twisted Truths",
+   "need": [
+    "80404"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Jirayen and Estoreit",
    "time": 1800,
@@ -38341,6 +38635,9 @@
    "map": "8041",
    "medal": "1:9",
    "name": "A Black Bargain",
+   "need": [
+    "80405"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Kielazar",
    "time": 1800,
@@ -38371,6 +38668,7 @@
    "map": "8051",
    "medal": "1:4",
    "name": "Skeletons in the Closet",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Reduhark and Nalda Delia",
    "time": 1800,
@@ -38408,6 +38706,9 @@
    "map": "8051",
    "medal": "1:4",
    "name": "Meeting a Lonely Wolf",
+   "need": [
+    "80500"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Balmedia and others",
    "time": 1800,
@@ -38445,6 +38746,9 @@
    "map": "8051",
    "medal": "1:7",
    "name": "An Outsider Arrives",
+   "need": [
+    "80501"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Draegar and others",
    "time": 1800,
@@ -38482,6 +38786,9 @@
    "map": "8051",
    "medal": "1:7",
    "name": "At the Gates of Gunegarth",
+   "need": [
+    "80502"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Arkem and others",
    "time": 1800,
@@ -38512,6 +38819,9 @@
    "map": "8051",
    "medal": "1:5",
    "name": "The Price of Oaths",
+   "need": [
+    "80503"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Kamekichi and Shusui",
    "time": 1800,
@@ -38542,6 +38852,9 @@
    "map": "8051",
    "medal": "1:9",
    "name": "A Small Victory",
+   "need": [
+    "80504"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Barion and Zael",
    "time": 1800,
@@ -38568,6 +38881,7 @@
    "map": "8702",
    "medal": "1:5",
    "name": "Orebus Recon 1",
+   "need": [],
    "players": 1,
    "target": "<color=242:215:145>Target</color>　Orphaned Flame Constructs",
    "time": 1800,
@@ -38594,6 +38908,9 @@
    "map": "8703",
    "medal": "1:5",
    "name": "Orebus Recon 2",
+   "need": [
+    "87000"
+   ],
    "players": 1,
    "target": "<color=242:215:145>Target</color>　Orphaned Frost Constructs",
    "time": 1800,
@@ -38620,6 +38937,9 @@
    "map": "8704",
    "medal": "1:5",
    "name": "Orebus Recon 3",
+   "need": [
+    "87001"
+   ],
    "players": 1,
    "target": "<color=242:215:145>Target</color>　Orphaned Earth Constructs",
    "time": 1800,
@@ -38646,6 +38966,9 @@
    "map": "8705",
    "medal": "1:5",
    "name": "Orebus Recon 4",
+   "need": [
+    "87002"
+   ],
    "players": 1,
    "target": "<color=242:215:145>Target</color>　Orphaned Thunder Constructs",
    "time": 1800,
@@ -38672,6 +38995,9 @@
    "map": "8701",
    "medal": "1:5",
    "name": "Orebus Recon 5",
+   "need": [
+    "87003"
+   ],
    "players": 1,
    "target": "<color=242:215:145>Target</color>　Orphaned Sun Constructs",
    "time": 1800,
@@ -38698,6 +39024,9 @@
    "map": "8700",
    "medal": "1:5",
    "name": "Orebus Recon 6",
+   "need": [
+    "87004"
+   ],
    "players": 1,
    "target": "<color=242:215:145>Target</color>　Orphaned Moon Constructs",
    "time": 1800,
@@ -38742,6 +39071,7 @@
    "map": "8702",
    "medal": "1:11",
    "name": "Hot on the Trail",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Flamebound Revenant",
    "time": 2100,
@@ -38786,6 +39116,9 @@
    "map": "8702",
    "medal": "1:11",
    "name": "Fiend of Fire",
+   "need": [
+    "87100"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Flamebound Revenant",
    "time": 2100,
@@ -38809,6 +39142,7 @@
    "map": "8703",
    "medal": "1:11",
    "name": "Slippery Spoor",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Icebound Revenant",
    "time": 2100,
@@ -38835,6 +39169,9 @@
    "map": "8703",
    "medal": "1:11",
    "name": "Tidal Terror",
+   "need": [
+    "87102"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -38867,6 +39204,9 @@
    "map": "8703",
    "medal": "1:11",
    "name": "Tidal Terror II",
+   "need": [
+    "87103"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -38893,6 +39233,7 @@
    "map": "8704",
    "medal": "1:1",
    "name": "Novice Mission",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Practice Constructs",
    "time": 1800,
@@ -38916,6 +39257,7 @@
    "map": "8704",
    "medal": "1:11",
    "name": "Jungle Hunt",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Earthbound Revenant",
    "time": 2100,
@@ -38942,6 +39284,9 @@
    "map": "8704",
    "medal": "1:11",
    "name": "Subterranean Shadow",
+   "need": [
+    "87107"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -38974,6 +39319,9 @@
    "map": "8704",
    "medal": "1:11",
    "name": "Subterranean Shadow II",
+   "need": [
+    "87108"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -38997,6 +39345,7 @@
    "map": "8705",
    "medal": "1:11",
    "name": "Chasing Storms",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>   Thunderbound Revenant",
    "time": 2100,
@@ -39023,6 +39372,9 @@
    "map": "8705",
    "medal": "1:11",
    "name": "Thundering Tyrant",
+   "need": [
+    "87110"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -39055,6 +39407,9 @@
    "map": "8705",
    "medal": "1:11",
    "name": "Thundering Tyrant II",
+   "need": [
+    "87111"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -39078,6 +39433,7 @@
    "map": "8701",
    "medal": "1:11",
    "name": "Lightfinder",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>   Sunbound Revenant",
    "time": 2100,
@@ -39104,6 +39460,9 @@
    "map": "8701",
    "medal": "1:11",
    "name": "Shattered Sentinel",
+   "need": [
+    "87113"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -39136,6 +39495,9 @@
    "map": "8701",
    "medal": "1:11",
    "name": "Shattered Sentinel II",
+   "need": [
+    "87114"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -39159,6 +39521,7 @@
    "map": "8700",
    "medal": "1:11",
    "name": "Piercing the Gloom",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>   Moonbound Revenant",
    "time": 2100,
@@ -39185,6 +39548,9 @@
    "map": "8700",
    "medal": "1:11",
    "name": "Devil in the Dark",
+   "need": [
+    "87116"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -39217,6 +39583,9 @@
    "map": "8700",
    "medal": "1:11",
    "name": "Devil in the Dark II",
+   "need": [
+    "87117"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -39249,6 +39618,7 @@
    "map": "8707",
    "medal": "1:11",
    "name": "Dichroma Chaos",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Dichroma Wraith",
    "time": 1800,
@@ -39272,6 +39642,7 @@
    "map": "8702",
    "medal": "1:11",
    "name": "Hot on the Trail",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>　Flamebound Revenant",
    "time": 2100,
@@ -39298,6 +39669,9 @@
    "map": "8702",
    "medal": "1:11",
    "name": "Fiend of Fire",
+   "need": [
+    "87120"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -39330,6 +39704,9 @@
    "map": "8702",
    "medal": "1:11",
    "name": "Fiend of Fire II",
+   "need": [
+    "87121"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Revenants",
    "time": 2100,
@@ -39362,6 +39739,7 @@
    "map": "8708",
    "medal": "1:11",
    "name": "Dichroma Mayhem",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Dichroma Spectre",
    "time": 1800,
@@ -39394,6 +39772,7 @@
    "map": "8710",
    "medal": "1:11",
    "name": "Dichroma Havoc",
+   "need": [],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Dichroma Shadow",
    "time": 1800,
@@ -39417,6 +39796,7 @@
    "map": "8709",
    "medal": "1:11",
    "name": "Chasing Legato",
+   "need": [],
    "players": 1,
    "target": "<color=242:215:145>Target</color>      Legato Bluesummers",
    "time": 1800,
@@ -39440,6 +39820,9 @@
    "map": "8709",
    "medal": "1:11",
    "name": "Legato Cornered!",
+   "need": [
+    "88000"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Legato Bluesummers",
    "time": 1800,
@@ -39463,6 +39846,7 @@
    "map": "8709",
    "medal": "1:11",
    "name": "Stalking Knives",
+   "need": [],
    "players": 1,
    "target": "<color=242:215:145>Target</color>      Millions Knives",
    "time": 1800,
@@ -39486,6 +39870,9 @@
    "map": "8709",
    "medal": "1:11",
    "name": "Trapped Knives",
+   "need": [
+    "88002"
+   ],
    "players": 4,
    "target": "<color=242:215:145>Target</color>      Millions Knives",
    "time": 1800,

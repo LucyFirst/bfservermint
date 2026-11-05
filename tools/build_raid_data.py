@@ -68,7 +68,9 @@ def build_data(mst_dir):
             'time': int(r.get('qY49LBjw') or 1800), 'players': int(r.get('KR6JacN8') or 4),
             'class_up': r.get('UJTR1h5r') == '1', 'zel': int(r.get('Najhr8m6') or 0),
             'karma': int(r.get('HTVh8a65') or 0), 'medal': r.get('b5yeVr61') or '',
-            'target': r.get('WDUyI85C', '')}
+            'target': r.get('WDUyI85C', ''),
+            # HSRhkf70: the quests that must be cleared first ('' / '0' = none)
+            'need': [x.strip() for x in str(r.get('HSRhkf70') or '').split(',') if x.strip() and x.strip() != '0']}
     for r in T['mission_boss']:
         m = missions.get(r['j28VNcUW'])
         if m is not None:

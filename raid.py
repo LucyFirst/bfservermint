@@ -149,9 +149,35 @@ class Raid:
             self._quests = [m for m in first + more if self.supported(m)]
         return self._quests
 
+    def needs(self, mid):
+        """Quests that must be cleared before this one. The game's own list (F_RAID_MISSION_MST
+        HSRhkf70) - and the Raid Class-up quest (Ruler of Twilight, The Fury of the Empress, ...)
+        needs every main quest of its class before it: same id block, not Medal Rush, ids below it."""
+        if getattr(self, '_needs', None) is None:
+            ms = self.D['missions']
+            run = set(self.quest_list())
+            out = {}
+            for m, d in ms.items():
+                need = [x for x in d.get('need') or [] if x in run and x != m]
+                if d.get('class_up') and not need:
+                    need = [x for x, e in ms.items() if x in run and x != m and e['cls'] == d['cls']
+                            and len(x) == len(m) and x[:-3] == m[:-3] and int(x) < int(m)
+                            and not e.get('class_up') and 'Medal Rush' not in e.get('name', '')]
+                out[m] = need
+            self._needs = out
+        return self._needs.get(str(mid), [])
+
+    def unlocked(self, pl, mid):
+        """Open for this player: within their Raid Class, and every quest it needs already cleared
+        (a quest they've cleared stays open)."""
+        m = self.D['missions'].get(str(mid))
+        if not m or m['cls'] > self.cls(pl):
+            return False
+        done = set(self.state(pl)['cleared'])
+        return str(mid) in done or all(x in done for x in self.needs(mid))
+
     def offered(self, pl):
-        cls = self.cls(pl)
-        return [mid for mid in self.quest_list() if self.D['missions'][mid]['cls'] <= cls]
+        return [mid for mid in self.quest_list() if self.unlocked(pl, mid)]
 
     # ------------------------------------------------------------------ player raid state
     def state(self, pl):
@@ -896,7 +922,7 @@ class Raid:
 
             def open_room(rm):
                 return rm['state'] == 0 and len(rm['members']) < min(MAX_MEMBERS, self.D['missions'][rm['mission']]['players']) \
-                    and self.D['missions'][rm['mission']]['cls'] <= self.cls(pl)
+                    and self.unlocked(pl, rm['mission'])
             if kind == '2':
                 links = S.friend_engine().links.get(pl['user_id']) or {}
                 rows = []
@@ -926,6 +952,8 @@ class Raid:
                     raise RaidError('The quest in this Room has already started.')
                 if self.D['missions'][room['mission']]['cls'] > self.cls(pl):
                     raise RaidError('Your Raid Class is too low for this quest.')
+                if not self.unlocked(pl, room['mission']):
+                    raise RaidError('You have not unlocked this quest yet. Clear the quests before it first.')
                 self.leave(pl)
                 room['members'].append(pl['user_id'])
                 room['info'][pl['user_id']] = self.member_info()
