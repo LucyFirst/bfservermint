@@ -4909,7 +4909,7 @@ class Handler(BaseHTTPRequestHandler):
                 log.info('Brave Slots prize page opened')
                 return self._send(200, slot_prizes_page(), 'text/html; charset=utf-8')
             if '/web/frontier_hunter/' in p:
-                return self._send(200, fh_engine().info_page(), 'text/html; charset=utf-8')
+                return self._send(200, fh_engine().info_page(u.query), 'text/html; charset=utf-8')
             if '/web/notice/' in p:
                 return self._send(200, news_engine().page(), 'text/html; charset=utf-8')
             if p.startswith('/bf/web/') or p.startswith('/views/'):

@@ -531,8 +531,89 @@ class FrontierHunter:
                        len(got), f['hr'])
 
     # ------------------------------------------------------------------ the game's info page (WebView)
-    def info_page(self):
+    def reward_text(self, r):
+        t, target, n = str(r.get('30Kw4WBa')), str(r.get('TdDHf59J') or ''), _i(r.get('wJsB35iH'), 1)
+        if t == '10':
+            return f'Hunter Rank +{n}'
+        if t == '8':
+            return f'{n:,} gem' + ('s' if n != 1 else '')
+        if t == '3':
+            return f'{n:,} zel'
+        if t == '2':
+            return f'{n:,} karma'
+        if t == '6':
+            name = (self.S.unit_mst().get(target) or {}).get('utP1c0CD', 'a unit')
+            return f'{name}' + (f' x{n}' if n > 1 else '')
+        if t in ('4', '5', '7'):
+            return f'{self.S.item_names_get(target)}' + (f' x{n}' if n > 1 else '')
+        return f'reward x{n}'
+
+    @staticmethod
+    def place_text(lo, hi):
+        if not hi:
+            return f'{lo:,}th and below' if lo > 1 else 'Everyone who scores'
+        return f'{lo:,}' if lo == hi else f'{lo:,} - {hi:,}'
+
+    def rewards_page(self, which):
+        """The Rewards screen's Survey Rewards (frohunInfo=1) and MVP Rewards (frohunInfo=2) buttons."""
         import html
+        n, season, st, en = self.run_at()
+        rr = [r for r in self.rank_rewards.get(season, []) if str(r.get('30Kw4WBa')) != '10' and _i(r.get('u7Ijep5o'))]
+        esc = html.escape
+
+        def table(rows):
+            return ('<table><tr><th>Rank</th><th>Reward</th></tr>' + ''.join(
+                f'<tr><td>{esc(a)}</td><td>{esc(b)}</td></tr>' for a, b in rows) + '</table>')
+
+        if which == '2':
+            body = [f'<h2>MVP Rewards - Season {esc(season)}</h2>',
+                    '<p>Each survey and each MVP category has its own ranking. The top players in each get these '
+                    'rewards in their gift box when the season ends.</p>']
+            for m in sorted(self.mvp.get(season, []), key=lambda m: _i(m['9w5e3ZJB'])):
+                rows = [(self.place_text(_i(r['u7Ijep5o']), _i(r.get('4BtYr6Eg'))), self.reward_text(r))
+                        for r in rr if r.get('9w5e3ZJB') == m['9w5e3ZJB']]
+                if not rows:
+                    continue
+                title = m.get('h6V4weL2') or m['9w5e3ZJB']
+                if m['9w5e3ZJB'].startswith('1'):
+                    title = f'MVP {title} (best score)'
+                body.append(f'<h3>{esc(title)}</h3>' + table(rows))
+        else:
+            body = [f'<h2>Survey Rewards - Season {esc(season)}</h2>',
+                    '<p>The overall ranking is by Survey points (your survey scores added up). When the season ends, '
+                    'your place gives Hunter Rank:</p>',
+                    table([(self.place_text(lo, hi) if hi else (f'{lo:,}th and below'), f'Hunter Rank +{up}')
+                           for lo, hi, up, _ in HR_TIERS])]
+            rows = [(self.place_text(_i(r['u7Ijep5o']), _i(r.get('4BtYr6Eg'))), self.reward_text(r))
+                    for r in rr if r.get('9w5e3ZJB') == '1']
+            if rows:
+                body.append('<h3>Ranking rewards</h3>' + table(rows))
+            hr = [(f'Hunter Rank {k}', self.reward_text(h)) for k, h in sorted(self.hr.items())
+                  if str(h.get('30Kw4WBa')) not in ('', '0', '10')][:30]
+            if hr:
+                body.append('<h3>Hunter Rank rewards</h3><p>Each new Hunter Rank also gives:</p>' + table(hr)
+                            + '<p>...and more at every Hunter Rank after that.</p>')
+            body.append('<p>Score targets in each survey give rewards straight away - tap a survey on the Rewards '
+                        'screen to see them.</p>')
+        return self._html(''.join(body))
+
+    @staticmethod
+    def _html(body):
+        return ('<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>'
+                'body{background:#141018;color:#eee;font-family:sans-serif;padding:12px}h2{color:#f2d27a}'
+                'h3{color:#f2d27a;margin-top:18px}th{text-align:left;color:#bbb}'
+                'table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #333;padding:4px}</style></head>'
+                f'<body>{body}</body></html>')
+
+    def info_page(self, query=''):
+        import html
+        from urllib.parse import parse_qs
+        which = ((parse_qs(query or '').get('frohunInfo') or [''])[0]).strip()
+        if which in ('1', '2'):
+            try:
+                return self.rewards_page(which)
+            except Exception as e:
+                self.S.log.exception('Frontier Hunter: rewards page')
         try:
             n, season, st, en = self.run_at()
             ms = self.missions.get(season, [])
