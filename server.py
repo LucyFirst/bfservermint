@@ -1372,7 +1372,8 @@ def _relevel_team(t):
         log.info('player level up: %s -> %s', old, lv)
     return old, lv
 
-UNITBOX_START, UNITBOX_MAX = 300, 4000     # a new account's unit box / the most the admin page allows
+UNITBOX_START, UNITBOX_MAX = 300, 8000     # a new account's unit box / the most any box can hold (the game's
+# own limit, DEFINE_MST ouXxIY63, was 4000 - the server sends 8000 instead, see patch_define_mst)
 
 def fix_unitbox(pl):
     """The admin page's base unit box size: every player's box (Px1X7fcd, which gem-shop expansions
@@ -1386,7 +1387,7 @@ def fix_unitbox(pl):
     if base == had:
         return
     before = _num(t.get('Px1X7fcd')) or UNITBOX_START
-    after = max(UNITBOX_START, before + base - had)
+    after = min(UNITBOX_MAX, max(UNITBOX_START, before + base - had))
     t['Px1X7fcd'] = after if isinstance(t.get('Px1X7fcd'), int) else str(after)
     pl['unitbox_base'] = base
     log.info('unit box: base %s -> %s, this player %s -> %s', had, base, before, after)
@@ -3683,10 +3684,12 @@ def _num_text(x):
     return str(int(x)) if float(x).is_integer() else f'{x:g}'
 
 def patch_define_mst(resp):
-    """URLMst VkoZ5t3K (DEFINE_MST): the Great / Super exp multipliers the game shows after a fusion."""
+    """URLMst VkoZ5t3K (DEFINE_MST): the Great / Super exp multipliers the game shows after a fusion,
+    and ouXxIY63 the biggest unit box (the gem shop won't expand past it)."""
     d = resp.get('VkoZ5t3K')
     row = d[0] if isinstance(d, list) and d else d
     if isinstance(row, dict):
+        row['ouXxIY63'] = str(UNITBOX_MAX)
         fp = fusion_params()
         row['2inP0tCg'] = _num_text(fp['great']['mult'])
         row['zn65EXYF'] = _num_text(fp['super']['mult'])
@@ -3886,6 +3889,10 @@ def shop_use(pl, req):
         if n <= 0:
             return None, 'Nothing to buy.'
         before = _num(t.get(field)) or 0
+        if field == 'Px1X7fcd' and before + n > UNITBOX_MAX:
+            if before >= UNITBOX_MAX:
+                return None, f'Your unit box is already at the most it can hold ({UNITBOX_MAX:,}).'
+            n = UNITBOX_MAX - before
         t[field] = (before + n) if isinstance(t.get(field), int) else str(before + n)
         log.info('gem shop: %s %s -> %s for %s gems', what, before, before + n, gems)
     elif kind == '4':
@@ -4187,6 +4194,11 @@ def handle_action(rid, req):
     with LOCK:
         _CUR.pl = _CUR.snap = None
         resp = _handle_action(rid, req)
+        if isinstance(resp, dict) and resp.get('VkoZ5t3K'):
+            try:
+                patch_define_mst(resp)      # every copy of the game settings (some replies replay one)
+            except Exception:
+                log.exception('could not patch the game settings')
         pl, snap = _CUR.pl, _CUR.snap
         _CUR.pl = _CUR.snap = None
         if pl is not None and snap is not None:
