@@ -1101,8 +1101,8 @@ def mock_to_lord(pl):
 
 def new_unit_row(pl, template, unit_id, uuid, unit_type=None):
     m = unit_mst().get(unit_id, {})
-    if is_material(unit_id) or str(unit_id) in mock_units():
-        unit_type = LORD
+    if is_material(unit_id):
+        unit_type = LORD          # mock units from rewards come as Lord through grant(); admin gifts roll
     row = dict(template)
     sk, ex = m.get('nj9Lw7mV', '0'), m.get('iEFZ6H19', '0')
     row.update({'edy7fq3L': uuid, 'h7eY3sAK': pl['user_id'], 'pn16CNah': unit_id,
@@ -1810,7 +1810,7 @@ def receive_presents(pl, req):
         if present_expired(r, now):
             log.info('present %s not claimed - it expired', r.get('S1B82FHK'))
             continue
-        utype = r.get('srv_unit_type') or \
+        utype = r.get('srv_unit_type') or (RANDOM_TYPE if r.get('srv_gift') else None) or \
             ('1' if str(r.get('ZC0msu2L') or '').startswith('Trial cleared:') else None)   # trial units: Lord
         grant(pl, r.get('30Kw4WBa'), r.get('TdDHf59J'), r.get('wJsB35iH'), out, utype)
         r.update({'g85qMNxf': '1', 'DbMVG16I': '3', '0wmDb9vi': str(int(now)),
@@ -1855,12 +1855,14 @@ def deliver_server_gifts(pl):
         if 'per_player' in g:              # only some players, each their own amount
             n = int((g['per_player'] or {}).get(pl['user_id']) or 0)
             if n > 0:
-                add_present(pl, g['type'], g['target'], n, g['message'], created=g['created'], tag=g['id'])
+                add_present(pl, g['type'], g['target'], n, g['message'], created=g['created'], tag=g['id'],
+                            unit_type=RANDOM_TYPE if str(g['type']) == '6' else None)
             got.append(g['id'])
             continue
         if str(g['type']) == '6':
             for _ in range(int(g['count'])):
-                add_present(pl, 6, g['target'], 1, g['message'], created=g['created'], tag=g['id'])
+                add_present(pl, 6, g['target'], 1, g['message'], created=g['created'], tag=g['id'],
+                            unit_type=RANDOM_TYPE)        # an admin gift: the unit rolls its type like a summon
         else:
             add_present(pl, g['type'], g['target'], g['count'], g['message'], created=g['created'], tag=g['id'])
         got.append(g['id'])
@@ -4173,7 +4175,7 @@ def do_evo(pl, plan, resp):
                 'nj9Lw7mV': sk if sk not in ('0', '') else '', '3NbeC8AB': '1' if sk not in ('0', '') else '0',
                 'iEFZ6H19': ex if ex not in ('0', '') else '0',
                 'iNy0ZU5M': ELEMENTS.get(str(m.get('iNy0ZU5M')), base.get('iNy0ZU5M', ''))}, **unit_stats(m, 1))
-    if is_material(new) or str(new) in mock_units():
+    if is_material(new):
         row['nBTx56W9'] = LORD
     pl['units'][plan['base']] = row
     add_to_dictionary(pl, new)
@@ -4384,10 +4386,8 @@ def _handle_action(rid, req):
         fix_unitbox(pl)
         fix_progress(pl)
         materials_to_lord(pl)
-        try:
-            mock_to_lord(pl)
-        except Exception:
-            log.exception('could not make mock units Lord')
+        # mock_to_lord(pl) no longer runs: every save has been converted already, and running it each
+        # login turned admin-gifted mock units (which roll their type) into Lord
         fix_type_stats(pl)
         ensure_recipes(pl)
         split_stacks(pl)
