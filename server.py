@@ -458,9 +458,56 @@ def personalise(pl, obj):
             obj['Md9gG3c0'] = [r for r in obj['Md9gG3c0'] if not (isinstance(r, dict) and str(r.get('b4D63uav')) in gone)]
     return obj
 
+ENTERED = '2386Diw1'     # features / Vortex dungeons the player has opened (e63D1BV0 feature, MHx05sXt dungeon,
+                         # Diwl3b56 flag). The game clears its list and reads the whole thing from every reply,
+                         # and shows NEW / the unlock icon for what isn't in it - so it's always the player's own.
+
+def entered_rows(pl):
+    rows = pl['state'].get(ENTERED)
+    if not isinstance(rows, list):
+        rows = []
+    pl['state'][ENTERED] = [r for r in rows if isinstance(r, dict)]
+    return pl['state'][ENTERED]
+
+def entered_add(pl, rows):
+    """UserEnteredFeature: what the player just opened joins their list (one row per feature + dungeon)."""
+    have = {(str(r.get('e63D1BV0')), str(r.get('MHx05sXt') or '0')): r for r in entered_rows(pl)}
+    for r in rows or []:
+        if not isinstance(r, dict) or not str(r.get('e63D1BV0') or '').strip():
+            continue
+        k = (str(r['e63D1BV0']), str(r.get('MHx05sXt') or '0'))
+        flag = str(r.get('Diwl3b56') or '0')
+        if k in have:
+            have[k]['Diwl3b56'] = flag if flag != '0' else have[k].get('Diwl3b56', '0')
+        else:
+            have[k] = {'e63D1BV0': k[0], 'MHx05sXt': k[1], 'Diwl3b56': flag}
+    pl['state'][ENTERED] = sorted(have.values(), key=lambda r: (_num(r['e63D1BV0']), _num(r['MHx05sXt'])))
+    return pl['state'][ENTERED]
+
+# Home / Randall / Arena features (no dungeon) the game badges with NEW or the unlock icon until
+# they're in the entered list. Until now the list was overwritten by recordings, so what players had
+# opened was lost; and some of these can't be opened at all while switched off on the admin page.
+ENTERED_FEATURES = ['3', '4', '5', '7', '8', '9', '11', '12', '13', '14', '15', '16', '17']
+
+def seed_entered(pl):
+    """Once per player: every menu feature counts as seen, and so does every Vortex dungeon they've
+    cleared a quest in (from then on the list just grows as they open things)."""
+    if pl.get('entered_seed') == 1:
+        return
+    rows = [{'e63D1BV0': f, 'MHx05sXt': '0', 'Diwl3b56': '0'} for f in ENTERED_FEATURES]
+    for r in _rows(pl['state'].get('UT1SVg59')):
+        dun = str((MISSIONS.get(str((r or {}).get('j28VNcUW'))) or {}).get('dungeon') or '')
+        if dun.isdigit() and int(dun) >= 100000:
+            rows.append({'e63D1BV0': '6', 'MHx05sXt': dun, 'Diwl3b56': '0'})
+    entered_add(pl, rows)
+    pl['entered_seed'] = 1
+    log.info('entered list for %s: %d rows', pl.get('handle'), len(entered_rows(pl)))
+
 def absorb(pl, resp, full=False):
     """Fold the user-state parts of a response into the saved player."""
     for g, v in resp.items():
+        if g == ENTERED:
+            continue                   # the player's own list (entered_add), never a recording's
         if g in STATE_GROUPS and g not in MASTER_GROUPS:
             if g == G_USERINFO and pl['state'].get(g):
                 # merge: never blank a field, never touch identity/tutorial fields
@@ -4324,6 +4371,8 @@ def handle_action(rid, req):
             close_frontier_gate(resp)
         pl, snap = _CUR.pl, _CUR.snap
         _CUR.pl = _CUR.snap = None
+        if pl is not None and isinstance(resp, dict) and ENTERED in resp:
+            resp[ENTERED] = [dict(r) for r in entered_rows(pl)]      # never a recording's list
         if pl is not None and snap is not None:
             try:
                 if records_engine().after(pl, snap, req, resp):
@@ -4384,6 +4433,7 @@ def _handle_action(rid, req):
         fix_exp_model(pl)
         fix_squad(pl)
         fix_unitbox(pl)
+        seed_entered(pl)
         fix_progress(pl)
         materials_to_lord(pl)
         # mock_to_lord(pl) no longer runs: every save has been converted already, and running it each
@@ -4432,6 +4482,13 @@ def _handle_action(rid, req):
                 and not admin_settings()['features'].get('frontier_gate', 1):
             save_player(pl)
             return error_response('Frontier Gate is closed right now.')
+        if cls == 'UserEnteredFeatureRequest':
+            rows = entered_add(pl, (req.get(ENTERED) or []) if isinstance(req.get(ENTERED), list) else [req.get(ENTERED)])
+            save_player(pl)
+            log.info('%s opened %s', pl.get('handle'), ', '.join(
+                f"feature {r.get('e63D1BV0')}" + (f" (dungeon {r.get('MHx05sXt')})" if str(r.get('MHx05sXt') or '0') != '0' else '')
+                for r in (req.get(ENTERED) if isinstance(req.get(ENTERED), list) else [req.get(ENTERED) or {}])))
+            return {ENTERED: rows}
         if cls in FH_REQUESTS:
             resp = fh_engine().handle(pl, cls, req)
             apply_wallet(pl, resp)
