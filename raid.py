@@ -494,6 +494,39 @@ class Raid:
     def player(self, q, pl):
         return q['players'].get(pl['user_id'])
 
+    # ------------------------------------------------------------------ Raid Record (6nqGvdY1)
+    REC_KEYS = ['T7BvL1kh', '8CEu9Kcm', '58rGsYvL', '2dVBPNQ5', 'ai0gh9Vo', 'UNycbmV0', 'x0s78E4G', 'y6fVdTch',
+                'Js8Amd2N', '0LwvAF3H', 'rQ3TAy6I', 'hoG2ieT5', '6PLsn8xo', '5NRJQ1LU', 'XP06YWdT', 'Wnc6A31E',
+                'kqI45VU1', 'kHbYZ9w1', '4vx39EIB', 'c3Bo97kI', '1VbdgX76', 'E5S7XgR6', 'bprW7k3f', 'D8EZfi4p',
+                'nLb68MSq', '54imIPa2', 'nbu1dyP5', 'b28wpmvq']
+    RC_WIN = {1: '58rGsYvL', 2: '2dVBPNQ5', 3: 'ai0gh9Vo', 4: 'UNycbmV0', 5: 'x0s78E4G', 6: 'y6fVdTch'}
+
+    def rec(self, pl):
+        st = self.state(pl)
+        if 'rec' not in st:          # started late: quests won / played before are known from the old counts
+            sts = st.get('stats') or {}
+            st['rec'] = {'8CEu9Kcm': sts.get('cleared', 0), 'T7BvL1kh': sts.get('cleared', 0) + sts.get('failed', 0)}
+        r = st['rec']
+        for k in self.REC_KEYS:
+            r.setdefault(k, 0)
+        return r
+
+    def rec_add(self, pl, k, n=1):
+        r = self.rec(pl)
+        r[k] = r.get(k, 0) + max(0, int(n))
+
+    def rec_best(self, pl, k, v, low=False):
+        r = self.rec(pl)
+        v = int(v)
+        if v > 0 and (not r.get(k) or (v < r[k] if low else v > r[k])):
+            r[k] = v
+
+    def rec_row(self, pl):
+        row = {k: '0' for k in self.tmpl('6nqGvdY1')}
+        row.update({k: str(v) for k, v in self.rec(pl).items()})
+        row['h7eY3sAK'] = pl['user_id']
+        return row
+
     def join_quest(self, pl, q, req):
         st = self.state(pl)
         ps = q['players'].get(pl['user_id'])
@@ -513,6 +546,7 @@ class Raid:
               'units': units, 'got': [], 'seqs': [], 'done': False, 'left': False, 'joined': time.time(),
               'unit_ids': [str(r.get('edy7fq3L')) for r in _rows('wc2DiMY1', req) if str(r.get('edy7fq3L')) != '0']}
         q['players'][pl['user_id']] = ps
+        self.rec_add(pl, 'T7BvL1kh')                     # quests challenged
         self.S.log.info('raid: %s joined quest %s (%s), %s entries left', pl.get('handle'), q['id'], q['mission'],
                         st['tickets'])
         return ps
@@ -775,6 +809,20 @@ class Raid:
         m = self.D['missions'][q['mission']]
         won = q['phase'] == 2 and ps and not ps.get('left')
         before = st['cls']
+        if ps:
+            took = max(1, int(round((time.time() - ps.get('joined', time.time())) / 60)))   # minutes (bfrevive's records)
+            self.rec_add(pl, 'nbu1dyP5', took)
+            qa = ps.get('acc') or {}
+            self.rec_best(pl, '0LwvAF3H', qa.get('bc', 0))
+            self.rec_best(pl, 'rQ3TAy6I', qa.get('hc', 0))
+            self.rec_best(pl, 'kqI45VU1', qa.get('dmg', 0))
+            if won:
+                self.rec_add(pl, '8CEu9Kcm')
+                k = self.RC_WIN.get(int(self.D['missions'][q['mission']].get('cls') or 0))
+                if k:
+                    self.rec_add(pl, k)
+                self.rec_add(pl, 'D8EZfi4p' if len(q['players']) <= 1 else 'nLb68MSq')
+                self.rec_best(pl, '54imIPa2', took, low=True)
         first = q['mission'] not in st['cleared']
         rewards, boss_name, class_up = [], '', False
         if won:
@@ -864,9 +912,7 @@ class Raid:
             if name == 'Agreement':
                 st['agreed'] = 1
             if name == 'GetPlayerInfo':
-                row = {k: '0' for k in self.tmpl('6nqGvdY1')}
-                row['h7eY3sAK'] = pl['user_id']
-                return {'6nqGvdY1': [row]}
+                return {'6nqGvdY1': [self.rec_row(pl)]}
             resp = self.lobby(pl)
             if name == 'WorloInfo':
                 resp.pop('1ry6BKoe')
@@ -1079,11 +1125,13 @@ class Raid:
                 x -= chance
             ps['visited'][point] = done + 1
             self.add_got(ps, item, n)
+            self.rec_add(pl, 'Js8Amd2N')
             return self.quest_groups(pl, room, q)
 
         if name in ('CampRestStart', 'CampRestGet', 'CampRestEnd'):
             if name == 'CampRestStart':
                 ps['camp'], ps['camp_t'] = 1, time.time()
+                self.rec_add(pl, 'b28wpmvq')
             elif ps['camp']:
                 ticks = int((time.time() - ps['camp_t']) // CAMP_TICK)
                 if ticks > 0:
@@ -1100,6 +1148,7 @@ class Raid:
             use = _row('igAhC0R5', req)
             if use.get('kixHbe54'):
                 self.take_bag_item(pl, use['kixHbe54'], _i(use.get('H6k1LIxC')) or 1)
+                self.rec_add(pl, '1VbdgX76', _i(use.get('H6k1LIxC')) or 1)
             self.update_units(ps, req)
             out = self.quest_groups(pl, room, q)
             out['Fihk73ZR'] = st['bag']
@@ -1159,6 +1208,16 @@ class Raid:
                     for u in ps['units']:
                         u.update({'e7DK0FQT': u.get('3WMz78t6', u.get('e7DK0FQT')), 'gU2xtQ0V': '0', 'nIGZ1X9C': '0'})
                     S.log.info('raid: %s was wiped out - %s heart(s) left', pl.get('handle'), ps['lives'])
+                for k in ('hoG2ieT5', '6PLsn8xo', 'kHbYZ9w1', '4vx39EIB', 'E5S7XgR6', 'Wnc6A31E'):
+                    src = {'kHbYZ9w1': 'U8uZLA34', '4vx39EIB': 'rZQJF5G9'}.get(k, k)
+                    self.rec_add(pl, k, _i(res.get(src)))
+                for k in ('5NRJQ1LU', 'XP06YWdT'):
+                    self.rec_best(pl, k, _i(res.get(k)))
+                qa = ps.setdefault('acc', {})
+                for k, src in (('bc', 'hoG2ieT5'), ('hc', '6PLsn8xo'), ('dmg', 'kqI45VU1')):
+                    qa[k] = qa.get(k, 0) + max(0, _i(res.get(src)))
+                if ps.get('boss_battle') and str(res.get('M4NAYyc6')) == '1':
+                    self.rec_add(pl, 'bprW7k3f')                # bosses finished off
                 for part in str(res.get('4T0Q2Bh5') or '').split(','):     # items the fight dropped
                     it, _, n = part.partition(':')
                     if it.isdigit() and _i(n) > 0 and len(ps['got']) < BAG_STACKS:
@@ -1199,6 +1258,7 @@ class Raid:
 
         if name == 'ItemMix':
             self.mix(pl, ps, req)
+            self.rec_add(pl, 'c3Bo97kI')
             return {'UsDq1E6o': self.got_rows(pl, ps)}
 
         if name == 'ItemDelete':
