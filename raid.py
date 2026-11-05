@@ -984,8 +984,12 @@ class Raid:
                         continue
                     f = self.prof.get(fid) or {}
                     row = self.room_row(rm)
-                    row.update({'8ZK3w0Np': fid, 'IAfv98Wd': f.get('name', ''), 'usM7W3DS': str(f.get('level', '1')),
-                                '8Ix0Soup': str(f.get('leader_lv', '1')), 'ouU5H7qm': '2'})
+                    # the friend's own fields (the game reads these for the Friends list; 8ZK3w0Np / IAfv98Wd
+                    # stay the host's): gkYiqB40 id, H5pQK04c name, usM7W3DS level, 1ctR6GHC leader unit,
+                    # 8Ix0Soup leader level
+                    row.update({'gkYiqB40': fid, 'H5pQK04c': f.get('name', ''), 'usM7W3DS': str(f.get('level', '1')),
+                                '1ctR6GHC': str(f.get('leader', '0')), '8Ix0Soup': str(f.get('leader_lv', '1')),
+                                'JmLLHcDv': str(f.get('img_type', row.get('i9L42Gx0', '0'))), 'ouU5H7qm': '2'})
                     rows.append(row)
                 S.log.info('raid: %s searched friends\' rooms: %d found%s', pl.get('handle'), len(rows),
                            ('; ' + '; '.join(why)) if why else '')
