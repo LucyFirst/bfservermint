@@ -506,6 +506,18 @@ class Battlegen:
             b['chests'] = out
         return plan
 
+    def _cap_key(self, u, caps):
+        """Which of this banner's capture chances an enemy uses: its own, or its first form's."""
+        if not caps or not u or u == '0':
+            return None
+        if u in caps:
+            return u
+        try:
+            lf = self.lowest_form(u)
+        except Exception:
+            return None
+        return lf if lf in caps else None
+
     def area_captures(self, dun):
         """Capture chance per kill (0-1) of units with a fixed one in this area: the built-in ones
         (DUNGEON_CAPTURE) with the admin page's on top."""
@@ -1059,9 +1071,12 @@ class Battlegen:
                 elif qb and m.get('boss'):
                     if rng.random() < _chance(unit_drop_override(qb[0]) or qb[1], 'drop'):
                         drop = qb[0]
-                elif m['u'] in dun_caps:
-                    if rng.random() < _chance(dun_caps[m['u']], 'drop'):
-                        drop = m['u']
+                elif self._cap_key(m['u'], dun_caps):
+                    # the admin page lists what a banner gives (Squire Atro), the quest has the enemy it
+                    # comes from (God Atro): either one's chance counts
+                    ck = self._cap_key(m['u'], dun_caps)
+                    if rng.random() < _chance(dun_caps[ck], 'drop'):
+                        drop = ck
                 elif m.get('boss') and hero_base and self.kind(m['u']) == '0' and m['u'] in self.U:
                     if rng.random() < _chance(hero_rate, 'drop'):
                         drop = hero_base
@@ -1088,7 +1103,7 @@ class Battlegen:
                     drop = rng.choice(extra_caps)  # a wiki-listed rare drop now and then (one not fought here)
                     if qb and drop == qb[0]:
                         drop = None               # this one comes from the boss
-                if drop and not m.get('force_drop') and m['u'] not in dun_caps and self.kind(drop) == '0':
+                if drop and not m.get('force_drop') and not self._cap_key(m['u'], dun_caps) and self.kind(drop) == '0':
                     # a unit enemy drops as the first form of its line: Azrael drops Archangel
                     drop = self.lowest_form(drop)
                 if drop and (dun in NO_UNIT_DUNGEONS or (dun in MATERIAL_ONLY_DUNGEONS and self.kind(drop) == '0')
