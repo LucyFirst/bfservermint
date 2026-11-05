@@ -4418,7 +4418,10 @@ def _handle_action(rid, req):
             save_player(pl)
             return resp
         if cls == 'ShopUseRequest' and str(((req.get('32ibWjFG') or [{}])[0]).get('60IsqxDt')) == '5' \
-                and time.time() - (pl.get('fh_ctx') or 0) < 3600:      # in the Survey Office
+                and admin_settings()['features'].get('frontierhunter'):
+            # type 5 is the Hunter Orb refill (bfrevive's own capture); a quest continue has its own
+            # request (MissionContinueRequest), so this is never anything else - wherever the game sends it
+            # from (the survey list after a run comes without a new ChallengeBase)
             gems = _num(((req.get('32ibWjFG') or [{}])[0]).get('03UGMHxF')) or 1
             err = check_and_apply(pl, {'gems': -max(0, gems)})
             if err:

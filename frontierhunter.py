@@ -340,10 +340,10 @@ class FrontierHunter:
                 'cv9rC2KN': self.mission_rows(pl)}
 
     def refill(self, pl, gems):
-        """ShopUse type 5 in the Survey Office: energy back to full."""
+        """ShopUse type 5: Hunter Orbs back to full."""
         f = self.me(pl)
         f['energy'], f['energy_t'] = self.max_energy, 0
-        self.S.log.info('Frontier Hunter: %s refilled Survey energy for %s gems', pl.get('handle'), gems)
+        self.S.log.info('Frontier Hunter: %s refilled Hunter Orbs for %s gems', pl.get('handle'), gems)
         return {'kN2i7qds': self.header(pl)}
 
     # ------------------------------------------------------------------ battles
