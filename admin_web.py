@@ -669,7 +669,7 @@ class Admin:
                     note = str(data.get('message') or '').strip()[:80] or 'A gift from the server'
                     if ptype == 6:
                         for _ in range(count):
-                            S.add_present(pl, 6, target, 1, note)
+                            S.add_present(pl, 6, target, 1, note, unit_type=S.RANDOM_TYPE)
                     else:
                         S.add_present(pl, ptype, target, count, note)
                     S.save_player(pl)

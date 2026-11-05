@@ -887,6 +887,7 @@ def roll_unit_type():
     return random.choices(list(UNIT_TYPE_CHANCE), weights=list(UNIT_TYPE_CHANCE.values()))[0]
 
 LORD = '1'
+RANDOM_TYPE = 'random'     # a gift whose unit rolls its type like a summon (admin gifts)
 
 def is_material(unit_id):
     """Evolution / fusion / sell materials (crystals, ghosts, kings, gods, imps, nymphs, spirits, idols,
@@ -1453,7 +1454,7 @@ def give_unit(pl, unit_id):
     gacha = next((a for a in T['action'] if a['cls'] == 'GachaActionRequest' and G_UNITS_ADD in BLOBS[a['resp']]), None)
     tmpl = personalise(pl, BLOBS[gacha['resp']])[G_UNITS_ADD][0] if gacha else next(iter(pl['units'].values()), {})
     uuid = fresh_unit_id(pl)
-    pl['units'][uuid] = new_unit_row(pl, tmpl, unit_id, uuid, LORD)
+    pl['units'][uuid] = new_unit_row(pl, tmpl, unit_id, uuid)
     add_to_dictionary(pl, unit_id)
     log.info('admin: gave unit %s (%s)', unit_mst()[unit_id].get('utP1c0CD'), unit_id)
 
@@ -1721,10 +1722,11 @@ def item_names_get(item):
 
 def grant(pl, ptype, target, count, out, unit_type=None):
     """Give one reward; out collects what the reply must show (new units, item change).
-    Reward units (gift box, Exchange Hall, raid / trial / first-clear rewards, admin gifts, login and
-    slot prizes) always come as Lord - only summons and battle captures roll a random type."""
+    Reward units (gift box, Exchange Hall, raid / trial / first-clear rewards, login and slot prizes)
+    always come as Lord. Summons, battle captures and units the admin gives (unit_type RANDOM_TYPE)
+    roll a random type."""
     ptype, count = str(ptype), _num(count) or 0
-    unit_type = unit_type or LORD
+    unit_type = None if str(unit_type) == RANDOM_TYPE else (unit_type or LORD)
     if ptype == '8':
         pl['wallet']['gems'] = pl['wallet'].get('gems', 0) + count
     elif ptype == '3':
