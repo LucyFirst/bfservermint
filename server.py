@@ -456,6 +456,12 @@ def personalise(pl, obj):
         gone = {k for k, f in (('3000', 'frontier_rift'), ('3001', 'frontier_spire')) if not feats.get(f, 1)}
         if gone and isinstance(obj['Md9gG3c0'], list):
             obj['Md9gG3c0'] = [r for r in obj['Md9gG3c0'] if not (isinstance(r, dict) and str(r.get('b4D63uav')) in gone)]
+        # Frontier Hunter / Frontier Gate switched off: the game always draws their banners, but it
+        # draws event 16 / 17's picture over them - the game's own "Coming Soon..." text
+        if isinstance(obj['Md9gG3c0'], list):
+            for ev, f in (('16', 'frontierhunter'), ('17', 'frontier_gate')):
+                if not feats.get(f, 1) and not any(isinstance(r, dict) and str(r.get('b4D63uav')) == ev for r in obj['Md9gG3c0']):
+                    obj['Md9gG3c0'].append({'v80VfcXr': f'90{ev}', 'b4D63uav': ev, '1wHpzcy5': '0', 't5R47iwj': 'coming_soon.png'})
     return obj
 
 def absorb(pl, resp, full=False):
