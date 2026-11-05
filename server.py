@@ -3030,7 +3030,13 @@ def generate_mission_start(pl, mid, req, base):
     spec = TRIAL_SPECS.get(str(mid)) or recorded_spec(mid)
     if spec and not str(mid).startswith('_'):
         return trial_mission_start(str(mid), req, base, spec)
-    plan = battle_generator().plan(mission_alias(mid))
+    run = pl.get('fh_run') or {}
+    if run.get('mission') == str(mid):
+        # a Frontier Hunter survey: the same battles for everyone all season, so scores compare fairly
+        # (a new season gets a new line-up)
+        plan = battle_generator().plan(mission_alias(mid), random.Random(f"fh:{run.get('n')}:{mid}"))
+    else:
+        plan = battle_generator().plan(mission_alias(mid))
     if pl.get('fh_run'):
         try:
             plan = fh_engine().adjust_plan(pl, mid, plan)
