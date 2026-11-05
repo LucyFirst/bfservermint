@@ -972,17 +972,26 @@ class Raid:
             if kind == '2':
                 links = S.friend_engine().links.get(pl['user_id']) or {}
                 rows = []
+                why = []
                 for fid, st in links.items():
                     rm = self.rooms.get(self.where.get(fid) or '')
                     if str(st) != 'friend' or not rm or rm['id'] == mine or not open_room(rm):
+                        if str(st) == 'friend':
+                            why.append(f"{(self.prof.get(fid) or {}).get('name', fid)}: " + (
+                                'not in a room' if not rm else 'same room' if rm['id'] == mine else
+                                f"room {rm['id']} state {rm['state']}, {len(rm['members'])} in it, "
+                                f"quest {rm['mission']} {'open' if self.unlocked(pl, rm['mission']) else 'locked'} for them"))
                         continue
                     f = self.prof.get(fid) or {}
                     row = self.room_row(rm)
                     row.update({'8ZK3w0Np': fid, 'IAfv98Wd': f.get('name', ''), 'usM7W3DS': str(f.get('level', '1')),
                                 '8Ix0Soup': str(f.get('leader_lv', '1')), 'ouU5H7qm': '2'})
                     rows.append(row)
+                S.log.info('raid: %s searched friends\' rooms: %d found%s', pl.get('handle'), len(rows),
+                           ('; ' + '; '.join(why)) if why else '')
                 return {'8iBuZa3n': rows}
             rows = [dict(self.room_row(rm), ouU5H7qm=kind) for rm in self.rooms.values() if rm['id'] != mine and open_room(rm)]
+            S.log.info('raid: %s room search (kind %s): %d of %d room(s) shown', pl.get('handle'), kind, len(rows), len(self.rooms))
             return {'8iBuZa3n': rows}
 
         if name == 'Enter':
