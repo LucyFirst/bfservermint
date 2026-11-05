@@ -319,6 +319,14 @@ class FrontierHunter:
                             (self.S.MISSIONS.get(mid) or {}).get('name', mid), season, f['energy'])
             return None
 
+    def start_groups(self, pl):
+        """MissionStart of a survey (as bfrevive sent it): the header (Hunter Orbs), 7B5Ue9kH your best
+        score in this survey, cv9rC2KN the season's surveys."""
+        run = pl.get('fh_run') or {}
+        u = self.entry(pl, _i(run.get('n')))
+        return {'kN2i7qds': self.header(pl), '7B5Ue9kH': {'TPR79fyI': str(_i(u['best'].get(run.get('mission'))))},
+                'cv9rC2KN': self.mission_rows(pl)}
+
     def refill(self, pl, gems):
         """ShopUse type 5 in the Survey Office: energy back to full."""
         f = self.me(pl)

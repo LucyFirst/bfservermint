@@ -4494,6 +4494,11 @@ def _handle_action(rid, req):
             else:
                 resp = generate_mission_start(pl, mid, req, base)
             pl['last_battle'] = resp[G_MNUM][0]['LE6JkUp7']
+            if pl.get('fh_run'):             # a survey's start carries the Survey Office's own groups too
+                try:
+                    resp.update(fh_engine().start_groups(pl))
+                except Exception:
+                    log.exception('could not add the Frontier Hunter start groups')
             bst = mission_boost(mid)
             for row in _rows(resp.get(G_MNUM)):
                 if isinstance(row, dict):       # the game multiplies the zel / karma monsters drop
