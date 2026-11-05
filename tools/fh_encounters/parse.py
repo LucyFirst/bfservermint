@@ -2,7 +2,7 @@ import json, re, sys
 W = json.load(open('/tmp/claude-0/fhwiki/seasons.json'))
 TPL = re.compile(r'\{\{\s*(?:Template:)?(UnitImage|UnitInfo|Unit)\s*\|([^}]*)\}\}', re.I)
 NOTE = re.compile(r"^\s*(''')?\s*Notes?\b", re.I)
-HDR = re.compile(r'^!.*$')
+HDR = re.compile(r'^\|?!.*$')
 
 
 def cell_units(cell):
@@ -42,7 +42,7 @@ def parse(text):
         for row in re.split(r'\n\|-[^\n]*', body):
             if re.search(r'^!\s*scope', row, re.M):
                 continue
-            if re.search(r'^!.*Round\s*\d+', row, re.M):
+            if re.search(r'^\|?!.*Round\s*\d+', row, re.M):
                 cur = []
                 rounds.append(cur)
             keep = []
