@@ -1151,6 +1151,37 @@ def mock_to_lord(pl):
             u.update(unit_row_stats(u, m, _num(u.get('D9wXQI2V')) or 1))
     log.info('%d mock unit(s) of %s are now Lord', len(change), pl['user_id'])
 
+ZEBRA = {'60233', '60234'}          # Disciple Zebra, Mad God Zebra
+
+def reroll_zebra_once(pl):
+    """One time, for Lucy (asked 7 Nov 2026): her Zebras from The Mad God Descends were made Lord by the old
+    mock-unit rule; each rolls a type like a quest drop does now, stats recalculated for its level.
+    The save is copied to saves/backups/old first."""
+    if pl.get('zebra_reroll') or str(pl.get('handle') or '').lower() != 'lucy':
+        return
+    zs = [u for u in pl['units'].values() if str(u.get('pn16CNah')) in ZEBRA]
+    try:
+        import shutil
+        d = os.path.join(SAVE_DIR, 'backups', 'old')
+        os.makedirs(d, exist_ok=True)
+        dst = os.path.join(d, f"player_{pl['user_id']}_before_zebra_reroll.json")
+        if os.path.exists(player_path(pl['user_id'])) and not os.path.exists(dst):
+            shutil.copy2(player_path(pl['user_id']), dst)
+    except Exception:
+        log.exception('could not back up %s before re-rolling Zebra', pl['user_id'])
+        return
+    um = unit_mst()
+    got = []
+    for u in zs:
+        u['nBTx56W9'] = roll_unit_type()
+        m = um.get(str(u.get('pn16CNah')))
+        if m:
+            u.update(unit_row_stats(u, m, _num(u.get('D9wXQI2V')) or 1))
+        got.append(u['nBTx56W9'])
+    pl['zebra_reroll'] = 1
+    save_player(pl)
+    log.info('Zebra re-rolled for %s: %d unit(s), types %s', pl.get('handle'), len(zs), ','.join(got))
+
 def new_unit_row(pl, template, unit_id, uuid, unit_type=None):
     m = unit_mst().get(unit_id, {})
     if is_material(unit_id):
@@ -4439,6 +4470,7 @@ def _handle_action(rid, req):
         fix_squad(pl)
         fix_unitbox(pl)
         seed_entered(pl)
+        reroll_zebra_once(pl)
         fix_progress(pl)
         materials_to_lord(pl)
         # mock_to_lord(pl) no longer runs: every save has been converted already, and running it each
