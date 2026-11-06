@@ -456,6 +456,11 @@ def personalise(pl, obj):
         gone = {k for k, f in (('3000', 'frontier_rift'), ('3001', 'frontier_spire')) if not feats.get(f, 1)}
         if gone and isinstance(obj['Md9gG3c0'], list):
             obj['Md9gG3c0'] = [r for r in obj['Md9gG3c0'] if not (isinstance(r, dict) and str(r.get('b4D63uav')) in gone)]
+        # Frontier Gate switched off: app 1.0.9+ greys its Survey Office banner out (and it can't be tapped)
+        # when GeneralEvent 1017 is there; older apps never look for 1017
+        if not feats.get('frontier_gate', 1) and isinstance(obj['Md9gG3c0'], list) and \
+                not any(isinstance(r, dict) and str(r.get('b4D63uav')) == '1017' for r in obj['Md9gG3c0']):
+            obj['Md9gG3c0'].append({'v80VfcXr': '91017', 'b4D63uav': '1017', '1wHpzcy5': '0', 't5R47iwj': ''})
     return obj
 
 ENTERED = '2386Diw1'     # features / Vortex dungeons the player has opened (e63D1BV0 feature, MHx05sXt dungeon,
