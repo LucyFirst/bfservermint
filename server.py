@@ -1788,37 +1788,59 @@ def mix_orders(req):
     return out
 
 def item_mix(pl, req):
+    """Make what the game asked for, one order after another in the game's order: the Town only sends
+    its crafting when the player leaves it, so one request can hold a sphere AND the sphere made from
+    it (Divine Sword, then God Sword from it) - each order may use what the ones before it made. An
+    order that can't be made is skipped (and logged); the reply's storage shows what was really made."""
     recipes = {str(r.get('4HqhTf3a')): r for r in _town_mst('8f0bCciN') if isinstance(r, dict)}
     mine = {str(r.get('4HqhTf3a')): r for r in _rows(pl['state'].get(G_RECIPES)) if isinstance(r, dict)}
-    jobs = []
-    for rid, n in mix_orders(req):
+    orders = mix_orders(req)
+    made, refused = 0, []
+    for rid, n in orders:
         rec = recipes.get(rid)
-        if not rec or rid not in mine:
-            return 'That recipe is not open yet.'
+        name = item_names_get(rec.get('kixHbe54')) if rec else rid
+        if not rec:
+            refused.append((rid, name, 'not in the recipe table'))
+            continue
+        if rid not in mine and recipe_hidden(rid):
+            refused.append((rid, name, 'switched off on the admin page'))
+            continue
+        if rid not in mine:
+            # the game shows it (a facility level-up in the same Town visit opens it before the server
+            # hears of the level-up): add it to the list rather than refuse it
+            mine[rid] = {'4HqhTf3a': rid, 'H6k1LIxC': '0', 'VDKB0Y5h': '-1'}
+            pl['state'][G_RECIPES] = list(_rows(pl['state'].get(G_RECIPES))) + [mine[rid]]
+            log.info('crafting: recipe %s (%s) was not in the list - added', rid, name)
         lim = _num(mine[rid].get('VDKB0Y5h'))
         if lim is not None and lim >= 0 and (_num(mine[rid].get('H6k1LIxC')) or 0) + n > lim:
-            return 'That recipe cannot be made again.'
-        jobs.append((rid, rec, n))
-    karma = sum((_num(rec.get('HTVh8a65')) or 0) * n for _, rec, n in jobs)
-    if karma > int(pl['wallet'].get('karma', 0)):
-        return 'Not enough karma.'
-    need = collections.Counter()
-    for _, rec, n in jobs:
+            refused.append((rid, name, 'craft limit reached'))
+            continue
+        karma = (_num(rec.get('HTVh8a65')) or 0) * n
+        if karma > int(pl['wallet'].get('karma', 0)):
+            refused.append((rid, name, 'not enough karma (%s needed, %s held)' % (karma, pl['wallet'].get('karma', 0))))
+            continue
+        need = collections.Counter()
         for part in str(rec.get('75YV2q1i') or '').split(','):
             it, _, c = part.partition(':')
             if it:
                 need[it] += (_num(c) or 1) * n
-    for it, c in need.items():
-        if item_count(pl, it, free_only=True) < c:
-            return 'You do not have the materials for this.'
-    for it, c in need.items():
-        warehouse_take(pl, it, c)
-    pl['wallet']['karma'] = int(pl['wallet'].get('karma', 0)) - karma
-    for rid, rec, n in jobs:
+        short = [(it, c, item_count(pl, it, free_only=True)) for it, c in need.items()
+                 if item_count(pl, it, free_only=True) < c]
+        if short:
+            refused.append((rid, name, 'missing ' + ', '.join('%s %s/%s' % (item_names_get(it), have, c)
+                                                             for it, c, have in short)))
+            continue
+        for it, c in need.items():
+            warehouse_take(pl, it, c)
+        pl['wallet']['karma'] = int(pl['wallet'].get('karma', 0)) - karma
         warehouse_add(pl, rec.get('kixHbe54'), (_num(rec.get('wgV86x1q')) or 1) * n)
         mine[rid]['H6k1LIxC'] = str((_num(mine[rid].get('H6k1LIxC')) or 0) + n)
-        log.info('crafted %s x%s (recipe %s, %s karma)', item_names_get(rec.get('kixHbe54')), n, rid,
-                 (_num(rec.get('HTVh8a65')) or 0) * n)
+        made += n
+        log.info('crafted %s x%s (recipe %s, %s karma)', name, n, rid, karma)
+    for rid, name, why in refused:
+        log.warning('crafting: could not make %s (recipe %s): %s', name, rid, why)
+    if refused and not made:
+        return 'Those items could not be made: ' + '; '.join('%s (%s)' % (nm, why) for _, nm, why in refused)
     return None
 
 def item_sell(pl, req):
