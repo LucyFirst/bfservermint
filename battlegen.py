@@ -1195,6 +1195,13 @@ class Battlegen:
                     fixed.append(':'.join(parts))
                 chests = fixed
             out_b.append({'mons': mons, 'unit_drops': unit_drops, 'chests': chests})
+        # rare materials the wiki lists for this quest that no recorded chest table holds (Empty Sphere in
+        # Bariura, Phantom Feather in Menon): [item, chance per run, most per run], in a random battle
+        for item, pct, most in wiki.get('extra_drops') or []:
+            for _ in range(max(1, int(most))):
+                if out_b and rng.random() < _chance(float(pct), 'item'):
+                    bi = rng.randrange(len(out_b))
+                    out_b[bi]['chests'].append(f"{rng.randrange(max(1, len(out_b[bi]['mons'])))}/1/4:1000:{item}:1")
         # a mimic chest: a small chance in each normal battle, never the boss, at most once per quest.
         # "2/<mimic battle group>:0:0:<mimic unit>:1:<lv>" - the group is the one after the last battle
         mimic = self.mimic_for(mid, wiki)
