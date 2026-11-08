@@ -3345,9 +3345,11 @@ def chest_items(battle):
             continue
         for c in f[2].split('-'):
             p = c.strip().split('/')
-            if len(p) >= 3:
+            # "pos/1/4:rate:item:count" is an item chest; "pos/2/<battle>:0:0:<unit>:1:<lv>" is a
+            # mimic - in battle 4 it looked like an item chest of item 0, counted by the mimic's unit id
+            if len(p) >= 3 and p[1] == '1':
                 spec = p[2].split(':')
-                if len(spec) >= 4 and spec[0] == '4' and spec[2].isdigit():
+                if len(spec) >= 4 and spec[0] == '4' and spec[2].isdigit() and spec[2] != '0':
                     out.append((spec[2], _num(spec[3]) or 1))
     return out
 
