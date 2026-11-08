@@ -187,7 +187,7 @@ for _m in WIKI_LINEUPS.values():
 # Bulbs...) - the ordinary units fought alongside them (Lilin, Rantoul, Skeleton...) never do.
 MATERIAL_ONLY_DUNGEONS = {
     '100100',                      # Faerie Paradise: Nymphs, Spirits, Idols, Phantom Pots
-    '100300', '100310', '100400',  # Totem ruins
+    '100300', '100310',            # Totem ruins
     '100320',                      # The Mecha Gods Awaken
     '100500',                      # Golden Slumberland (gold)
     '100600', '100650',            # Metal Parade, Jewel Parade
@@ -198,7 +198,8 @@ MATERIAL_ONLY_DUNGEONS = {
 }
 
 # ...and these drop no units at all (karma / zel farms)
-NO_UNIT_DUNGEONS = {'100050'}      # Souls Training Ground (karma)
+NO_UNIT_DUNGEONS = {'100050',      # Souls Training Ground (karma)
+                    '100400'}      # Hostile Relics (The Wandering Spirit): materials only, no units (wiki)
 # ...and these drop only these units
 ONLY_UNITS = {'100200': {'60142', '60143', '60144', '60224'}}   # Cave of Greed (The Box of Desires): the 4 Mimics
 
@@ -761,10 +762,26 @@ class Battlegen:
         if lineup and lineup.get('rounds'):
             return self._finish(mid, wiki, self._lineup_battles(lineup, lvl, zel, karma, by_unit, rng), runs, rng, story=False)
         battles = []
+        squads = [[u for u in g if u in self.U] for g in wiki.get('squads') or []]
+        squads = [g for g in squads if g]
         for _ in range(n - 1):
+            if squads:       # the wiki's list of squads for this quest: one of them per battle
+                battles.append([enemy(u, lvl) for u in rng.choice(squads)][:5])
+                continue
             k = max(1, min(5, rng.choice(sizes)))
             battles.append([enemy(u, lvl) for u in rng.choices(pool, weights=weights, k=k)])
-        battles.append(self._story_boss(mid, wiki, runs, pool, enemy, lvl, blvl, rng))
+        boss_squads = [[u for u in g if u in self.U] for g in wiki.get('boss_squads') or []]
+        boss_squads = [g for g in boss_squads if g]
+        if boss_squads:      # "Boss may spawn": one of the wiki's boss groups, each of them a boss
+            g = rng.choice(boss_squads)
+            out = []
+            for u in g:
+                e = enemy(u, {f: blvl[f] / (1 if len(g) == 1 else 1.6) if f == 'hp' else blvl[f] for f in blvl}, 0.05)
+                e.update(boss=True, act=[1, 2])
+                out.append(e)
+            battles.append(out)
+        else:
+            battles.append(self._story_boss(mid, wiki, runs, pool, enemy, lvl, blvl, rng))
         return self._finish(mid, wiki, battles, runs, rng, story=True)
 
     def _lineup_battles(self, lineup, lvl, zel, karma, by_unit, rng):
@@ -1167,6 +1184,16 @@ class Battlegen:
                     kind = rng.choice((1, 2))
                     base = max(50, int((self.exp(mid) + 20) ** 0.5 * (60 if kind == 1 else 30)))
                     chests.append(f'{rng.randrange(k)}/1/{kind}:25:{int(base * rng.uniform(.5, 1.5))}')
+            if wiki.get('items_only') and items:
+                # this quest's chests hold only its own wiki drop list (borrowed chest counts from other
+                # quests can carry their items): anything else becomes one of this quest's materials
+                fixed = []
+                for c in chests:
+                    parts = c.split(':')
+                    if '/1/4:' in c and len(parts) >= 3 and parts[2] not in items:
+                        parts[2] = rng.choice(items)
+                    fixed.append(':'.join(parts))
+                chests = fixed
             out_b.append({'mons': mons, 'unit_drops': unit_drops, 'chests': chests})
         # a mimic chest: a small chance in each normal battle, never the boss, at most once per quest.
         # "2/<mimic battle group>:0:0:<mimic unit>:1:<lv>" - the group is the one after the last battle
