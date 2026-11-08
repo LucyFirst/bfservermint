@@ -1646,6 +1646,18 @@ def stack_limit(item):
 def _wh(pl):
     return [r for r in _rows(pl['state'].get(G_WAREHOUSE)) if isinstance(r, dict)]
 
+def clear_item_new_flags(pl):
+    """Storage rows go to the game with their "new" flag (dJNpLc81) off, as the original server sent
+    them: the game keeps a list of flagged rows, and crafting with a flagged sphere (its row is used
+    up) crashes the game - Holy Blade or Skill Bracer from a sphere in storage."""
+    n = 0
+    for r in _wh(pl):
+        if str(r.get('dJNpLc81', '0')) != '0':
+            r['dJNpLc81'] = '0'
+            n += 1
+    if n:
+        log.info('%s: "new" flag taken off %d storage row(s)', pl['user_id'], n)
+
 def _new_row_id(rows):
     used = {str(r.get('n6E8iMf3')) for r in rows}
     rid = str(random.randint(100000, 999999))
@@ -1671,13 +1683,13 @@ def warehouse_add(pl, item, n):
         return touched
     if stack_limit(item) == 1:
         for _ in range(n):
-            row = {'n6E8iMf3': _new_row_id(wh), 'kixHbe54': item, 'wgV86x1q': '1', 'dJNpLc81': '1', 'DbMVG16I': '0'}
+            row = {'n6E8iMf3': _new_row_id(wh), 'kixHbe54': item, 'wgV86x1q': '1', 'dJNpLc81': '0', 'DbMVG16I': '0'}
             wh.append(row)
             touched.append(row)
     else:
         row = next((r for r in wh if str(r.get('kixHbe54')) == item), None)
         if row is None:
-            row = {'n6E8iMf3': _new_row_id(wh), 'kixHbe54': item, 'wgV86x1q': '0', 'dJNpLc81': '1', 'DbMVG16I': '0'}
+            row = {'n6E8iMf3': _new_row_id(wh), 'kixHbe54': item, 'wgV86x1q': '0', 'dJNpLc81': '0', 'DbMVG16I': '0'}
             wh.append(row)
         row['wgV86x1q'] = str((_num(row.get('wgV86x1q')) or 0) + n)
         touched.append(row)
@@ -1759,7 +1771,7 @@ def split_stacks(pl):
                 out.append(r)
                 for _ in range(have - 1):
                     out.append({'n6E8iMf3': _new_row_id(out + wh), 'kixHbe54': r['kixHbe54'], 'wgV86x1q': '1',
-                                'dJNpLc81': r.get('dJNpLc81', '1'), 'DbMVG16I': '0'})
+                                'dJNpLc81': '0', 'DbMVG16I': '0'})
                     n_new += 1
             else:
                 out.append(r)
@@ -4500,6 +4512,7 @@ def _handle_action(rid, req):
         fix_type_stats(pl)
         ensure_recipes(pl)
         split_stacks(pl)
+        clear_item_new_flags(pl)
         try:
             fix_sphere_links(pl)
         except Exception:
