@@ -1646,6 +1646,31 @@ def stack_limit(item):
 def _wh(pl):
     return [r for r in _rows(pl['state'].get(G_WAREHOUSE)) if isinstance(r, dict)]
 
+def _ITEM_INFO_KNOWN():
+    item_info('')
+    return len(_ITEM_INFO) > 1
+
+def drop_unknown_item_rows(pl):
+    """Storage rows of item "0" (no item - rows with huge counts got into some saves) crash the game
+    when it crafts: it looks the item up and finds nothing. Backed up, then taken out of storage."""
+    wh = _wh(pl)
+    bad = [r for r in wh if not str(r.get('kixHbe54')).isdigit() or str(r.get('kixHbe54')) == '0']
+    if not bad:
+        return
+    try:
+        import shutil
+        d = os.path.join(SAVE_DIR, 'backups', 'old')
+        os.makedirs(d, exist_ok=True)
+        dst = os.path.join(d, f"player_{pl['user_id']}_before_unknown_items_{int(time.time())}.json")
+        if os.path.exists(player_path(pl['user_id'])):
+            shutil.copy2(player_path(pl['user_id']), dst)
+    except Exception:
+        log.exception('could not back up %s before taking unknown items out of storage', pl['user_id'])
+        return
+    pl['state'][G_WAREHOUSE] = [r for r in wh if r not in bad]
+    pl.setdefault('unknown_items_removed', []).extend(bad)
+    log.info('%s (%s): unknown item row(s) taken out of storage: %s', pl['user_id'], pl.get('handle'), bad)
+
 def clear_item_new_flags(pl):
     """Storage rows go to the game with their "new" flag (dJNpLc81) off, as the original server sent
     them: the game keeps a list of flagged rows, and crafting with a flagged sphere (its row is used
@@ -1680,6 +1705,15 @@ def warehouse_add(pl, item, n):
     item, n = str(item), int(n)
     wh, touched = _wh(pl), []
     if n <= 0:
+        return touched
+    if _ITEM_INFO_KNOWN() and item not in _ITEM_INFO and item.isdigit() and item != '0':
+        log.warning('%s gets item %s x%s, which is not in the item table', pl.get('handle'), item, n)
+    if not item.isdigit() or item == '0':
+        # an item the game's item table doesn't have: the game crashes looking it up (crafting
+        # anything then crashed) - say who tried, and keep it out of storage
+        import traceback
+        log.warning('not putting unknown item %r x%s in %s\'s storage (from %s)', item, n, pl.get('handle'),
+                    ' <- '.join(f'{fr.name}:{fr.lineno}' for fr in traceback.extract_stack()[-5:-1][::-1]))
         return touched
     if stack_limit(item) == 1:
         for _ in range(n):
@@ -4512,6 +4546,7 @@ def _handle_action(rid, req):
         fix_type_stats(pl)
         ensure_recipes(pl)
         split_stacks(pl)
+        drop_unknown_item_rows(pl)
         clear_item_new_flags(pl)
         try:
             fix_sphere_links(pl)
