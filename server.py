@@ -3082,6 +3082,12 @@ for _ev in battlegen.EVENT_BOSSES.values():       # event bosses' real moves (to
     AI_ROWS[_ev['ai']] = list(_ev['ai_rows'])
     for _row in _ev['skill_rows']:
         SKILL_ROWS[_row['nj9Lw7mV']] = _row
+for _mid in [m for m in battlegen.WIKI_LINEUPS if battlegen.WIKI_LINEUPS[m].get('maiden')]:   # Battle Maiden bosses
+    _mm = battlegen.maiden_moves(_mid)
+    if _mm:
+        AI_ROWS[_mm[0]['i74vGUFa']] = list(_mm[1])
+        for _row in _mm[2]:
+            SKILL_ROWS[_row['nj9Lw7mV']] = _row
 # Monster-only enemies (no unit behind them, e.g. Creator Maxwell, Juggernaut) need their animation
 # list (8hoyIF9Q) sent with the quest, keyed by the monster's id - without it the game crashes as
 # the enemy appears. Indexed by the monster's own animation file, from every recording.
