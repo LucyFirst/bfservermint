@@ -174,9 +174,11 @@ WIKI_LINEUPS = {
 # Battle Maidens Vortex (Flames of Justice, Waves of Fury, Nature's Wild Child, Bolts and Bombs, The Holy Sky
 # Mech, Demon Blade of the Dark - Lv. 1-3), from the wiki's dungeon pages: each dungeon's own enemies between
 # rounds, its round 4 / 5 / 6 elite encounters, its drop list, and the Maiden only ever as the boss. Lv. 3
-# Maidens have 3x the HP of the wiki's Lv. 3 boss (Raid Bolt Fennia: about 140,000 HP), ATK under 2,600.
+# Maidens have 3x the HP of the wiki's Lv. 3 boss (Raid Bolt Fennia: about 140,000 HP) and their old ATK.
 _MAIDEN_MOBS = {1: (2400, 580, 170), 2: (5000, 730, 220), 3: (8500, 850, 250)}
-_MAIDEN_BOSS = {1: (15000, 800, 300), 2: (45000, 1050, 400), 3: (140000 * 3, 2475, 500)}   # Lv. 3 ATK kept under 2,600 (with the +-5%)
+_MAIDEN_BOSS = {1: (15000, 800, 300), 2: (45000, 1050, 400), 3: (140000 * 3, 1300, 500)}
+# Lv. 3 ATK: each Maiden's own from before the rebuild (3x hit far too hard)
+_MAIDEN_LV3_ATK = {'1': 1344, '2': 1344, '3': 1285, '4': 1097, '5': 1285, '6': 1344}
 
 def _maiden_lineups():
     def grp(lv, lead, mates=(), n=1):
@@ -256,6 +258,8 @@ def _maiden_lineups():
     for el, (z, maidens, rooms) in spec.items():
         for lv in (1, 2, 3):
             hp, atk, df = _MAIDEN_BOSS[lv]
+            if lv == 3:
+                atk = _MAIDEN_LV3_ATK[el]
             out[f'83{el}{lv}000'] = {'normal': _MAIDEN_MOBS[lv], 'rare': [], 'room3': [], 'rooms': rooms.get(lv, {}),
                                      'boss': [[(maidens[lv - 1], hp, atk, df)]], 'zone': zones[z],
                                      'items': [(i, 1) for i in items[z].split()], 'maiden': True}
