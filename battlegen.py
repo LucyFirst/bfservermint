@@ -267,6 +267,48 @@ def _maiden_lineups():
 
 WIKI_LINEUPS.update(_maiden_lineups())
 
+# The Maidens' own Vortex moves (the game's skill table, names from the wiki): (big move, its level,
+# single-target move or None) per element and quest level. The big move only every 4th turn, as the
+# wiki says ("She casts AoE BB every fourth turn"); otherwise the single-target move now and then, or attacks.
+MAIDEN_MOVES = {
+    '1': {1: ('8410001', 1, None), 2: ('8510004', 3, None), 3: ('8510005', 5, None)},                 # Cayena: Rocket Barrage / Storm
+    '2': {1: ('8420002', 1, '8420001'), 2: ('8520002', 3, '8420001'), 3: ('8520003', 5, '8420001')},  # Serin: Ripple Rampage / Tidal Discharge / Gatling Tsunami
+    '3': {1: ('8430002', 1, '8430001'), 2: ('8530003', 3, '8430001'), 3: ('8530001', 5, '8430001')},  # Bayley: Claw / Slash / Scratch Strike
+    '4': {1: ('8440002', 1, '8440001'), 2: ('8540002', 3, '8440001'), 3: ('8540003', 5, '8440001')},  # Fennia: Electric Explosion / Voltage Storm
+    '5': {1: ('8450002', 1, '8450001'), 2: ('8550002', 3, '8450001'), 3: ('8550003', 5, '8450001')},  # Vanila: Angel's Wrath / Divine Inferno
+    '6': {1: ('8560004', 1, '8560003'), 2: ('8560004', 3, '8560003'), 3: ('8560005', 5, '8560003')},  # Lico: Dark Impact / Death Strike
+}
+try:
+    import json as _json, os as _os
+    MAIDEN_SKILLS = _json.load(open(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'data', 'maiden_skills.json'),
+                                    encoding='utf-8'))
+except (OSError, ValueError):
+    MAIDEN_SKILLS = {}
+
+
+def _ai_row(aid, label, prio, act, conds=(), pct=100):
+    conds = list(conds) + ['non:0'] * (5 - len(conds))
+    return {'4eEVw5hL': str(aid), 'yu18xScw': str(prio), 'L8PCsu0K': label,
+            'q7Nit8JW': '@'.join(['0:non:non:non'] * 4) + '@#' + '@'.join(conds) + '@',
+            '4xctV8gF': '2', 'VBj9u0ot': 'random',
+            'Hhgi79M1': f"{act}@{','.join(['-1'] * 12)},@1@0@0", 'ug9xV4Fz': str(pct)}
+
+
+def maiden_moves(mid):
+    """(row changes, AI rows, skill rows) for a Battle Maiden boss: big move every 4th turn only."""
+    el, lv = mid[2], int(mid[3])
+    big, blv, st = MAIDEN_MOVES[el][lv]
+    if big not in MAIDEN_SKILLS or (st and st not in MAIDEN_SKILLS):
+        return None
+    aid = f'99083{el}{lv}0'
+    label = f'Battle Maiden {el} Lv{lv}'
+    ai = [_ai_row(aid, label, 1, 'skill', ['skill:1', 'actbetween:4', 'turn_limited_act:1'])]
+    if st:
+        ai.append(_ai_row(aid, label, 2, 'skill', ['skill:2'], 35))
+    ai.append(_ai_row(aid, label, len(ai) + 1, 'attack'))
+    moves = f'{big}:{blv}' + (f'@{st}:1' if st else '')
+    return ({'F4bQ7r8C': moves, 'i74vGUFa': aid}, ai, [MAIDEN_SKILLS[big]] + ([MAIDEN_SKILLS[st]] if st else []))
+
 # their bosses' real moves (game skills + AI from the wiki's descriptions): tools/build_event_bosses.py
 try:
     import json as _json, os as _os
@@ -756,6 +798,18 @@ class Battlegen:
                         skills[row['nj9Lw7mV']] = row
                     for row in ev['ai_rows']:
                         ai[(row['4eEVw5hL'], row['yu18xScw'])] = row
+        if cfg.get('maiden'):
+            mm = maiden_moves(mid)
+            if mm:
+                row_set, ai_rows, skill_rows = mm
+                for m in plan['battles'][-1]['mons']:
+                    if m.get('boss') and m.get('row'):
+                        m['row'] = dict(m['row'], **row_set)
+                        m['ai'] = row_set['i74vGUFa']
+                for row in ai_rows:
+                    ai[(row['4eEVw5hL'], row['yu18xScw'])] = row
+                for row in skill_rows:
+                    skills[row['nj9Lw7mV']] = row
         plan.update(skills=list(skills.values()), ai=list(ai.values()), label='built from the wiki')
         return plan
 
