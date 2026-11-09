@@ -174,9 +174,9 @@ WIKI_LINEUPS = {
 # Battle Maidens Vortex (Flames of Justice, Waves of Fury, Nature's Wild Child, Bolts and Bombs, The Holy Sky
 # Mech, Demon Blade of the Dark - Lv. 1-3), from the wiki's dungeon pages: each dungeon's own enemies between
 # rounds, its round 4 / 5 / 6 elite encounters, its drop list, and the Maiden only ever as the boss. Lv. 3
-# Maidens have 3x the HP and ATK of the wiki's Lv. 3 boss (Raid Bolt Fennia: about 140,000 HP).
+# Maidens have 3x the HP of the wiki's Lv. 3 boss (Raid Bolt Fennia: about 140,000 HP), ATK under 2,600.
 _MAIDEN_MOBS = {1: (2400, 580, 170), 2: (5000, 730, 220), 3: (8500, 850, 250)}
-_MAIDEN_BOSS = {1: (15000, 800, 300), 2: (45000, 1050, 400), 3: (140000 * 3, 1300 * 3, 500)}
+_MAIDEN_BOSS = {1: (15000, 800, 300), 2: (45000, 1050, 400), 3: (140000 * 3, 2475, 500)}   # Lv. 3 ATK kept under 2,600 (with the +-5%)
 
 def _maiden_lineups():
     def grp(lv, lead, mates=(), n=1):
