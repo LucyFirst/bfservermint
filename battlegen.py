@@ -479,7 +479,9 @@ class Battlegen:
         ghosts...), units the wiki lists as this quest's captures, or units the real game let you
         capture from enemies (datamine drop rates / recorded drops) - e.g. Goblin, Burny, Thief Leon.
         Enemies that never dropped anywhere (bosses' units, high-rarity enemies) still don't."""
-        return u != MIMIC and (self.kind(u) != '0' or u in (wiki.get('captures') or []) or u in self.capturable)
+        caps = wiki.get('captures') or []
+        return u != MIMIC and (self.kind(u) != '0' or u in caps or u in self.capturable
+                               or self.lowest_form(u) in caps)    # the wiki lists its first form (Black Magress -> Magress)
 
     def difficulty(self, mid):
         """Quest exp is the difficulty scale; a quest with no known exp (JP-only arcs) gets the exp
