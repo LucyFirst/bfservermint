@@ -253,6 +253,12 @@ def _maiden_lineups():
             3: {4: [g(3, 'hell king hades', ['memetes'] * 4)],
                 5: [g(3, 'black magress'), 'mobs']}}),
     }
+    # Lv. 3: one of the Six Heroes (3* form, the dungeon's element) opens every run, with two of the dungeon's enemies
+    heroes = {'1': 'fire king vargas', '2': 'ice queen selena', '3': 'earth pike lance', '4': 'thunder king eze',
+              '5': 'holy knight atro', '6': 'black magress'}
+    for el, (_, _, rooms) in spec.items():
+        rooms[3][0] = [g(3, heroes[el]) + ['mob', 'mob']]
+    spec['6'][2][3][5] = ['mobs']      # Black Magress now opens the run instead of round 6
     zones = {'F': F, 'W': W, 'E': E, 'T': T, 'L': L, 'D': D}
     out = {}
     for el, (z, maidens, rooms) in spec.items():
@@ -730,7 +736,7 @@ class Battlegen:
             rooms = cfg.get('rooms') or ({2: cfg['room3']} if cfg.get('room3') else {})
             pick = rng.choice(rooms[bi]) if rooms.get(bi) else 'mobs'
             if pick != 'mobs':
-                b = [enemy(*x) for x in pick][:5]
+                b = [mob() if x == 'mob' else enemy(*x) for x in pick][:5]
             else:
                 b = [mob() for _ in range(rng.choice((2, 3, 3, 4)))]
             battles.append([m for m in b if m])
