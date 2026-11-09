@@ -709,8 +709,8 @@ class Battlegen:
                 if not m.get('boss'):
                     continue
                 roll = rng.random()
-                p3 = area.get(three, {1: 0.10, 2: 0.15, 3: 0.18}[lv])
-                p4 = area.get(four, 0.07) if lv == 3 else 0
+                p3 = area.get(three, {1: 0.05, 2: 0.08, 3: 0.12}[lv])
+                p4 = area.get(four, 0.03) if lv == 3 else 0
                 got = three if roll < _chance(p3, 'drop') else four if roll < _chance(p3, 'drop') + _chance(p4, 'drop') else None
                 if got and got in self.U and got not in SETTINGS.get('off_units', ()):
                     m['drop'] = got
