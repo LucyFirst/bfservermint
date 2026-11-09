@@ -745,6 +745,15 @@ class Battlegen:
             battles[-1] = [battles[-1][1], battles[-1][0], battles[-1][2]]
         plan = self._finish(mid, wiki, battles, [], rng, story=False)
         if cfg.get('maiden'):
+            # only the Six Heroes (Fencer Vargas, Black Magress...) and the Maidens drop as units here
+            def keep(u):
+                u = str(u)
+                return (len(u) == 5 and u[1:4] == '001') or (len(u) == 6 and u[0] == '8' and u[2:5] == '000')
+            for b in plan['battles'][:-1]:
+                b['unit_drops'] = [d for d in b['unit_drops'] if keep(d.split(':')[2])]
+                for m in b['mons']:
+                    if m.get('drop') and not keep(m['drop']):
+                        m['drop'] = None
             # the Maiden is caught only from the boss: Lv. 1 "very small chance", Lv. 2 "small chance" (her
             # 3* form), Lv. 3 "chance" (3*, now and then her 4* form) - the admin page's area rate wins
             lv, base = int(mid[3]), mid[:3] + '00'
