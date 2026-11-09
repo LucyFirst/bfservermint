@@ -171,6 +171,98 @@ WIKI_LINEUPS = {
                 'boss': [[('abyssal witch ciara', 480000, 2360, 81), ('skull lord', 80000, 1800, 450), ('skull lord', 80000, 1800, 450)],
                          [('ruinous despoiler galtier', 480000, 2360, 81), ('skull lord', 80000, 1800, 450), ('skull lord', 80000, 1800, 450)]]},
 }
+# Battle Maidens Vortex (Flames of Justice, Waves of Fury, Nature's Wild Child, Bolts and Bombs, The Holy Sky
+# Mech, Demon Blade of the Dark - Lv. 1-3), from the wiki's dungeon pages: each dungeon's own enemies between
+# rounds, its round 4 / 5 / 6 elite encounters, its drop list, and the Maiden only ever as the boss. Lv. 3
+# Maidens have 3x the HP and ATK of the wiki's Lv. 3 boss (Raid Bolt Fennia: about 140,000 HP).
+_MAIDEN_MOBS = {1: (2400, 580, 170), 2: (5000, 730, 220), 3: (8500, 850, 250)}
+_MAIDEN_BOSS = {1: (15000, 800, 300), 2: (45000, 1050, 400), 3: (140000 * 3, 1300 * 3, 500)}
+
+def _maiden_lineups():
+    def grp(lv, lead, mates=(), n=1):
+        """An elite round: its leader much tougher than the dungeon's normal enemies, its mates a bit."""
+        hp, atk, df = _MAIDEN_MOBS[lv]
+        out = [(lead, hp * 5, int(atk * 1.25), int(df * 1.5))] * n
+        for m in mates:
+            out.append((m, int(hp * 1.3), int(atk * 1.1), df))
+        return out
+    F = ['redcap', 'salamander', 'ifrit', 'zahhak', 'sage mimir', 'priestess maria', 'lilin', 'sylph', 'trent', 'rantoul',
+         'head bandit zaza', 'sky pirate grafl', 'thief leon', 'head thief leon', 'pirate verica', 'plunderer verica',
+         'witch liza', 'geomancer claris']
+    W = ['rantoul', 'pirate verica', 'ramia', 'sahuagin', 'trent', 'bandit zaza', 'head bandit zaza', 'salamander',
+         'thief leon', 'sylph', 'sage mimir', 'priestess maria', 'unicorn', 'pegasus', 'goblin', 'mandragora']
+    E = ['rantoul', 'thief leon', 'head thief leon', 'pirate verica', 'bandit zaza', 'head bandit zaza', 'sky pirate grafl',
+         'salamander', 'sylph', 'medusa', 'zahhak', 'lilin', 'trent', 'polevik', 'mandragora', 'witch liza', 'dancer may',
+         'sorceress lily', 'sage mimir', 'priestess maria']
+    T = ['aero', 'bandit zaza', 'priestess maria', 'rantoul', 'sage mimir', 'salamander', 'sky pirate grafl', 'sylph',
+         'thief leon', 'trent']
+    L = ['bandit zaza', 'trent', 'thief leon', 'salamander', 'head bandit zaza', 'merman', 'pirate verica', 'rantoul', 'angel',
+         'sky pirate grafl', 'sylph', 'harpy', 'skeleton', 'medusa', 'lilin', "al-mi'raj"]
+    D = ['witch liza', 'skeleton king', 'medusa', 'lilin', 'skeleton', 'harpy', 'goblin', 'imp', 'magician lily', 'zahhak',
+         'warlock liza', 'pegasus', 'trent', 'redcap', 'sylph', 'polevik', 'aero', 'empusa', 'sorceress lily', 'unicorn',
+         'salamander', 'rantoul']
+    items = {
+        'F': '10802 10901 10902 10402 10302 10500 10000 10201 10203 10602 10600 10603 10601 10604 10701 10702 10100 10606',
+        'W': '10802 10901 10902 10402 10302 10500 10000 10201 10203 10602 10600 10603 10601 10604 10701 10702 10100 10606',
+        'E': '10802 10901 10900 10902 10402 10301 10300 10302 10602 10600 10604 10603 10601 10500 10100 10001 10000 10003 10203 10201 10708 10702 11001 10606',
+        'T': '10203 10201 10200 10202 10001 10003 10901 10902 10500 10502 10604 10605 10600 10601 10402 10300 10304 10702 10801 10802 10808 10100',
+        'L': '10807 10805 10802 10600 10602 10604 10601 10603 10302 10303 10502 10000 10003 10002 10901 10902 10702 10205 10201 10203 10200 10104 11004 11002',
+        'D': '10003 10000 10802 10800 10902 10605 10608 10708 10301 10302 10500 10204 10201 10203 10400 10101 10102 10100 11003'}
+    g = grp
+    # rooms: 0-based battle index -> the encounters it can be (one picked per run); "mobs" = the dungeon's normal enemies
+    spec = {
+        '1': ('F', ['maiden cayena', 'hot rocket cayena', 'war rocket cayena'], {
+            1: {3: [g(1, 'phoenix', ['warlock liza']), g(1, 'fencer vargas', ['warlock liza'])],
+                4: [g(1, 'sky boss grafl', ['sylph', 'goblin', 'goblin']), 'mobs']},
+            2: {3: [g(2, 'time mage claris', ['warlock liza'])],
+                5: [g(2, 'rage beast zegar'), g(2, 'ifrit', ['salamander', 'salamander'])]},
+            3: {3: [g(3, 'time mage claris', ['warlock liza']), g(3, 'sky boss grafl', ['thief leon'] * 3, n=2)],
+                5: [g(3, 'god phoenix'), g(3, 'rage beast zegar')]}}),
+        '2': ('W', ['maiden serin', 'gun lady serin', 'gun goddess serin'], {
+            1: {3: [g(1, 'gun king douglas', ['bandit zaza'] * 2), g(1, 'twin flash rickel', ['pirate verica'] * 2)],
+                4: [g(1, 'pegasus', ['merman', 'merman', 'priestess maria']), 'mobs']},
+            2: {3: [g(2, 'twin flash rickel', ['pirate verica'] * 2), g(2, 'gun king douglas', ['bandit zaza'] * 2)],
+                5: [[('gunner douglas', int(_MAIDEN_MOBS[2][0] * 1.6), int(_MAIDEN_MOBS[2][1] * 1.1), _MAIDEN_MOBS[2][2])] * 5]},
+            3: {3: [g(3, 'gun god douglas', ['bandit zaza'] * 2), g(3, 'twin shot rickel', ['pirate verica'] * 2)],
+                5: [[('gunner douglas', int(_MAIDEN_MOBS[3][0] * 1.6), int(_MAIDEN_MOBS[3][1] * 1.1), _MAIDEN_MOBS[3][2])] * 5,
+                    [('twin flash rickel', int(_MAIDEN_MOBS[3][0] * 1.6), int(_MAIDEN_MOBS[3][1] * 1.1), _MAIDEN_MOBS[3][2])] * 5]}}),
+        '3': ('E', ['maiden bayley', 'nyan slash bayley', 'wild slash bayley'], {
+            1: {},
+            2: {3: [g(2, 'ice ruler sergio', ['dwarf'] * 2), g(2, 'princess lidith', ['wendigo'] * 2)],
+                5: [g(2, 'siren', ['polevik'] * 4), g(2, 'ent', ['ramia'] * 4)]},
+            3: {3: [g(3, 'ice ruler sergio', ['dwarf prince'] * 2), g(3, 'queen lidith', ['hrungnir'] * 2)],
+                5: [g(3, 'siren', ['titania'] * 4), g(3, 'ent', ['scylla'] * 4)]}}),
+        '4': ('T', ['maiden fennia', 'raid bomb fennia', 'raid bolt fennia'], {
+            1: {},
+            2: {3: [g(2, 'knight agni', ['minotaur'] * 2), g(2, 'inventor elulu', ['witch liza'] * 2)],
+                5: [g(2, 'salamander', ['aero'] * 4), g(2, 'dancer may', ['thief leon'] * 4)]},
+            3: {3: [g(3, 'fire knight agni', ['cyclops'] * 2), g(3, 'bolt mallet elulu', ['witch liza'] * 2)],
+                5: [g(3, 'ifrit', ['sylph'] * 4), g(3, 'royal dancer may', ['head thief leon'] * 4)]}}),
+        '5': ('L', ['maiden vanila', 'sky queen vanila', 'sky angel vanila'], {
+            1: {3: [g(1, 'cowboy heidt', ['lilin'] * 2), g(1, 'shida', ['archangel'] * 2)],
+                5: [g(1, 'nyx', ["al-mi'raj"] * 4), g(1, 'bahamut', ['imp'] * 4)]},
+            2: {3: [g(2, 'cowboy heidt', ['lilin'] * 2), g(2, 'shida', ['priestess maria'] * 2)],
+                5: [g(2, 'nyx', ["al-mi'raj"] * 4), g(2, 'bahamut', ['imp'] * 4)]},
+            3: {3: [g(3, 'holy shot heidt', ['succubus'] * 2), g(3, 'garroter shida', ['angel maria'] * 2)],
+                5: [g(3, 'rameldria', ['imp', 'imp', 'incubus', 'incubus']), g(3, 'nyx', ["al-mi'raj", "al-mi'raj", 'cait sith', 'cait sith'])]}}),
+        '6': ('D', ['maiden lico', 'dark blade lico', 'demon blade lico'], {
+            1: {},
+            2: {5: [g(2, 'garroter shida', ['skeleton king'] * 2), g(2, 'memetes', ['zahhak'] * 2)]},
+            3: {4: [g(3, 'hell king hades', ['memetes'] * 4)],
+                5: [g(3, 'black magress'), 'mobs']}}),
+    }
+    zones = {'F': F, 'W': W, 'E': E, 'T': T, 'L': L, 'D': D}
+    out = {}
+    for el, (z, maidens, rooms) in spec.items():
+        for lv in (1, 2, 3):
+            hp, atk, df = _MAIDEN_BOSS[lv]
+            out[f'83{el}{lv}000'] = {'normal': _MAIDEN_MOBS[lv], 'rare': [], 'room3': [], 'rooms': rooms.get(lv, {}),
+                                     'boss': [[(maidens[lv - 1], hp, atk, df)]], 'zone': zones[z],
+                                     'items': [(i, 1) for i in items[z].split()], 'maiden': True}
+    return out
+
+WIKI_LINEUPS.update(_maiden_lineups())
+
 # their bosses' real moves (game skills + AI from the wiki's descriptions): tools/build_event_bosses.py
 try:
     import json as _json, os as _os
@@ -587,8 +679,10 @@ class Battlegen:
 
         battles = []
         for bi in range(n - 1):
-            if bi == 2 and cfg['room3']:
-                b = [enemy(*x) for x in rng.choice(cfg['room3'])]
+            rooms = cfg.get('rooms') or ({2: cfg['room3']} if cfg.get('room3') else {})
+            pick = rng.choice(rooms[bi]) if rooms.get(bi) else 'mobs'
+            if pick != 'mobs':
+                b = [enemy(*x) for x in pick][:5]
             else:
                 b = [mob() for _ in range(rng.choice((2, 3, 3, 4)))]
             battles.append([m for m in b if m])
@@ -602,6 +696,26 @@ class Battlegen:
         if len(battles[-1]) == 3:          # the main boss in the middle, its two mates beside it
             battles[-1] = [battles[-1][1], battles[-1][0], battles[-1][2]]
         plan = self._finish(mid, wiki, battles, [], rng, story=False)
+        if cfg.get('maiden'):
+            # the Maiden is caught only from the boss: Lv. 1 "very small chance", Lv. 2 "small chance" (her
+            # 3* form), Lv. 3 "chance" (3*, now and then her 4* form) - the admin page's area rate wins
+            lv, base = int(mid[3]), mid[:3] + '00'
+            three, four = f'8{mid[2]}0003', f'8{mid[2]}0004'
+            area = self.area_captures(f'80{mid[2]}000')
+            last = plan['battles'][-1]
+            last['unit_drops'] = []
+            for pos, m in enumerate(last['mons']):
+                m['drop'] = None
+                if not m.get('boss'):
+                    continue
+                roll = rng.random()
+                p3 = area.get(three, {1: 0.10, 2: 0.15, 3: 0.18}[lv])
+                p4 = area.get(four, 0.07) if lv == 3 else 0
+                got = three if roll < _chance(p3, 'drop') else four if roll < _chance(p3, 'drop') + _chance(p4, 'drop') else None
+                if got and got in self.U and got not in SETTINGS.get('off_units', ()):
+                    m['drop'] = got
+                    last['unit_drops'].append(f'{pos}:0:{got}:1:{rng.randint(1, 5)}')
+                break
         # the zone's material drops in chests now and then
         items, w = zip(*cfg['items'])
         for b in plan['battles'][:-1]:
