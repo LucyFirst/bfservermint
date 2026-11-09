@@ -275,8 +275,13 @@ class Admin:
             um = S.unit_mst()
             off = set(self.settings()['off']['units'])
             mock = S.mock_units()
+            try:      # the wiki's unit batches in release order (from the Summon Batch Planner)
+                batches = json.load(open(os.path.join(S.HERE, 'data', 'unit_batches.json'), encoding='utf-8'))
+            except Exception:
+                batches = []
             return {'units': [[i, u.get('utP1c0CD') or i, int(u.get('7ofj5xa1') or 0), int(u.get('iNy0ZU5M') or 0),
-                               1 if i in off else 0, 1 if i in mock else 0] for i, u in sorted(um.items(), key=lambda x: int(x[0]))]}
+                               1 if i in off else 0, 1 if i in mock else 0] for i, u in sorted(um.items(), key=lambda x: int(x[0]))],
+                    'batches': batches}
         if action == 'units_set':
             ids = [str(x) for x in data.get('ids') or [] if str(x) in S.unit_mst()]
             s = self.settings()

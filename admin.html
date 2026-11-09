@@ -117,6 +117,10 @@ main.wide{max-width:1180px}
 .minigrid .ut{padding:4px 2px} .minigrid .ut img{width:48px;height:48px}
 .minigrid .ut .nm{font-size:10.5px}
 .ut.up{border-color:#ff7ad9;box-shadow:0 0 0 1px #ff7ad9 inset}
+.ubyr{font-size:20px;color:var(--gold);margin:22px 0 6px;font-weight:700}
+.ubat{border-top:1px solid var(--line);padding:10px 0 12px}
+.ubat h4{margin:0 0 2px;font-size:15px}
+.ubat .bm{color:var(--muted);font-size:12px;margin-bottom:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .ut .mk{position:absolute;top:2px;left:50%;transform:translateX(-50%);background:#2f8f6a;color:#fff;font-size:10px;font-weight:bold;border-radius:6px;padding:0 4px;line-height:15px}
 .ut .pg{position:absolute;top:2px;right:2px;background:#e0a800;color:#201500;font-size:10px;font-weight:bold;border-radius:6px;padding:0 4px;line-height:15px}
 .ut.pity{border-color:#ffd77a}
@@ -410,6 +414,7 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
       <select id="uRarity"><option value="">All rarities</option></select>
       <select id="uElem"><option value="">All elements</option><option value="1">Fire</option><option value="2">Water</option><option value="3">Earth</option><option value="4">Thunder</option><option value="5">Light</option><option value="6">Dark</option><option value="mock">Mock units</option></select>
       <select id="uShow"><option value="">Open and closed</option><option value="closed">Closed only</option><option value="open">Open only</option></select>
+      <select id="uView"><option value="batch">By batch (release order)</option><option value="grid">All units</option></select>
     </div>
     <div class="toolbar" style="margin:0">
       <button class="btn ghost sm" id="uAll">Select all shown</button>
@@ -1012,10 +1017,32 @@ $('#storySave').onclick=async()=>{
 
 // ---------- units
 const ELEM=['','Fire','Water','Earth','Thunder','Light','Dark'];
-let U=[], uSel=new Set(), uShown=[], uLimit=240;
+let U=[], uSel=new Set(), uShown=[], uLimit=240, UBAT=[];
+const MONS=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+try{const v=localStorage.getItem('uView');if(v)document.getElementById('uView').value=v}catch(e){}
+function utile(u){return `<div class="ut${u.off?' closed':''}${uSel.has(u.id)?' sel':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★ ${ELEM[u.el]||''}</div>${u.mock?'<span class="mk">Mock</span>':''}</div>`}
+// the units grouped like the Summon Batch Planner: year, then each batch in release order, every form of its units
+function drawBatches(){
+  const shown=new Map(uShown.map(u=>[u.id,u])), used=new Set();
+  let html='',yr=null;
+  UBAT.forEach((b,bi)=>{
+    const us=[];
+    b.lines.forEach(l=>{U.forEach(u=>{if(u.id.slice(0,-1)===l&&shown.has(u.id)&&!used.has(u.id)){us.push(u);used.add(u.id)}})});
+    if(!us.length)return;
+    us.sort((a,c)=>b.lines.indexOf(a.id.slice(0,-1))-b.lines.indexOf(c.id.slice(0,-1))||(+a.id)-(+c.id));
+    const y=b.k==999999?'Undated':Math.floor(b.k/100);
+    if(y!==yr){html+=`<div class="ubyr">${y}</div>`;yr=y}
+    const when=b.k==999999?'':MONS[b.k%100]+' '+Math.floor(b.k/100);
+    html+=`<div class="ubat"><h4>${esc(b.t)}</h4><div class="bm"><span>${when}</span><span>${esc(b.reg)}</span><span>${us.length} units · ${us.filter(u=>u.off).length} closed</span><button class="btn ghost sm" data-bsel="${bi}">Select this batch</button></div><div class="ugrid">${us.map(utile).join('')}</div></div>`;
+  });
+  const rest=uShown.filter(u=>!used.has(u.id));
+  if(rest.length)html+=`<div class="ubyr">Not in a batch</div><div class="ubat"><div class="bm"><span>${rest.length} units (enemies, materials, event units and others)</span><button class="btn ghost sm" data-bsel="rest">Select these</button></div><div class="ugrid">${rest.slice(0,uLimit).map(utile).join('')}</div></div>`;
+  return {html,more:rest.length>uLimit,left:rest.length-uLimit};
+}
 async function loadUnits(){
   if(!U.length){
     const r=await api('units'); U=r.units.map(([id,name,rar,el,off,mock])=>({id,name,rar,el,off:!!off,mock:!!mock}));
+    UBAT=r.batches||[];
     const rs=[...new Set(U.map(u=>u.rar))].sort((a,b)=>b-a);
     $('#uRarity').innerHTML='<option value="">All rarities</option>'+rs.map(r=>`<option value="${r}">${r}★</option>`).join('');
   }
@@ -1029,15 +1056,22 @@ function filtered(){
 function drawUnitGrid(reset){
   if(reset) uLimit=240;
   uShown=filtered();
-  const list=uShown.slice(0,uLimit);
-  $('#uGrid').innerHTML=list.map(u=>`<div class="ut${u.off?' closed':''}${uSel.has(u.id)?' sel':''}" data-id="${u.id}" title="#${u.id} ${esc(u.name)}"><img loading="lazy" src="/admin/img/unit/${u.id}.png" alt="" onerror="this.style.visibility='hidden'"><div class="nm">${esc(u.name)}</div><div class="rr">${u.rar}★ ${ELEM[u.el]||''}</div>${u.mock?'<span class="mk">Mock</span>':''}</div>`).join('')||'<p style="color:var(--muted)">No units match.</p>';
-  $('#uMore').classList.toggle('hide',uShown.length<=uLimit);
-  $('#uMore').textContent=`Show more (${uShown.length-uLimit} left)`;
+  if($('#uView').value==='batch'&&UBAT.length){
+    const r=drawBatches();
+    $('#uGrid').style.display='block';$('#uGrid').innerHTML=r.html||'<p style="color:var(--muted)">No units match.</p>';
+    $('#uMore').classList.toggle('hide',!r.more);$('#uMore').textContent=`Show more (${r.left} left)`;
+  }else{
+    const list=uShown.slice(0,uLimit);
+    $('#uGrid').style.display='';$('#uGrid').innerHTML=list.map(utile).join('')||'<p style="color:var(--muted)">No units match.</p>';
+    $('#uMore').classList.toggle('hide',uShown.length<=uLimit);
+    $('#uMore').textContent=`Show more (${uShown.length-uLimit} left)`;
+  }
   uCount();
 }
 function uCount(){$('#uCount').textContent=`${uShown.length} shown · ${uSel.size} selected · ${U.filter(u=>u.off).length} closed`}
-$('#uGrid').onclick=e=>{const t=e.target.closest('.ut');if(!t)return;const id=t.dataset.id;uSel.has(id)?uSel.delete(id):uSel.add(id);t.classList.toggle('sel');uCount()};
-['#uSearch','#uRarity','#uElem','#uShow'].forEach(x=>$(x).addEventListener(x==='#uSearch'?'input':'change',()=>drawUnitGrid(true)));
+$('#uGrid').onclick=e=>{const bs=e.target.closest('[data-bsel]');if(bs){bs.closest('.ubat').querySelectorAll('.ut').forEach(t=>{uSel.add(t.dataset.id);t.classList.add('sel')});uCount();return}
+  const t=e.target.closest('.ut');if(!t)return;const id=t.dataset.id;uSel.has(id)?uSel.delete(id):uSel.add(id);t.classList.toggle('sel');uCount()};
+['#uSearch','#uRarity','#uElem','#uShow','#uView'].forEach(x=>$(x).addEventListener(x==='#uSearch'?'input':'change',()=>{if(x==='#uView'){try{localStorage.setItem('uView',$('#uView').value)}catch(e){}}drawUnitGrid(true)}));
 $('#uMore').onclick=()=>{uLimit+=480;drawUnitGrid(false)};
 $('#uAll').onclick=()=>{uShown.forEach(u=>uSel.add(u.id));drawUnitGrid(false)};
 $('#uNone').onclick=()=>{uSel.clear();drawUnitGrid(false)};
