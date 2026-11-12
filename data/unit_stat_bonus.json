@@ -1,0 +1,7 @@
+{
+  "_note": "Flat stat bonuses for units, added to the unit's own level-1 and max-level stats (so every level gets the same amount). Keys: unit id -> {hp, atk, def, rec}. Units players already own get the difference on their next login; the game's unit table is re-sent with the same numbers.",
+  "10233": {"name": "Swordswoman Seria", "hp": 400, "atk": 400},
+  "10234": {"name": "Blade God Seria", "hp": 400, "atk": 400},
+  "10235": {"name": "Flare Goddess Seria", "hp": 400, "atk": 400},
+  "10236": {"name": "Solar Fervor Seria", "hp": 400, "atk": 400}
+}

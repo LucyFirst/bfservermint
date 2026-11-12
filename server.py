@@ -340,6 +340,10 @@ def load_player(uid):
     # copy from whatever reply last carried it (e.g. a one-banner summon list after a summon)
     for g in MASTER_GROUPS - {G_SIGNAL}:
         (pl.get('state') or {}).pop(g, None)
+    try:
+        apply_stat_bonus(pl)     # on every load, so no unit is used before it has its bonus
+    except Exception:
+        log.exception('stat bonus failed for %s', uid)
     return pl
 
 def save_player(pl):
@@ -870,12 +874,52 @@ G_OPE_UNIT = 'Km35HAXv'
 SUMMON_EFFECT = {1: ['1'], 2: ['2'], 3: ['8'], 4: ['10', '11'], 5: ['13', '15'], 6: ['19', '21'],
                  7: ['229'], 8: ['901']}
 
+# Flat stat bonuses for some units (data/unit_stat_bonus.json): added to the unit's level-1 and
+# max-level stats, so the whole curve moves up by the same amount.
+STAT_BONUS_FILE = os.path.join(HERE, 'data', 'unit_stat_bonus.json')
+STAT_BONUS_FIELDS = {'hp': ('UZ1Bj7w2', '3WMz78t6'), 'atk': ('i9Tn7kYr', 'omuyP54D'),
+                     'def': ('q78KoWsg', '32INDST4'), 'rec': ('92ij6UGB', 'X9P3AN5d')}
+STAT_BONUS_ROW = {'hp': 'e7DK0FQT', 'atk': '67CApcti', 'def': 'q08xLEsy', 'rec': 'PWXu25cg'}
+_STAT_BONUS = None
+
+def stat_bonus():
+    """{unit id: {'hp': n, 'atk': n, 'def': n, 'rec': n}} - only the stats that change."""
+    global _STAT_BONUS
+    if _STAT_BONUS is None:
+        out = {}
+        try:
+            raw = json.load(open(STAT_BONUS_FILE, encoding='utf-8')) if os.path.exists(STAT_BONUS_FILE) else {}
+        except Exception:
+            log.exception('could not read %s', STAT_BONUS_FILE)
+            raw = {}
+        for uid, b in raw.items():
+            if uid.startswith('_') or not isinstance(b, dict):
+                continue
+            add = {k: int(b[k]) for k in STAT_BONUS_FIELDS if int(b.get(k) or 0)}
+            if add:
+                out[str(uid)] = add
+        _STAT_BONUS = out
+    return _STAT_BONUS
+
+def with_stat_bonus(row, add):
+    """A unit table row with the bonus added to its level-1 and max-level stats."""
+    row = dict(row)
+    for k, n in add.items():
+        for f in STAT_BONUS_FIELDS[k]:
+            if f in row:
+                row[f] = str(int(row.get(f) or 0) + n)
+    return row
+
 def unit_mst():
-    """Unit master rows (stats, skills) from the game's own data files."""
+    """Unit master rows (stats, skills) from the game's own data files, with the stat bonuses."""
     if not UNIT_MST:
         p = os.path.join(HERE, 'data', 'unit_mst.json')
         if os.path.exists(p):
-            UNIT_MST.update(json.load(open(p, encoding='utf-8')))
+            raw = json.load(open(p, encoding='utf-8'))
+            for uid, add in stat_bonus().items():
+                if uid in raw:
+                    raw[uid] = with_stat_bonus(raw[uid], add)
+            UNIT_MST.update(raw)
     return UNIT_MST
 
 _HL = None
@@ -1005,6 +1049,42 @@ def unit_row_stats(row, m, lv):
     for f, add in zip(STAT_FIELDS, type_growth(row, lv)):
         st[f] = str(max(1, int(st[f]) + add))
     return st
+
+def apply_stat_bonus(pl):
+    """Units the player already owns get the stat bonuses (data/unit_stat_bonus.json). The save
+    keeps what it has been given per unit id (stat_bonus), so a bonus is added once and a later
+    change to it only adds or takes away the difference. A copy of the save goes to
+    saves/backups/old first."""
+    want = stat_bonus()
+    done = pl.get('stat_bonus') or {}
+    ids = set(want) | set(done)
+    delta = {}
+    for uid in ids:
+        d = {k: int((want.get(uid) or {}).get(k, 0)) - int((done.get(uid) or {}).get(k, 0)) for k in STAT_BONUS_ROW}
+        d = {k: v for k, v in d.items() if v}
+        if d:
+            delta[uid] = d
+    if not delta:
+        return
+    hit = [u for u in pl['units'].values() if str(u.get('pn16CNah')) in delta]
+    if hit:
+        try:
+            import shutil
+            d = os.path.join(SAVE_DIR, 'backups', 'old')
+            os.makedirs(d, exist_ok=True)
+            dst = os.path.join(d, f"player_{pl['user_id']}_before_stat_bonus_{int(time.time())}.json")
+            if os.path.exists(player_path(pl['user_id'])):
+                shutil.copy2(player_path(pl['user_id']), dst)
+        except Exception:
+            log.exception('could not back up %s before the unit stat bonus', pl['user_id'])
+            return
+        for u in hit:
+            for k, n in delta[str(u.get('pn16CNah'))].items():
+                f = STAT_BONUS_ROW[k]
+                u[f] = str(max(1, int(_num(u.get(f)) or 0) + n))
+        log.info('stat bonus: %d unit(s) of %s changed (%s)', len(hit), pl['user_id'],
+                 ', '.join(f'{u}: ' + ' '.join(f'{k}{v:+d}' for k, v in d.items()) for u, d in sorted(delta.items())))
+    pl['stat_bonus'] = {uid: dict(b) for uid, b in want.items()}
 
 def fix_type_stats(pl):
     """Once per save: units levelled here before unit types counted get their type's stats. Only

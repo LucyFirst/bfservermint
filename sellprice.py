@@ -7,7 +7,9 @@ the new prices, under a newer version number (the game downloads a table again w
 changes), and pays the new price when a unit is sold.
 
 F_UNIT_MST comes in 8 files (Ver{version}_2r9cNSdt_{1..8}.dat); the edited copy keeps the same
-split. saves/sell_price.json keeps a revision number that goes up whenever the prices change.
+split. The same edited copy also carries the flat stat bonuses from data/unit_stat_bonus.json
+(server.stat_bonus), so the game's unit guide shows the same stats the server gives.
+saves/sell_price.json keeps a revision number that goes up whenever the prices change.
 Copies from earlier revisions are moved to saves/backups/old (like old account backups) - never
 deleted; clear that folder by hand when you want. The game's original table stays where it is.
 """
@@ -101,11 +103,15 @@ class SellPrice:
         with self.mu:
             o = self.overrides()
             changes = {u: z for u, z in o.items() if z != self.normal(u)}
+            bonus = self.S.stat_bonus()         # flat stat bonuses (data/unit_stat_bonus.json)
             if not self.info or not self.base_parts():
                 return False
-            if not changes and not self.state['rev']:
+            if not changes and not bonus and not self.state['rev']:
                 return False                    # nothing changed, never edited: original table
-            sig = hashlib.md5(json.dumps(sorted(changes.items())).encode()).hexdigest()
+            key = sorted(changes.items())
+            if bonus:                           # (signature unchanged for tables without bonuses)
+                key = [key, sorted((u, sorted(b.items())) for u, b in bonus.items())]
+            sig = hashlib.md5(json.dumps(key).encode()).hexdigest()
             if sig != self.state.get('sig'):
                 self.state = {'rev': int(self.state.get('rev', 0)) + 1, 'sig': sig}
                 tmp = self.file + '.tmp'
@@ -117,13 +123,17 @@ class SellPrice:
                 for i, rows in enumerate(self.base_parts(), 1):
                     rows = [dict(r, **{F_SELL: str(changes[r.get(F_ID)])}) if r.get(F_ID) in changes else r
                             for r in rows]
+                    rows = [self.S.with_stat_bonus(r, bonus[r.get(F_ID)]) if r.get(F_ID) in bonus else r
+                            for r in rows]
                     data = masterdata.encrypt(
                         json.dumps(rows, ensure_ascii=False, separators=(',', ':')).encode('utf-8'), KEYS[1])
                     for d in self.dirs():
                         os.makedirs(d, exist_ok=True)
                         open(os.path.join(d, f'Ver{v}_{KEYS[0]}_{i}.dat'), 'wb').write(data)
-                self.S.log.info('sell prices: unit table rebuilt (revision %s): %s', self.state['rev'],
-                                ', '.join(f'{u}={z}' for u, z in sorted(changes.items())) or 'all normal')
+                self.S.log.info('sell prices: unit table rebuilt (revision %s): %s; stat bonuses: %s',
+                                self.state['rev'],
+                                ', '.join(f'{u}={z}' for u, z in sorted(changes.items())) or 'all normal',
+                                ', '.join(sorted(bonus)) or 'none')
             self.archive_old()
             return True
 
