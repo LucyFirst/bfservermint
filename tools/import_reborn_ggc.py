@@ -18,6 +18,9 @@ for line in open(sys.argv[1], encoding='utf-8'):
                'ai': known_ai.get(str(e[0]), '1'), 'act': e[7] or [1, 1], 'zel': e[8], 'karma': e[9],
                'drop': None, 'items': []} for e in w] for w in r['w']]
     spec = B.setdefault(mid, {'name': r['n']})
+    same = lambda ws: sorted((str(e['u']), e['hp'], e['atk'], e['def']) for w in ws for e in w)
+    if spec.get('src') == 'datamine' and spec.get('from') != 'rebornbf' and same(spec.get('battles') or []) == same(waves):
+        print(mid, r['n'], 'already the same (kept, with its drops)'); continue
     spec.update({'n': len(waves), 'src': 'datamine', 'from': 'rebornbf', 'battles': waves,
                  'bosses': [{'u': e['u'], 'hp': e['hp']} for e in waves[-1]]})
     if mid in M and M[mid].get('battles') != str(len(waves)):
