@@ -471,10 +471,12 @@ class FrontierHunter:
             friends = set()
 
         def row(uid, val, place, info, kind, mission):
+            # 2Cn0bWt9 is shown as "Times Served": the surveys this player ran this season (was Hunter Rank)
             u = users.get(uid) or {}
             return {'h7eY3sAK': uid, 'B5JQyV8j': u.get('name', ''), '2Fh3J7ng': u.get('lv', '1'),
                     'pn16CNah': u.get('unit', '10011'), '4A6LzBxr': u.get('unit_lv', '1'), 'U4pMNjy0': str(val),
-                    'pG2n1A28': '0', '2Cn0bWt9': str(u.get('hr', 1)), 'vV4P53m7': str(place), 'NH65Wj0f': info,
+                    'pG2n1A28': '0', '2Cn0bWt9': str(_i((u.get('mvp') or {}).get('206'))),
+                    'vV4P53m7': str(place), 'NH65Wj0f': info,
                     '9w5e3ZJB': kind, 'j28VNcUW': mission or '0', '2pAyFjmZ': '1', 'jkldTrhL': '0',
                     '9i2xhMaJ': '1', 'iNy0ZU5M': '1', 'btZizNep': '1', 'RVVgyuor': '1'}
         out = []
