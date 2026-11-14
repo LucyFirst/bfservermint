@@ -69,7 +69,7 @@ BOSSES = {}
 # ---------------------------------------------------------------- Vargas of Mint (green recolor of Fencer Vargas)
 # 3,000,000 HP / 3,500 ATK / 1,600 DEF, Fire, 3 actions a turn.
 #  - under 50%: a turn of 6 actions (each an attack on a random unit) every 2 turns, starting the turn it drops under 50%
-#  - under 30%: 250,000 HP Earth shield (one of his actions), then every 4 turns
+#  - under 30%: 100,000 HP Earth shield (one of his actions), then every 4 turns
 #  - turn 63: Mint Finale wipes the team (the quest's turn limit)
 #  - his attacks (Mint Slash) can Paralyze; 3,000 ATK, 1,600 DEF
 #  - at 5% or lower (first time): 9,999 fixed damage to 4 random units (4 actions that turn)

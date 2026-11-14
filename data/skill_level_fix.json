@@ -6,8 +6,8 @@
   "was": "1:1500:150,150,100,0,0,0,0,0,0"
  },
  "830131253": {
-  "name": "Mint Bulwark (custom boss Vargas of Mint): 250,000 HP Earth shield",
-  "params": "1:2000:500,250000,3,4,15",
+  "name": "Mint Bulwark (custom boss Vargas of Mint): 100,000 HP Earth shield",
+  "params": "1:2000:500,100000,3,4,15",
   "was": "1:2800:2500,1750000,3,99,0"
  },
  "6000594": {
