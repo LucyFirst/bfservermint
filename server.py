@@ -2465,6 +2465,9 @@ def clear_bonus_text(mid):
         out.append(f"6:{u['id']}:{u.get('count', 1)}")
     for it in qrw.get('items') or []:
         out.append(f"4:{it['id']}:{it.get('count', 1)}")
+    crw = CUSTOM_QUEST_REWARDS.get(str(mid)) or {}           # our own quests (custom_clear_gift)
+    for it in (crw.get('first_clear') or []) + (crw.get('every_clear') or []):
+        out.append(f"4:{it['id']}:{it.get('count', 1)}")
     if is_trial(mid):
         rw = TRIAL_REWARDS.get(str(mid)) or {}
         gems += _num(rw.get('gems')) or 0
@@ -2473,6 +2476,11 @@ def clear_bonus_text(mid):
         for it in rw.get('items') or []:
             out.append(f"4:{it.get('id')}:{_num(it.get('count')) or 1}")
     return ','.join([f'8:0:{gems}'] + out)
+
+def every_clear_text(mid):
+    """The result screen's bonus list on a repeat clear: only our quests' every-clear items."""
+    crw = CUSTOM_QUEST_REWARDS.get(str(mid)) or {}
+    return ','.join(f"4:{it['id']}:{it.get('count', 1)}" for it in crw.get('every_clear') or [])
 
 def trial_first_clear(pl, mid):
     """A trial's one-time reward (data/trial_rewards.json) goes to the gift box."""
@@ -2529,7 +2537,7 @@ def end_mission(pl, resp):
     if after > before:
         highlight('level', pl, before, after)
     tmplr = dict((_rows(resp.get(G_REWARD)) or [{}])[0])
-    tmplr.update({'92ms7J5M': clear_bonus_text(mid) if first else '',
+    tmplr.update({'92ms7J5M': clear_bonus_text(mid) if first else every_clear_text(mid),
                   'wPb5uMR9': '1' if after > before else '0', '81CsGAR9': str(before),
                   'd96tuT2E': str(exp_gain),
                   '4sQ8vBXm': done[0], 'NgPQbA46': done[1],     # dungeon / area finished -> its story scene
