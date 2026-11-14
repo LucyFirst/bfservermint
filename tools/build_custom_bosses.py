@@ -67,7 +67,7 @@ BOSSES = {}
 
 # ---------------------------------------------------------------- Vargas of Mint (green recolor of Fencer Vargas)
 # 3,000,000 HP / 3,500 ATK / 1,600 DEF, Fire, 3 actions a turn.
-#  - the turn it first drops under 50%: 6 actions, each a normal attack on a random unit
+#  - under 50%: a turn of 6 actions (each an attack on a random unit) every 2 turns, starting the turn it drops under 50%
 #  - under 30%: 250,000 HP Earth shield (one of his actions), then every 4 turns
 #  - his attacks (Mint Slash) can Paralyze; 3,000 ATK, 1,600 DEF
 #  - at 5% or lower (first time): 9,999 fixed damage to 4 random units (4 actions that turn)
@@ -78,7 +78,7 @@ BOSSES = {}
 #   params "31,1"    = add 1 to this turn's counter 1; flg_tmp_cntup_under:1,k = counter below k
 # So the boss may act 6 times a turn; every action adds 1 to counter 1, ordinary actions only run
 # while it is below 3, and when nothing else may run the last row ends the turn.
-#   flag 13 (this turn only) = the 6-action turn (first time under 50%)
+#   flag 13 (this turn only) = a 6-action turn (under 50%, every 2 turns)
 #   flag 14 (this turn only) = the 5% turn: 4 x 9,999 then the turn ends
 SHIELD, FIXED, SLASH = '830131253', '6000594', '650460'   # moves re-numbered in data/skill_level_fix.json
 C = (31, 1)                                # count this action
@@ -95,7 +95,7 @@ BOSSES['vv'] = dict(
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 2
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 3
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 4
-        ('skill', ['skill:3', 'hp_pr_under:50', 'limited_act:1'], 100, (13, 1) + C),                 # 50%: 6-action turn
+        ('skill', ['skill:3', 'hp_pr_under:50', 'actbetween:2'], 100, (13, 1) + C),                 # 50%: 6-action turn
         ('skill', ['skill:3', 'flg_on:13', 'flg_tmp_cntup_under:1,6'], 100, C),
         ('skill', ['skill:1', 'hp_pr_under:30', 'actbetween:4', 'flg_tmp_cntup_under:1,3'], 100, C),   # shield
         ('skill', ['skill:3', 'flg_tmp_cntup_under:1,3'], 100, C),                         # normal: 3 actions
