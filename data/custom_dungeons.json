@@ -10,9 +10,7 @@
   },
   "order": 1,
   "image": "sp_quest_banner_mint_challenge.png",
-  "testers": [
-   "ADMIN"
-  ],
+  "testers": [],
   "quests": [
    {
     "id": "99900001",
