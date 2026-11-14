@@ -2440,6 +2440,7 @@ CUSTOM_BOSSES_FILE = os.path.join(HERE, 'data', 'custom_bosses.json')
 CUSTOM_BOSSES = json.load(open(CUSTOM_BOSSES_FILE, encoding='utf-8')) if os.path.exists(CUSTOM_BOSSES_FILE) else {}
 CUSTOM_QUEST_BOSS = {}      # custom quest id -> CUSTOM_BOSSES key (filled by vortexedit.apply_to_server)
 CUSTOM_QUEST_REWARDS = {}   # custom quest id -> {'first_clear': [...], 'every_clear': [...]} items
+CUSTOM_NO_CONTINUE = set()  # custom quests where gems can't be used to continue ("no_continue")
 
 def custom_spec(mid):
     k = CUSTOM_QUEST_BOSS.get(str(mid))
@@ -4858,6 +4859,10 @@ def _handle_action(rid, req):
             if is_trial(pl.get('current_mission')):
                 save_player(pl)
                 return error_response("You can't continue in the Research Lab.")
+            if str(pl.get('current_mission')) in CUSTOM_NO_CONTINUE:
+                save_player(pl)
+                log.info('continue refused: %s allows no gem retries', pl.get('current_mission'))
+                return error_response("No retries in this quest - gems can't be used to continue.")
             err = check_and_apply(pl, {'gems': -1})
             if err:
                 save_player(pl)

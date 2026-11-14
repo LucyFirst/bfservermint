@@ -359,6 +359,9 @@ class VortexEditor:
         S.CUSTOM_QUEST_BOSS.update(bosses)
         S.CUSTOM_QUEST_REWARDS.clear()
         S.CUSTOM_QUEST_REWARDS.update(rewards)
+        S.CUSTOM_NO_CONTINUE.clear()
+        S.CUSTOM_NO_CONTINUE.update(q['id'] for c in self.all_custom().values() for q in c.get('quests', [])
+                                    if q.get('no_continue'))
         for did, e in self.state['edits'].items():
             if e.get('area'):
                 geo_d[did] = [e['area'], '99']
