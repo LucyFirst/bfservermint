@@ -51,12 +51,13 @@ def ai_row(aid, label, prio, act, conds=(), pct=100, tc='random', params=()):
             'Hhgi79M1': f'{act}@{",".join(vals)},@1@0@0', 'ug9xV4Fz': str(pct)}
 
 
-def skill_row(sid, name, look=None):
-    """The game's own skill row, renamed; look: another skill whose animation it borrows."""
+def skill_row(sid, name, look=None, set_=None):
+    """The game's own skill row, renamed; look: another skill whose animation it borrows; set_: fields."""
     r = dict(S[sid])
     if look:
         for f in ('eyUo6a8c', '6Aou5M9r', 'diGe6u21', 'I7cmtqW8', 'K2i8emcH', 'qYCx73y2', '9pXSKmn1', 'AR7y0sY4'):
             r[f] = S[look][f]
+    r.update(set_ or {})
     r['0nxpBDz2'] = name
     r['qp37xTDh'] = 'None'
     return r
@@ -65,9 +66,10 @@ def skill_row(sid, name, look=None):
 BOSSES = {}
 
 # ---------------------------------------------------------------- Vargas of Mint (green recolor of Fencer Vargas)
-# 1,500,000 HP / 2,000 ATK / 800 DEF, Fire, 3 actions a turn.
+# 1,500,000 HP / 3,000 ATK / 1,600 DEF, Fire, 3 actions a turn.
 #  - the turn it first drops under 50%: 6 actions, each a normal attack on a random unit
-#  - under 30%: 100,000 HP Earth shield, then every 4 turns
+#  - under 30%: 250,000 HP Earth shield (one of his actions), then every 4 turns
+#  - his attacks (Mint Slash) can Paralyze; 3,000 ATK, 1,600 DEF
 #  - at 5% or lower (first time): 9,999 fixed damage to 4 random units (4 actions that turn)
 # How the game's boss AI works (from its own scripts, e.g. the Frontier Hunter bosses):
 #   act:N            = battle turn N (not the action); turn_act:a,b = battle turns a..b
@@ -78,21 +80,25 @@ BOSSES = {}
 # while it is below 3, and when nothing else may run the last row ends the turn.
 #   flag 13 (this turn only) = the 6-action turn (first time under 50%)
 #   flag 14 (this turn only) = the 5% turn: 4 x 9,999 then the turn ends
-SHIELD, FIXED = '830131253', '6000594'     # moves re-numbered in data/skill_level_fix.json
+SHIELD, FIXED, SLASH = '830131253', '6000594', '650460'   # moves re-numbered in data/skill_level_fix.json
 C = (31, 1)                                # count this action
 BOSSES['vv'] = dict(
     name='Vargas of Mint', unit='990011', look='10011', monster='9900111', ai_id='99001101',
-    hp=1500000, atk=2000, df=800, el=1, act=(6, 6), resist=IMMUNE,
-    skills=[(SHIELD, 'Mint Bulwark', '8413008'), (FIXED, 'Mint Requiem', None)],
+    hp=1500000, atk=3000, df=1600, el=1, act=(6, 6), resist=IMMUNE,
+    skills=[(SHIELD, 'Mint Bulwark', '8413008', {'ToZj4zyn': '0'}),          # a shield that doesn't end his turn
+            (FIXED, 'Mint Requiem', None),
+            # his attack: Fencer Vargas's own swing (frames of unit 10011), normal-attack strength + Paralysis
+            (SLASH, 'Mint Slash', None, {'eyUo6a8c': '20:121:1,38:121:1,56:121:1', 'AR7y0sY4': '1',
+                                         '6Aou5M9r': '26:50:2:2,44:30:2:2,62:20:2:2@0:100:2:1'})],
     ai=[
         ('skill', ['skill:2', 'hp_pr_under:6', 'limited_act:1'], 100, (14, 1) + C),       # 5%: hit 1
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 2
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 3
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 4
-        ('attack', ['hp_pr_under:50', 'limited_act:1'], 100, (13, 1) + C),                 # 50%: 6-action turn
-        ('attack', ['flg_on:13', 'flg_tmp_cntup_under:1,6'], 100, C),
+        ('skill', ['skill:3', 'hp_pr_under:50', 'limited_act:1'], 100, (13, 1) + C),                 # 50%: 6-action turn
+        ('skill', ['skill:3', 'flg_on:13', 'flg_tmp_cntup_under:1,6'], 100, C),
         ('skill', ['skill:1', 'hp_pr_under:30', 'actbetween:4', 'flg_tmp_cntup_under:1,3'], 100, C),   # shield
-        ('attack', ['flg_tmp_cntup_under:1,3'], 100, C),                                   # normal: 3 actions
+        ('skill', ['skill:3', 'flg_tmp_cntup_under:1,3'], 100, C),                         # normal: 3 actions
         ('turn_end', []),
     ])
 
