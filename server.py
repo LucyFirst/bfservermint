@@ -4870,7 +4870,11 @@ def _handle_action(rid, req):
             if str(pl.get('current_mission')) in CUSTOM_NO_CONTINUE:
                 save_player(pl)
                 log.info('continue refused: %s allows no gem retries', pl.get('current_mission'))
-                return error_response("No retries in this quest - gems can't be used to continue.")
+                # a plain message box (as bfrevive answers Raid problems) rather than an error, which the
+                # game shows as "Connection error"; command 1 = just close the box, back to the prompt
+                return {'_plain': {'b5PH6mZa': {'3e9aGpus': 1, 'iPD12YCr': 1, 'zcJeTx18': '',
+                                                'ZC0msu2L': "No retries in this quest - gems can't be used "
+                                                            "to continue. Tap No to leave the battle."}}}
             err = check_and_apply(pl, {'gems': -1})
             if err:
                 save_player(pl)

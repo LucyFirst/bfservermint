@@ -11,7 +11,8 @@ conditions hold. Terms used here:
   turn_act:a,b      this is the boss's a-th..b-th action of the turn
   hp_pr_under:n     boss HP under n%
   limited_act:n     this row is used at most n times per battle
-  actbetween:n      at least n turns since this row was last used
+  actbetween:n      counted from the start of the battle (fires on turns divisible by n), not from a threshold
+  flg_timer_act:n,k timer n was (re)started k turns ago; an action's params "20+n,1" (21,1 = timer 1) start it
   flg_on:n/flg_off:n  battle flag n set / not set; an action's params "n,v,..." set flag n to v
 
 Run:  python3 tools/build_custom_bosses.py   (writes data/custom_bosses.json)
@@ -98,9 +99,14 @@ BOSSES['vv'] = dict(
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 2
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 3
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 4
-        # shield first: it is one of his actions; on a 6-attack turn he still makes all 6 (flag 15)
-        ('skill', ['skill:1', 'hp_pr_under:30', 'actbetween:4', 'flg_tmp_cntup_under:1,3'], 100, (15, 1) + C),
-        ('skill', ['skill:3', 'hp_pr_under:50', 'actbetween:2'], 100, (13, 1) + C),                 # 50%: 6-action turn
+        # shield first: it is one of his actions; on a 6-attack turn he still makes all 6 (flag 15).
+        # Repeats are timed from the turn he first drops under 30% / 50% with the battle timers the
+        # game's own trial bosses use (Gazia, Bozdell): params "21,1" / "22,1" (re)start timer 1 / 2,
+        # flg_timer_act:n,k = timer n started k turns ago.
+        ('skill', ['skill:1', 'hp_pr_under:30', 'limited_act:1', 'flg_tmp_cntup_under:1,3'], 100, (15, 1) + C + (22, 1)),
+        ('skill', ['skill:1', 'flg_timer_act:2,4', 'flg_tmp_cntup_under:1,3'], 100, (15, 1) + C + (22, 1)),
+        ('skill', ['skill:3', 'hp_pr_under:50', 'limited_act:1'], 100, (13, 1) + C + (21, 1)),     # 50%: 6-action turn
+        ('skill', ['skill:3', 'flg_timer_act:1,2'], 100, (13, 1) + C + (21, 1)),                  # then every 2 turns
         ('skill', ['skill:3', 'flg_on:13', 'flg_tmp_cntup_under:1,6'], 100, C),
         ('skill', ['skill:3', 'flg_on:13', 'flg_on:15', 'flg_tmp_cntup_under:1,7'], 100, C),
         ('skill', ['skill:3', 'flg_tmp_cntup_under:1,3'], 100, C),                         # normal: 3 actions
