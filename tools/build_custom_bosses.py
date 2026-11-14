@@ -69,26 +69,31 @@ BOSSES = {}
 #  - the turn it first drops under 50%: 6 actions, each a normal attack on a random unit
 #  - under 30%: 100,000 HP Earth shield, then every 4 turns
 #  - at 5% or lower (first time): 9,999 fixed damage to 4 random units (4 actions that turn)
-# The boss may act up to 6 times a turn; a normal turn is cut after its 3rd action. Flag 12 = "this
-# turn runs long" (set by the 50% turn and the 5% turn, cleared on the next turn's first action);
-# flag 14 = the 5% turn is over after its 4 hits.
+# How the game's boss AI works (from its own scripts, e.g. the Frontier Hunter bosses):
+#   act:N            = battle turn N (not the action); turn_act:a,b = battle turns a..b
+#   flags 11-20      = reset every turn (12 with "once per turn" moves, 11 to end a turn);
+#                      flags 1-10 last the whole battle; params "n,v" set flag n to v
+#   params "31,1"    = add 1 to this turn's counter 1; flg_tmp_cntup_under:1,k = counter below k
+# So the boss may act 6 times a turn; every action adds 1 to counter 1, ordinary actions only run
+# while it is below 3, and when nothing else may run the last row ends the turn.
+#   flag 13 (this turn only) = the 6-action turn (first time under 50%)
+#   flag 14 (this turn only) = the 5% turn: 4 x 9,999 then the turn ends
 SHIELD, FIXED = '830131253', '6000594'     # moves re-numbered in data/skill_level_fix.json
+C = (31, 1)                                # count this action
 BOSSES['vv'] = dict(
     name='Vargas of Mint', unit='990011', look='10011', monster='9900111', ai_id='99001101',
     hp=1500000, atk=2000, df=800, el=1, act=(6, 6), resist=IMMUNE,
     skills=[(SHIELD, 'Mint Bulwark', '8413008'), (FIXED, 'Mint Requiem', None)],
     ai=[
-        ('turn_end', ['turn_act:4,6', 'flg_off:12']),                       # normal turn: 3 actions
-        ('turn_end', ['turn_act:5,6', 'flg_on:14']),                        # 5% turn: 4 actions
-        ('attack', ['turn_act:1,1', 'flg_on:12'], 100, (12, 0)),            # back to normal turns
-        ('skill', ['skill:2', 'hp_pr_under:6', 'limited_act:1'], 100, (12, 1, 14, 0)),
-        ('skill', ['skill:2', 'hp_pr_under:6', 'limited_act:1'], 100, ()),
-        ('skill', ['skill:2', 'hp_pr_under:6', 'limited_act:1'], 100, ()),
-        ('skill', ['skill:2', 'hp_pr_under:6', 'limited_act:1'], 100, (14, 1)),
-        ('attack', ['hp_pr_under:50', 'limited_act:1'], 100, (12, 1, 14, 0)),   # the 6-action turn
-        ('skill', ['skill:1', 'hp_pr_under:30', 'limited_act:1'], 100, ()),
-        ('skill', ['skill:1', 'hp_pr_under:30', 'actbetween:4', 'turn_limited_act:1'], 100, ()),
-        ('attack', [], 100, ()),
+        ('skill', ['skill:2', 'hp_pr_under:6', 'limited_act:1'], 100, (14, 1) + C),       # 5%: hit 1
+        ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 2
+        ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 3
+        ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 4
+        ('attack', ['hp_pr_under:50', 'limited_act:1'], 100, (13, 1) + C),                 # 50%: 6-action turn
+        ('attack', ['flg_on:13', 'flg_tmp_cntup_under:1,6'], 100, C),
+        ('skill', ['skill:1', 'hp_pr_under:30', 'actbetween:4', 'flg_tmp_cntup_under:1,3'], 100, C),   # shield
+        ('attack', ['flg_tmp_cntup_under:1,3'], 100, C),                                   # normal: 3 actions
+        ('turn_end', []),
     ])
 
 
