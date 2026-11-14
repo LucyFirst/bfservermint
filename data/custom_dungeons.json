@@ -1,5 +1,5 @@
 {
- "_how": "Vortex banners we design ourselves (vortexedit.py). Quest 'set' = the quest's own game fields (0iAIR2LP name, A8DEK5ob energy, 69vnphig battles, d96tuT2E exp, Rs7bCE3t zel, qp37xTDh description); 'boss' = data/custom_bosses.json; 'first_clear' / 'every_clear' = items into the gift box; 'testers' = accounts (sign-in name or in-game name) that see the banner while it is tested (empty list = everyone).",
+ "_how": "Vortex banners we design ourselves (vortexedit.py). Quest 'set' = the quest's own game fields (0iAIR2LP name, A8DEK5ob energy, 69vnphig battles, d96tuT2E exp, Rs7bCE3t zel, qp37xTDh description); 'boss' = data/custom_bosses.json; 'first_clear' / 'every_clear' = items into the gift box; 'dungeon_set' = the banner's own game fields (copied from the first quest's banner otherwise; a Research Lab banner is a trial type the Vortex list hides); 'testers' = accounts (sign-in name or in-game name) that see the banner while it is tested (empty list = everyone).",
  "9990001": {
   "name": "Mint Challenge",
   "area": "9990000",
@@ -37,6 +37,14 @@
     ],
     "every_clear": []
    }
-  ]
+  ],
+  "dungeon_set": {
+   "bWsLFP96": "Mint Challenge",
+   "3hPeI1RV": "0",
+   "0u1nvMeS": "99",
+   "SnNtTh51": "300",
+   "M6C1aXfR": "300",
+   "qp37xTDh": ""
+  }
  }
 }
