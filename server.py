@@ -4871,10 +4871,12 @@ def _handle_action(rid, req):
                 save_player(pl)
                 log.info('continue refused: %s allows no gem retries', pl.get('current_mission'))
                 # a plain message box (as bfrevive answers Raid problems) rather than an error, which the
-                # game shows as "Connection error"; command 1 = just close the box, back to the prompt
-                return {'_plain': {'b5PH6mZa': {'3e9aGpus': 1, 'iPD12YCr': 1, 'zcJeTx18': '',
+                # game shows as "Connection error". Command 2 -> notice -4000, which the game-over screen
+                # (MissionGameOverScene::noticeOK) answers by going on as if No was pressed; command 1
+                # only closed the box and the game carried on with the continue (units came back)
+                return {'_plain': {'b5PH6mZa': {'3e9aGpus': 1, 'iPD12YCr': 2, 'zcJeTx18': '',
                                                 'ZC0msu2L': "No retries in this quest - gems can't be used "
-                                                            "to continue. Tap No to leave the battle."}}}
+                                                            "to continue."}}}
             err = check_and_apply(pl, {'gems': -1})
             if err:
                 save_player(pl)
