@@ -36,51 +36,6 @@
      }
     ],
     "every_clear": []
-   },
-   {
-    "id": "99900091",
-    "src": "2000002",
-    "boss": "vv_t1",
-    "set": {
-     "0iAIR2LP": "TEST 1",
-     "A8DEK5ob": 0,
-     "69vnphig": 1,
-     "d96tuT2E": 0,
-     "Rs7bCE3t": 0,
-     "SiYs27Cj": "",
-     "HSRhkf70": "0",
-     "qp37xTDh": "Crash test"
-    }
-   },
-   {
-    "id": "99900092",
-    "src": "2000002",
-    "boss": "vv_t2",
-    "set": {
-     "0iAIR2LP": "TEST 2",
-     "A8DEK5ob": 0,
-     "69vnphig": 1,
-     "d96tuT2E": 0,
-     "Rs7bCE3t": 0,
-     "SiYs27Cj": "",
-     "HSRhkf70": "0",
-     "qp37xTDh": "Crash test"
-    }
-   },
-   {
-    "id": "99900093",
-    "src": "2000002",
-    "boss": "vv_t3",
-    "set": {
-     "0iAIR2LP": "TEST 3",
-     "A8DEK5ob": 0,
-     "69vnphig": 1,
-     "d96tuT2E": 0,
-     "Rs7bCE3t": 0,
-     "SiYs27Cj": "",
-     "HSRhkf70": "0",
-     "qp37xTDh": "Crash test"
-    }
    }
   ],
   "dungeon_set": {

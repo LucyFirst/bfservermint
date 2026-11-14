@@ -92,18 +92,6 @@ BOSSES['vv'] = dict(
     ])
 
 
-# ---- crash hunt (testers only, 0 energy): which part of Vargas of Mint the game can't load
-#  t1: plain Fencer Vargas look (APK sprite), normal attacks only, 3 actions
-#  t2: the green look (unit 990011), normal attacks only, 3 actions
-#  t3: plain look, every move and AI rule of the real fight
-_vv = BOSSES['vv']
-BOSSES['vv_t1'] = dict(_vv, name='Test 1', unit='10011', monster='9900191', ai_id='99001191', act=(3, 3),
-                       skills=[], ai=[('attack', [], 100, ())])
-BOSSES['vv_t2'] = dict(_vv, name='Test 2', monster='9900192', ai_id='99001192', act=(3, 3),
-                       skills=[], ai=[('attack', [], 100, ())])
-BOSSES['vv_t3'] = dict(_vv, name='Test 3', unit='10011', monster='9900193', ai_id='99001193')
-
-
 def build():
     out = {}
     for key, b in BOSSES.items():
