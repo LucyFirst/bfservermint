@@ -98,9 +98,11 @@ BOSSES['vv'] = dict(
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 2
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 3
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 4
+        # shield first: it is one of his actions; on a 6-attack turn he still makes all 6 (flag 15)
+        ('skill', ['skill:1', 'hp_pr_under:30', 'actbetween:4', 'flg_tmp_cntup_under:1,3'], 100, (15, 1) + C),
         ('skill', ['skill:3', 'hp_pr_under:50', 'actbetween:2'], 100, (13, 1) + C),                 # 50%: 6-action turn
         ('skill', ['skill:3', 'flg_on:13', 'flg_tmp_cntup_under:1,6'], 100, C),
-        ('skill', ['skill:1', 'hp_pr_under:30', 'actbetween:4', 'flg_tmp_cntup_under:1,3'], 100, C),   # shield
+        ('skill', ['skill:3', 'flg_on:13', 'flg_on:15', 'flg_tmp_cntup_under:1,7'], 100, C),
         ('skill', ['skill:3', 'flg_tmp_cntup_under:1,3'], 100, C),                         # normal: 3 actions
         ('turn_end', []),
     ])
