@@ -1464,6 +1464,16 @@ def full_user_info(pl):
             out['3SG2wX0R'] = hide_closed_tabs(vortex_editor().patch_area_rows(out['3SG2wX0R'], pl))
         except Exception:
             log.exception('could not apply the edited Vortex tab pictures')
+    try:                             # our own banners (data/custom_dungeons.json): what this player got
+        for did, c in vortex_editor().fixed_custom().items():
+            tab = [r for r in _rows(out.get('3SG2wX0R')) if isinstance(r, dict) and str(r.get('VjCY7rX4')) == c.get('area')]
+            per = [r for r in _rows(out.get('Y73tHKS8')) if isinstance(r, dict)
+                   and (str(r.get('VjCY7rX4')) == c.get('area') or str(r.get('MHx05sXt')) == did
+                        or str(r.get('j28VNcUW')) in [q['id'] for q in c.get('quests', [])])]
+            log.info('custom banner %s "%s" for %s: tab row %s, Vortex list rows %s', did, c.get('name'),
+                     pl.get('handle'), 'sent' if tab else 'NOT sent', per or 'none')
+    except Exception:
+        log.exception('custom banner check failed')
     return out
 
 # --------------------------------------------------------------------------- state model
@@ -3935,6 +3945,11 @@ def show_player(pl, resp):
             resp[g] = [row]
         elif g == 'Y73tHKS8':
             resp[g] = sp_permits(pl)
+        elif g == '3SG2wX0R' and isinstance(resp[g], list):
+            try:                  # the Vortex tabs, in every reply that carries them (not only GetUserInfo)
+                resp[g] = hide_closed_tabs(vortex_editor().patch_area_rows(resp[g], pl))
+            except Exception:
+                log.exception('could not apply the edited Vortex tabs')
         elif g in FULL_LIST_GROUPS and g in pl['state']:
             resp[g] = list(_rows(pl['state'][g]))
         elif g in PLAYER_GROUPS and g not in (G_UNITS_ADD, G_REWARD, G_OPE_UNIT):

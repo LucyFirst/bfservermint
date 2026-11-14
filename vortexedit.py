@@ -30,7 +30,7 @@ CUSTOM_MISSION_BASE = 99000000
 # doesn't list them
 HIDDEN_MISSIONS = {'2000012', '2000013', '2000014', '2000015'}
 VERSION_STEP = 5000                  # edited tables: original version + 5000 + revision
-TABLE_FORMAT = 3                     # raise when the way the tables are built changes (+10000 each),
+TABLE_FORMAT = 4                     # raise when the way the tables are built changes (+10000 each),
                                      # so the game fetches them again even if no edit changed
 BANNER_W, BANNER_H = 640, 224
 
@@ -297,8 +297,9 @@ class VortexEditor:
         if not self.active():
             return rows
         self.build()
-        _, dungeons, missions = self.tables()
-        counts = {'F_AREA_MST': None, 'F_DUNGEON_MST': len(dungeons), 'F_MISSION_MST': len(missions)}
+        areas, dungeons, missions = self.tables()
+        # row counts: the game reads that many rows - a tab of our own adds an area row
+        counts = {'F_AREA_MST': len(areas), 'F_DUNGEON_MST': len(dungeons), 'F_MISSION_MST': len(missions)}
         out = []
         for r in rows:
             name = r.get('moWQ30GH')
