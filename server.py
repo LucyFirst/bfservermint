@@ -2902,6 +2902,15 @@ try:
 except Exception:
     log.exception('could not copy the custom content into the CDN')
 
+_UNITCGS = None
+def unit_cgs():
+    """Our own units in the game's unit animation table (unitcgs.py)."""
+    global _UNITCGS
+    if _UNITCGS is None:
+        import unitcgs
+        _UNITCGS = unitcgs.UnitCgs(sys.modules[__name__])
+    return _UNITCGS
+
 def vortex_editor():
     global _VORTEX
     if _VORTEX is None:
@@ -5030,6 +5039,10 @@ def _handle_action(rid, req):
                 resp['KeC10fuL'] = skill_levels().patch_versions(resp.get('KeC10fuL') or [])
             except Exception:
                 log.exception('could not offer the edited skill-level table')
+            try:
+                resp['KeC10fuL'] = unit_cgs().patch_versions(resp.get('KeC10fuL') or [])
+            except Exception:
+                log.exception('could not offer the edited unit animation table')
             try:
                 patch_define_mst(resp)
             except Exception:
