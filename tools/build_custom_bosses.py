@@ -66,7 +66,7 @@ def skill_row(sid, name, look=None, set_=None):
 BOSSES = {}
 
 # ---------------------------------------------------------------- Vargas of Mint (green recolor of Fencer Vargas)
-# 1,500,000 HP / 3,500 ATK / 1,600 DEF, Fire, 3 actions a turn.
+# 3,000,000 HP / 3,500 ATK / 1,600 DEF, Fire, 3 actions a turn.
 #  - the turn it first drops under 50%: 6 actions, each a normal attack on a random unit
 #  - under 30%: 250,000 HP Earth shield (one of his actions), then every 4 turns
 #  - his attacks (Mint Slash) can Paralyze; 3,000 ATK, 1,600 DEF
@@ -84,7 +84,7 @@ SHIELD, FIXED, SLASH = '830131253', '6000594', '650460'   # moves re-numbered in
 C = (31, 1)                                # count this action
 BOSSES['vv'] = dict(
     name='Vargas of Mint', unit='990011', look='10011', monster='9900111', ai_id='99001101',
-    hp=1500000, atk=3500, df=1600, el=1, act=(6, 6), resist=IMMUNE,
+    hp=3000000, atk=3500, df=1600, el=1, act=(6, 6), resist=IMMUNE,
     skills=[(SHIELD, 'Mint Bulwark', '8413008', {'ToZj4zyn': '0'}),          # a shield that doesn't end his turn
             (FIXED, 'Mint Requiem', None),
             # his attack: Fencer Vargas's own swing (frames of unit 10011), normal-attack strength + Paralysis
