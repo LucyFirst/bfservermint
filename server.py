@@ -2560,6 +2560,8 @@ def end_mission(pl, resp):
                gain.get('karma', 0),
              ' - first clear' if first else '')
     custom_clear_gift(pl, mid, first)
+    if first and (str(mid) in CUSTOM_QUEST_BOSS or str(mid) in CUSTOM_QUEST_REWARDS):
+        highlight('custom', pl, mid)          # our own challenge quests: "first on the server!"
     if first:
         first_clear_gift(pl, mid)
         if is_trial(mid):
@@ -5480,6 +5482,10 @@ def main():
         vortex_editor().build()
     except Exception:
         log.exception('could not prepare the edited Vortex tables')
+    try:
+        highlight('custom_backfill')          # custom quests cleared before their clears were posted
+    except Exception:
+        log.exception('could not check custom quest first clears')
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

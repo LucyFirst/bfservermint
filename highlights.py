@@ -20,6 +20,7 @@ What counts (config.json, all optional):
 Several things happening close together go out as one message (at most one post every 15 s).
 Nothing here can break the game: every hook catches its own errors.
 """
+import glob
 import json
 import os
 import re
@@ -150,6 +151,42 @@ class Highlights:
         first = self._server_first('trial', mid, pl)
         self._add(f"🏆 {self._who(pl)} cleared the trial **{_esc(name)}**"
                   + (' — first on the server!' if first else '!'))
+
+    def custom(self, pl, mid):
+        """A clear of one of our own challenge quests (data/custom_dungeons.json)."""
+        if not self._ok(pl):
+            return
+        name = (self.S.MISSIONS.get(str(mid)) or {}).get('name', mid)
+        first = self._server_first('custom', mid, pl)
+        self._add(f"🌿 {self._who(pl)} cleared **{_esc(name)}**"
+                  + (' — first on the server!' if first else '!'))
+
+    def custom_backfill(self):
+        """At start-up: a custom quest someone already cleared but whose first clear was never posted
+        (cleared before these posts existed) - post the earliest clear, from the players' saves."""
+        if not self.url:
+            return
+        ids = set(self.S.CUSTOM_QUEST_BOSS) | set(self.S.CUSTOM_QUEST_REWARDS)
+        seen = set(self.state.get('custom') or [])
+        todo = ids - seen
+        if not todo:
+            return
+        best = {}
+        for f in glob.glob(os.path.join(self.S.SAVE_DIR, 'player_*.json')):
+            try:
+                pl = json.load(open(f, encoding='utf-8'))
+            except Exception:
+                continue
+            if str(pl.get('user_id')) in self.skip or not self._can_first(pl):
+                continue
+            for r in (pl.get('state') or {}).get('UT1SVg59') or []:
+                if isinstance(r, dict) and str(r.get('j28VNcUW')) in todo:
+                    mid, when = str(r['j28VNcUW']), str(r.get('JATWnN57') or '9999')
+                    if mid not in best or when < best[mid][0]:
+                        best[mid] = (when, pl)
+        for mid, (when, pl) in sorted(best.items()):
+            self.S.log.info('highlights: first clear of %s by %s (%s) posted late', mid, pl.get('handle'), when)
+            self.custom(pl, mid)
 
     def area(self, pl, area_id):
         if not self._ok(pl):
