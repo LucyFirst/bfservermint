@@ -6,12 +6,12 @@
   "was": "1:1500:150,150,100,0,0,0,0,0,0"
  },
  "830131253": {
-  "name": "Verdant Bulwark (custom boss Verdant Vargas): 100,000 HP Earth shield, like Hellgrove Shield's 55,000",
+  "name": "Mint Bulwark (custom boss Vargas of Mint): 100,000 HP Earth shield, like Hellgrove Shield's 55,000",
   "params": "1:2000:500,100000,3,4,15",
   "was": "1:2800:2500,1750000,3,99,0"
  },
  "6000594": {
-  "name": "Verdant Requiem (custom boss Verdant Vargas): 9,999 fixed damage to one unit",
+  "name": "Mint Requiem (custom boss Vargas of Mint): 9,999 fixed damage to one unit",
   "params": "1:1500:0,0,0,0,9999,100,1",
   "was": "1:1500:500,500,0,0,0,100,1"
  }

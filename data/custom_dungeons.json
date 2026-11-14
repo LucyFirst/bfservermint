@@ -1,18 +1,42 @@
 {
  "_how": "Vortex banners we design ourselves (vortexedit.py). Quest 'set' = the quest's own game fields (0iAIR2LP name, A8DEK5ob energy, 69vnphig battles, d96tuT2E exp, Rs7bCE3t zel, qp37xTDh description); 'boss' = data/custom_bosses.json; 'first_clear' / 'every_clear' = items into the gift box; 'testers' = accounts (sign-in name or in-game name) that see the banner while it is tested (empty list = everyone).",
  "9990001": {
-  "name": "Verdant Vargas",
+  "name": "Vargas of Mint",
   "area": "9990000",
-  "tab": {"name": "Verdant Vargas", "from": "100310", "order": 1},
+  "tab": {
+   "name": "Vargas of Mint",
+   "from": "100310",
+   "order": 1
+  },
   "order": 1,
   "image": "",
-  "testers": ["ADMIN"],
+  "testers": [
+   "ADMIN"
+  ],
   "quests": [
-   {"id": "99900001", "src": "2000002", "boss": "vv",
-    "set": {"0iAIR2LP": "Verdant Vargas", "qp37xTDh": "A green-clad Vargas of unknown origin awaits. Only the strongest squads will survive.",
-            "A8DEK5ob": 50, "69vnphig": 1, "d96tuT2E": 50000, "Rs7bCE3t": 500000, "SiYs27Cj": "", "HSRhkf70": "0"},
-    "first_clear": [],
-    "every_clear": []}
+   {
+    "id": "99900001",
+    "src": "2000002",
+    "boss": "vv",
+    "set": {
+     "0iAIR2LP": "Vargas of Mint",
+     "qp37xTDh": "A Vargas clad in mint green awaits. Only the strongest squads will survive.",
+     "A8DEK5ob": 50,
+     "69vnphig": 1,
+     "d96tuT2E": 300000,
+     "Rs7bCE3t": 50000000,
+     "SiYs27Cj": "",
+     "HSRhkf70": "0"
+    },
+    "first_clear": [
+     {
+      "id": "61000",
+      "count": 1,
+      "name": "Mournful Pike"
+     }
+    ],
+    "every_clear": []
+   }
   ]
  }
 }

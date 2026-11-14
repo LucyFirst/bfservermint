@@ -4,7 +4,7 @@
   "monsters": [
    {
     "o49dYfpH": "9900111",
-    "3evIn0zZ": "Verdant Vargas",
+    "3evIn0zZ": "Vargas of Mint",
     "e7DK0FQT": "1500000",
     "67CApcti": "2000",
     "q08xLEsy": "800",
@@ -54,7 +54,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "1",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#turn_act:4,6@flg_off:12@non:0@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -64,7 +64,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "2",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#turn_act:5,6@flg_on:14@non:0@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -74,7 +74,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "3",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#turn_act:1,1@flg_on:12@non:0@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -84,7 +84,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "4",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:2@hp_pr_under:6@limited_act:1@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -94,7 +94,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "5",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:2@hp_pr_under:6@limited_act:1@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -104,7 +104,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "6",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:2@hp_pr_under:6@limited_act:1@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -114,7 +114,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "7",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:2@hp_pr_under:6@limited_act:1@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -124,7 +124,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "8",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#hp_pr_under:50@limited_act:1@non:0@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -134,7 +134,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "9",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:1@hp_pr_under:30@limited_act:1@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -144,7 +144,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "10",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:1@hp_pr_under:30@actbetween:4@turn_limited_act:1@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -154,7 +154,7 @@
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "11",
-    "L8PCsu0K": "Custom - Verdant Vargas",
+    "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#non:0@non:0@non:0@non:0@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
@@ -165,7 +165,7 @@
   "skills": [
    {
     "nj9Lw7mV": "830131253",
-    "0nxpBDz2": "Verdant Bulwark",
+    "0nxpBDz2": "Mint Bulwark",
     "h6UL9A1B": "3",
     "AR7y0sY4": "1",
     "hjAy9St3": "10002",
@@ -187,7 +187,7 @@
    },
    {
     "nj9Lw7mV": "6000594",
-    "0nxpBDz2": "Verdant Requiem",
+    "0nxpBDz2": "Mint Requiem",
     "h6UL9A1B": "1",
     "AR7y0sY4": "1",
     "hjAy9St3": "48",
@@ -211,7 +211,7 @@
   "cgs": [],
   "names": [
    [
-    "Verdant Vargas"
+    "Vargas of Mint"
    ]
   ],
   "src": "custom",

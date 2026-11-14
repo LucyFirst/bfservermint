@@ -1,4 +1,4 @@
 {
  "_how": "Units we add to the game's unit table (sellprice.py builds the edited F_UNIT_MST): a copy of an existing unit's row under a new id, e.g. a recolor whose art is in custom_cdn/. Not obtainable by players; used as the look of custom bosses.",
- "990011": {"from": "10011", "name": "Verdant Vargas"}
+ "990011": {"from": "10011", "name": "Vargas of Mint"}
 }

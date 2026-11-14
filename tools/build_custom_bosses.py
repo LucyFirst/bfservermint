@@ -64,7 +64,7 @@ def skill_row(sid, name, look=None):
 
 BOSSES = {}
 
-# ---------------------------------------------------------------- Verdant Vargas (green recolor of Fencer Vargas)
+# ---------------------------------------------------------------- Vargas of Mint (green recolor of Fencer Vargas)
 # 1,500,000 HP / 2,000 ATK / 800 DEF, Fire, 3 actions a turn.
 #  - the turn it first drops under 50%: 6 actions, each a normal attack on a random unit
 #  - under 30%: 100,000 HP Earth shield, then every 4 turns
@@ -74,9 +74,9 @@ BOSSES = {}
 # flag 14 = the 5% turn is over after its 4 hits.
 SHIELD, FIXED = '830131253', '6000594'     # moves re-numbered in data/skill_level_fix.json
 BOSSES['vv'] = dict(
-    name='Verdant Vargas', unit='990011', look='10011', monster='9900111', ai_id='99001101',
+    name='Vargas of Mint', unit='990011', look='10011', monster='9900111', ai_id='99001101',
     hp=1500000, atk=2000, df=800, el=1, act=(6, 6), resist=IMMUNE,
-    skills=[(SHIELD, 'Verdant Bulwark', '8413008'), (FIXED, 'Verdant Requiem', None)],
+    skills=[(SHIELD, 'Mint Bulwark', '8413008'), (FIXED, 'Mint Requiem', None)],
     ai=[
         ('turn_end', ['turn_act:4,6', 'flg_off:12']),                       # normal turn: 3 actions
         ('turn_end', ['turn_act:5,6', 'flg_on:14']),                        # 5% turn: 4 actions
