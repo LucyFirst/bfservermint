@@ -1461,7 +1461,7 @@ def full_user_info(pl):
         out[G_KEYS] = key_rows(pl)
     if '3SG2wX0R' in out:            # the game's Vortex tabs come from here, not only from its table
         try:
-            out['3SG2wX0R'] = hide_closed_tabs(vortex_editor().patch_area_rows(out['3SG2wX0R']))
+            out['3SG2wX0R'] = hide_closed_tabs(vortex_editor().patch_area_rows(out['3SG2wX0R'], pl))
         except Exception:
             log.exception('could not apply the edited Vortex tab pictures')
     return out

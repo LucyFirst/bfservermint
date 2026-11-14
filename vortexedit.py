@@ -298,9 +298,10 @@ class VortexEditor:
             out.append(r)
         return out
 
-    def patch_area_rows(self, rows):
+    def patch_area_rows(self, rows, pl=None):
         """GetUserInfo 3SG2wX0R: the area rows the game shows its Vortex tabs from (they override the
-        table), so edited tab pictures go here too."""
+        table), so edited tab pictures go here too - and the tabs of our own banners (custom_dungeons.json
+        "tab") are added, for the players who may see them."""
         if not self.active():
             return rows
         areas = {r['VjCY7rX4']: r for r in self.tables()[0]}
@@ -310,6 +311,14 @@ class VortexEditor:
             if a and a.get('H0UB8pqm') and a.get('H0UB8pqm') != r.get('H0UB8pqm'):
                 r = dict(r, H0UB8pqm=a['H0UB8pqm'])
             out.append(r)
+        have = {str(r.get('VjCY7rX4')) for r in out if isinstance(r, dict)}
+        tmpl = next((r for r in out if isinstance(r, dict) and str(r.get('9C64Qwe0')) == '99'), None)
+        for did, c in sorted(self.all_custom().items()):
+            a = areas.get(c.get('area'))
+            if c.get('tab') and a and c['area'] not in have and self.visible(c, pl):
+                row = {k: a.get(k, v) for k, v in tmpl.items()} if tmpl else dict(a)
+                out.append(row)
+                have.add(c['area'])
         return out
 
     # ------------------------------------------------------------------ the server's own view
