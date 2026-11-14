@@ -99,14 +99,21 @@ BOSSES['vv'] = dict(
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 2
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 3
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 4
-        # shield first: it is one of his actions; on a 6-attack turn he still makes all 6 (flag 15).
-        # Repeats are timed from the turn he first drops under 30% / 50% with the battle timers the
-        # game's own trial bosses use (Gazia, Bozdell): params "21,1" / "22,1" (re)start timer 1 / 2,
-        # flg_timer_act:n,k = timer n started k turns ago.
-        ('skill', ['skill:1', 'hp_pr_under:30', 'limited_act:1', 'flg_tmp_cntup_under:1,3'], 100, (15, 1) + C + (22, 1)),
-        ('skill', ['skill:1', 'flg_timer_act:2,4', 'flg_tmp_cntup_under:1,3'], 100, (15, 1) + C + (22, 1)),
-        ('skill', ['skill:3', 'hp_pr_under:50', 'limited_act:1'], 100, (13, 1) + C + (21, 1)),     # 50%: 6-action turn
-        ('skill', ['skill:3', 'flg_timer_act:1,2'], 100, (13, 1) + C + (21, 1)),                  # then every 2 turns
+        # Repeats are counted with battle-long flags, from the turn he first drops under 30% / 50%
+        # (the game's flg_timer conditions fired every turn). Per-turn flags: 13 = 6-attack turn,
+        # 15 = shield used this turn, 16 = a rest turn after a 6-attack turn, 17 = shield count moved.
+        # Battle flags: 2 = under 50% seen, 1 = last turn was a 6-attack turn,
+        #               3 -> 4 -> 5 -> 6 = turns since the last shield (6 = shield again).
+        # shield: one of his actions; on a 6-attack turn he still makes all 6 (flag 15)
+        ('skill', ['skill:1', 'hp_pr_under:30', 'limited_act:1', 'flg_tmp_cntup_under:1,3'], 100, (15, 1) + C + (3, 1)),
+        ('skill', ['skill:1', 'flg_on:6', 'flg_off:17', 'flg_tmp_cntup_under:1,3'], 100, (15, 1) + C + (6, 0, 3, 1)),
+        ('skill', ['skill:3', 'flg_on:3', 'flg_off:15', 'flg_tmp_cntup_under:1,3'], 100, C + (3, 0, 4, 1, 17, 1)),
+        ('skill', ['skill:3', 'flg_on:4', 'flg_off:17', 'flg_tmp_cntup_under:1,3'], 100, C + (4, 0, 5, 1, 17, 1)),
+        ('skill', ['skill:3', 'flg_on:5', 'flg_off:17', 'flg_tmp_cntup_under:1,3'], 100, C + (5, 0, 6, 1, 17, 1)),
+        # 6-attack turn: the turn he first drops under 50%, then every other turn
+        ('skill', ['skill:3', 'hp_pr_under:50', 'limited_act:1'], 100, (13, 1) + C + (1, 1, 2, 1)),
+        ('skill', ['skill:3', 'flg_on:1', 'flg_off:13', 'flg_tmp_cntup_under:1,3'], 100, C + (1, 0, 16, 1)),   # rest turn
+        ('skill', ['skill:3', 'flg_on:2', 'flg_off:1', 'flg_off:16', 'flg_off:14'], 100, (13, 1) + C + (1, 1)),
         ('skill', ['skill:3', 'flg_on:13', 'flg_tmp_cntup_under:1,6'], 100, C),
         ('skill', ['skill:3', 'flg_on:13', 'flg_on:15', 'flg_tmp_cntup_under:1,7'], 100, C),
         ('skill', ['skill:3', 'flg_tmp_cntup_under:1,3'], 100, C),                         # normal: 3 actions

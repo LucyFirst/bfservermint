@@ -108,42 +108,82 @@
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:1@hp_pr_under:30@limited_act:1@flg_tmp_cntup_under:1,3@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
-    "Hhgi79M1": "skill@15,1,31,1,22,1,-1,-1,-1,-1,-1,-1,@1@0@0",
+    "Hhgi79M1": "skill@15,1,31,1,3,1,-1,-1,-1,-1,-1,-1,@1@0@0",
     "ug9xV4Fz": "100"
    },
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "7",
     "L8PCsu0K": "Custom - Vargas of Mint",
-    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:1@flg_timer_act:2,4@flg_tmp_cntup_under:1,3@non:0@non:0@",
+    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:1@flg_on:6@flg_off:17@flg_tmp_cntup_under:1,3@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
-    "Hhgi79M1": "skill@15,1,31,1,22,1,-1,-1,-1,-1,-1,-1,@1@0@0",
+    "Hhgi79M1": "skill@15,1,31,1,6,0,3,1,-1,-1,-1,-1,@1@0@0",
     "ug9xV4Fz": "100"
    },
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "8",
     "L8PCsu0K": "Custom - Vargas of Mint",
-    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@hp_pr_under:50@limited_act:1@non:0@non:0@",
+    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@flg_on:3@flg_off:15@flg_tmp_cntup_under:1,3@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
-    "Hhgi79M1": "skill@13,1,31,1,21,1,-1,-1,-1,-1,-1,-1,@1@0@0",
+    "Hhgi79M1": "skill@31,1,3,0,4,1,17,1,-1,-1,-1,-1,@1@0@0",
     "ug9xV4Fz": "100"
    },
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "9",
     "L8PCsu0K": "Custom - Vargas of Mint",
-    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@flg_timer_act:1,2@non:0@non:0@non:0@",
+    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@flg_on:4@flg_off:17@flg_tmp_cntup_under:1,3@non:0@",
     "4xctV8gF": "2",
     "VBj9u0ot": "random",
-    "Hhgi79M1": "skill@13,1,31,1,21,1,-1,-1,-1,-1,-1,-1,@1@0@0",
+    "Hhgi79M1": "skill@31,1,4,0,5,1,17,1,-1,-1,-1,-1,@1@0@0",
     "ug9xV4Fz": "100"
    },
    {
     "4eEVw5hL": "99001101",
     "yu18xScw": "10",
+    "L8PCsu0K": "Custom - Vargas of Mint",
+    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@flg_on:5@flg_off:17@flg_tmp_cntup_under:1,3@non:0@",
+    "4xctV8gF": "2",
+    "VBj9u0ot": "random",
+    "Hhgi79M1": "skill@31,1,5,0,6,1,17,1,-1,-1,-1,-1,@1@0@0",
+    "ug9xV4Fz": "100"
+   },
+   {
+    "4eEVw5hL": "99001101",
+    "yu18xScw": "11",
+    "L8PCsu0K": "Custom - Vargas of Mint",
+    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@hp_pr_under:50@limited_act:1@non:0@non:0@",
+    "4xctV8gF": "2",
+    "VBj9u0ot": "random",
+    "Hhgi79M1": "skill@13,1,31,1,1,1,2,1,-1,-1,-1,-1,@1@0@0",
+    "ug9xV4Fz": "100"
+   },
+   {
+    "4eEVw5hL": "99001101",
+    "yu18xScw": "12",
+    "L8PCsu0K": "Custom - Vargas of Mint",
+    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@flg_on:1@flg_off:13@flg_tmp_cntup_under:1,3@non:0@",
+    "4xctV8gF": "2",
+    "VBj9u0ot": "random",
+    "Hhgi79M1": "skill@31,1,1,0,16,1,-1,-1,-1,-1,-1,-1,@1@0@0",
+    "ug9xV4Fz": "100"
+   },
+   {
+    "4eEVw5hL": "99001101",
+    "yu18xScw": "13",
+    "L8PCsu0K": "Custom - Vargas of Mint",
+    "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@flg_on:2@flg_off:1@flg_off:16@flg_off:14@",
+    "4xctV8gF": "2",
+    "VBj9u0ot": "random",
+    "Hhgi79M1": "skill@13,1,31,1,1,1,-1,-1,-1,-1,-1,-1,@1@0@0",
+    "ug9xV4Fz": "100"
+   },
+   {
+    "4eEVw5hL": "99001101",
+    "yu18xScw": "14",
     "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@flg_on:13@flg_tmp_cntup_under:1,6@non:0@non:0@",
     "4xctV8gF": "2",
@@ -153,7 +193,7 @@
    },
    {
     "4eEVw5hL": "99001101",
-    "yu18xScw": "11",
+    "yu18xScw": "15",
     "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@flg_on:13@flg_on:15@flg_tmp_cntup_under:1,7@non:0@",
     "4xctV8gF": "2",
@@ -163,7 +203,7 @@
    },
    {
     "4eEVw5hL": "99001101",
-    "yu18xScw": "12",
+    "yu18xScw": "16",
     "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@flg_tmp_cntup_under:1,3@non:0@non:0@non:0@",
     "4xctV8gF": "2",
@@ -173,7 +213,7 @@
    },
    {
     "4eEVw5hL": "99001101",
-    "yu18xScw": "13",
+    "yu18xScw": "17",
     "L8PCsu0K": "Custom - Vargas of Mint",
     "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#non:0@non:0@non:0@non:0@non:0@",
     "4xctV8gF": "2",
