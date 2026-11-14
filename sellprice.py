@@ -95,6 +95,27 @@ class SellPrice:
             self.parts = parts
         return self.parts
 
+    def extra_units(self):
+        """{id: table row} for data/custom_units.json: a copy of an existing unit's row, new id and name."""
+        try:
+            raw = json.load(open(os.path.join(self.S.HERE, 'data', 'custom_units.json'), encoding='utf-8'))
+        except Exception:
+            return {}
+        base = {r.get(F_ID): r for p in (self.base_parts() or []) for r in p}
+        out = {}
+        for uid, c in raw.items():
+            if uid.startswith('_') or not isinstance(c, dict) or str(c.get('from')) not in base:
+                continue
+            row = dict(base[str(c['from'])])
+            row[F_ID] = str(uid)
+            for f in ('QqfI9mM4',):                 # its own animation file (unit_cgg_<id>.csv)
+                if row.get(f):
+                    row[f] = row[f].replace(str(c['from']), str(uid))
+            if c.get('name'):
+                row['utP1c0CD'] = c['name']
+            out[str(uid)] = row
+        return out
+
     def version(self):
         return self.base_version() + VERSION_STEP + int(self.state['rev'])
 
@@ -104,13 +125,16 @@ class SellPrice:
             o = self.overrides()
             changes = {u: z for u, z in o.items() if z != self.normal(u)}
             bonus = self.S.stat_bonus()         # flat stat bonuses (data/unit_stat_bonus.json)
+            extra = self.extra_units()          # our own units (data/custom_units.json)
             if not self.info or not self.base_parts():
                 return False
-            if not changes and not bonus and not self.state['rev']:
+            if not changes and not bonus and not extra and not self.state['rev']:
                 return False                    # nothing changed, never edited: original table
             key = sorted(changes.items())
             if bonus:                           # (signature unchanged for tables without bonuses)
                 key = [key, sorted((u, sorted(b.items())) for u, b in bonus.items())]
+            if extra:
+                key = [key, sorted((u, sorted(r.items())) for u, r in extra.items())]
             sig = hashlib.md5(json.dumps(key).encode()).hexdigest()
             if sig != self.state.get('sig'):
                 self.state = {'rev': int(self.state.get('rev', 0)) + 1, 'sig': sig}
@@ -120,9 +144,13 @@ class SellPrice:
             v, n = self.version(), self.part_count()
             if not all(os.path.exists(os.path.join(d, f'Ver{v}_{KEYS[0]}_{i}.dat'))
                        for d in self.dirs() for i in range(1, n + 1)):
-                for i, rows in enumerate(self.base_parts(), 1):
+                parts = self.base_parts()
+                for i, rows in enumerate(parts, 1):
                     rows = [dict(r, **{F_SELL: str(changes[r.get(F_ID)])}) if r.get(F_ID) in changes else r
                             for r in rows]
+                    if i == len(parts):
+                        have = {r.get(F_ID) for p in parts for r in p}
+                        rows = rows + [r for u, r in sorted(extra.items()) if u not in have]
                     rows = [self.S.with_stat_bonus(r, bonus[r.get(F_ID)]) if r.get(F_ID) in bonus else r
                             for r in rows]
                     data = masterdata.encrypt(

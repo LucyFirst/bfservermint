@@ -10,6 +10,10 @@ under a newer version number (the game downloads a table again when its version 
   custom  {dungeon: {"name", "area", "image", "order", "quests": [{"id", "src"}]}}
           new banners; their quests are copies of existing quests (same battles and rewards,
           new quest numbers) so the originals stay where they are.
+  data/custom_dungeons.json (in the repo, not saved here): banners we design ourselves, same shape
+          plus per quest "set" (the quest's own fields: name, energy...), "boss" (data/custom_bosses.json),
+          "first_clear" / "every_clear" items, and "testers" (accounts that see the banner while it is
+          being tested; empty = everyone).
 Banner pictures uploaded on the admin page go to cdn/content/dungeon/ in the game's own format.
 """
 import base64
@@ -66,6 +70,48 @@ class VortexEditor:
         s.setdefault('edits', {})
         s.setdefault('custom', {})
         return s
+
+    def fixed_custom(self):
+        """Banners from data/custom_dungeons.json, with the picture / tab set on the admin page."""
+        p = os.path.join(self.S.HERE, 'data', 'custom_dungeons.json')
+        try:
+            raw = json.load(open(p, encoding='utf-8')) if os.path.exists(p) else {}
+        except Exception:
+            self.S.log.exception('could not read %s', p)
+            raw = {}
+        out = {}
+        for did, c in raw.items():
+            if did.startswith('_') or not isinstance(c, dict):
+                continue
+            c = dict(c)
+            e = self.state['edits'].get(did) or {}
+            if e.get('image'):
+                c['image'] = e['image']
+            if e.get('area'):
+                c['area'] = e['area']
+            out[did] = c
+        return out
+
+    def all_custom(self):
+        out = self.fixed_custom()
+        out.update(self.state['custom'])
+        return out
+
+    def visible(self, c, pl):
+        if c.get('hidden'):
+            return False
+        testers = [str(t).strip().lower() for t in c.get('testers') or []]
+        if not testers:
+            return True
+        who = {str((pl or {}).get(k) or '').strip().lower() for k in ('account', 'handle')} - {''}
+        return bool(who & set(testers))
+
+    def quest_open(self, pl, mid):
+        """False for a quest of a banner that this player can't see (still being tested)."""
+        for c in self.all_custom().values():
+            if any(q.get('id') == str(mid) for q in c.get('quests', [])):
+                return self.visible(c, pl)
+        return True
 
     def save(self):
         tmp = self.file + '.tmp'
@@ -143,7 +189,18 @@ class VortexEditor:
                 for m in mis_by_dun.get(did, []):
                     m['VjCY7rX4'] = e['area']
         mis_src = {r['j28VNcUW']: r for r in missions}
-        for did, c in sorted(self.state['custom'].items()):
+        have_area = {r['VjCY7rX4'] for r in areas}
+        for did, c in sorted(self.all_custom().items()):
+            t = c.get('tab')            # a Vortex tab of its own (custom_dungeons.json)
+            if t and c['area'] not in have_area and t.get('from') in area_by:
+                a = dict(area_by[t['from']])
+                a.update({'VjCY7rX4': c['area'], 'V84mzqoX': t.get('name') or c['name'],
+                          'XuJL4pc5': str(t.get('order', a.get('XuJL4pc5', '1'))),
+                          'H0UB8pqm': c.get('image') or a.get('H0UB8pqm', ''), 'sHMai2ZG': None,
+                          'HSRhkf70': '0', 'np4K1xtq': ''})
+                areas.append(a)
+                area_by[c['area']] = a
+                have_area.add(c['area'])
             quests = [q for q in c.get('quests', []) if q.get('src') in mis_src]
             src_dun = dun_by.get(mis_src[quests[0]['src']]['MHx05sXt']) if quests else None
             row = dict(src_dun or next(r for r in dungeons if r.get('9C64Qwe0') == '99'))
@@ -155,7 +212,10 @@ class VortexEditor:
                 m = dict(mis_src[q['src']])
                 m.update({'j28VNcUW': q['id'], 'MHx05sXt': did, 'VjCY7rX4': c['area'], '9C64Qwe0': '99',
                           'XuJL4pc5': str(n), 'HSRhkf70': '0', 'np4K1xtq': '', '8f4NYKxb': ''})
+                m.update({k: str(v) for k, v in (q.get('set') or {}).items()})
                 missions.append(m)
+            if c.get('dungeon_set'):
+                row.update({k: str(v) for k, v in c['dungeon_set'].items()})
         # Names and descriptions in English, not just the dictionary key (MST_DUNGEONS_...): the game
         # shows the key itself when its own text files lack it (seen on the Metal Parade key dungeon).
         texts = self.texts()
@@ -257,13 +317,27 @@ class VortexEditor:
         """Custom quests behave like the quest they copy; moved / new banners sit in their tab."""
         S = self.S
         aliases, geo_d = {}, {}
-        for did, c in self.state['custom'].items():
+        bosses, rewards = {}, {}
+        for did, c in self.all_custom().items():
             geo_d[did] = [c['area'], '99']
             for q in c.get('quests', []):
                 src = S.MISSIONS.get(q['src'])
                 if src:
-                    S.MISSIONS[q['id']] = dict(src, dungeon=did, custom_src=q['src'])
+                    m = dict(src, dungeon=did, custom_src=q['src'])
+                    for field, key in (('0iAIR2LP', 'name'), ('A8DEK5ob', 'energy'), ('69vnphig', 'battles'),
+                                       ('d96tuT2E', 'exp'), ('Rs7bCE3t', 'zel')):
+                        if field in (q.get('set') or {}):
+                            m[key] = str(q['set'][field])
+                    S.MISSIONS[q['id']] = m
                     aliases[q['id']] = q['src']
+                if q.get('boss'):
+                    bosses[q['id']] = q['boss']
+                if q.get('first_clear') or q.get('every_clear'):
+                    rewards[q['id']] = {'first_clear': q.get('first_clear') or [], 'every_clear': q.get('every_clear') or []}
+        S.CUSTOM_QUEST_BOSS.clear()
+        S.CUSTOM_QUEST_BOSS.update(bosses)
+        S.CUSTOM_QUEST_REWARDS.clear()
+        S.CUSTOM_QUEST_REWARDS.update(rewards)
         for did, e in self.state['edits'].items():
             if e.get('area'):
                 geo_d[did] = [e['area'], '99']
@@ -272,11 +346,11 @@ class VortexEditor:
         S.DUNGEON_OVERRIDE.clear()
         S.DUNGEON_OVERRIDE.update(geo_d)
 
-    def permit_rows(self):
+    def permit_rows(self, pl=None):
         """Extra Vortex list rows so new banners show: their tab, dungeon and quests."""
         rows = []
-        for did, c in sorted(self.state['custom'].items()):
-            if c.get('hidden'):
+        for did, c in sorted(self.all_custom().items()):
+            if not self.visible(c, pl):
                 continue
             rows.append({'VjCY7rX4': c['area']})
             rows.append({'MHx05sXt': did})
@@ -285,7 +359,7 @@ class VortexEditor:
 
     # ------------------------------------------------------------------ admin page
     def name(self, did):
-        c = self.state['custom'].get(did)
+        c = self.all_custom().get(did)
         return c['name'] if c else self.dnames.get(did) or f'Banner {did}'
 
     def _fh_dungeons(self):
@@ -313,8 +387,8 @@ class VortexEditor:
             qs = sorted(by_dun.get(did, []), key=lambda m: int(m.get('XuJL4pc5') or 0))
             out.setdefault(tab, []).append({
                 'id': did, 'name': self.name(did), 'image': d.get('21VKZo0E') or '',
-                'custom': did in self.state['custom'],
-                'listed': did in self.listed or did in self.state['custom'],
+                'custom': did in self.all_custom(),
+                'listed': did in self.listed or did in self.all_custom(),
                 'edited': did in self.state['edits'],
                 'quests': [{'id': m['j28VNcUW'], 'name': (self.S.MISSIONS.get(m['j28VNcUW']) or {}).get('name')
                             or m['j28VNcUW'], 'energy': (self.S.MISSIONS.get(m['j28VNcUW']) or {}).get('energy', '')}

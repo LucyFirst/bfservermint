@@ -2114,6 +2114,15 @@ def first_clear_gift(pl, mid):
     for it in rw.get('items') or []:
         add_present(pl, 4, str(it['id']), it.get('count', 1), 'First clear reward')
 
+def custom_clear_gift(pl, mid, first):
+    """Items a custom quest gives (data/custom_dungeons.json): on its first clear and on every clear."""
+    rw = CUSTOM_QUEST_REWARDS.get(str(mid)) or {}
+    for key, msg in (('first_clear', 'First clear reward'), ('every_clear', 'Clear reward')):
+        if key == 'first_clear' and not first:
+            continue
+        for it in rw.get(key) or []:
+            add_present(pl, 4, str(it['id']), int(it.get('count', 1)), msg)
+
 LC_DAYS, LC_GEMS = 15, 15
 LC_IMG = '/logincampaign/private15_login_icon_day{}.png'
 LC_BANNER = '/logincampaign/private15_login_banner.png'
@@ -2368,6 +2377,9 @@ def start_mission(pl, req):
         return 'Frontier Hunter surveys start from the Survey Office in Randall.'
     if mission_closed(mid):
         return 'This quest is closed right now.'
+    if str(mid) in CUSTOM_QUEST_BOSS or str(mid) in CUSTOM_QUEST_REWARDS:
+        if not vortex_editor().quest_open(pl, mid):
+            return 'This quest is not open yet.'
     if str(mid) in EXTRA_FIGHTS and str(mid) not in admin_settings()['on_extra']:
         return 'This quest is not open yet.'
     if is_trial(mid) and not TRIAL_SPECS.get(str(mid)) and not battle_generator().refs.get(mid):
@@ -2412,6 +2424,16 @@ TRIAL_REWARDS = json.load(open(TRIAL_REWARDS_FILE, encoding='utf-8')) if os.path
 # boss fights for the trials, built by tools/build_trials.py from the game's own trial scripts and moves
 TRIAL_SPECS_FILE = os.path.join(HERE, 'data', 'trial_specs.json')
 TRIAL_SPECS = json.load(open(TRIAL_SPECS_FILE, encoding='utf-8')) if os.path.exists(TRIAL_SPECS_FILE) else {}
+# Boss fights we design ourselves (tools/build_custom_bosses.py), fought in the custom quests of
+# data/custom_dungeons.json (each quest names its boss).
+CUSTOM_BOSSES_FILE = os.path.join(HERE, 'data', 'custom_bosses.json')
+CUSTOM_BOSSES = json.load(open(CUSTOM_BOSSES_FILE, encoding='utf-8')) if os.path.exists(CUSTOM_BOSSES_FILE) else {}
+CUSTOM_QUEST_BOSS = {}      # custom quest id -> CUSTOM_BOSSES key (filled by vortexedit.apply_to_server)
+CUSTOM_QUEST_REWARDS = {}   # custom quest id -> {'first_clear': [...], 'every_clear': [...]} items
+
+def custom_spec(mid):
+    k = CUSTOM_QUEST_BOSS.get(str(mid))
+    return CUSTOM_BOSSES.get(k) if k else None
 
 def is_trial(mid):
     return (MISSIONS.get(str(mid or '')) or {}).get('dungeon') == TRIAL_DUNGEON
@@ -2518,6 +2540,7 @@ def end_mission(pl, resp):
       log.info('quest clear: %s "%s" (+%s exp, +%s zel, +%s karma)%s', mid, m['name'], exp_gain, gain.get('zel', 0),
                gain.get('karma', 0),
              ' - first clear' if first else '')
+    custom_clear_gift(pl, mid, first)
     if first:
         first_clear_gift(pl, mid)
         if is_trial(mid):
@@ -2846,6 +2869,28 @@ def evo_gate():
         import evogate
         _EVOGATE = evogate.EvoGate(sys.modules[__name__])
     return _EVOGATE
+
+def sync_custom_cdn():
+    """Our own art (custom_cdn/ in the repo, already in the game's format) copied into the CDN, so a
+    git pull is all it takes. Only missing or changed files are written."""
+    src = os.path.join(HERE, 'custom_cdn')
+    n = 0
+    for root, _, files in os.walk(src):
+        for f in files:
+            a = os.path.join(root, f)
+            b = os.path.join(CDN_DIR, os.path.relpath(a, src))
+            data = open(a, 'rb').read()
+            if not os.path.exists(b) or open(b, 'rb').read() != data:
+                os.makedirs(os.path.dirname(b), exist_ok=True)
+                open(b, 'wb').write(data)
+                n += 1
+    if n:
+        log.info('custom content: %d file(s) copied into the CDN', n)
+
+try:
+    sync_custom_cdn()
+except Exception:
+    log.exception('could not copy the custom content into the CDN')
 
 def vortex_editor():
     global _VORTEX
@@ -3206,7 +3251,7 @@ def trial_mission_start(mid, req, base, spec):
         r = dict(r)
         for f in ('e7DK0FQT', '67CApcti', 'q08xLEsy'):
             v = _num(r.get(f)) or 0
-            if v > 1000:
+            if v > 1000 and not spec.get('exact'):
                 r[f] = str(int(v * random.uniform(.97, 1.03)))
         resp[G_MON].append(r)
     if spec.get('cgs'):
@@ -3266,7 +3311,7 @@ def tutorial_mission_start(pl, mid, req):
     return resp
 
 def generate_mission_start(pl, mid, req, base):
-    spec = TRIAL_SPECS.get(str(mid)) or recorded_spec(mid)
+    spec = custom_spec(mid) or TRIAL_SPECS.get(str(mid)) or recorded_spec(mid)
     if spec and not str(mid).startswith('_'):
         return trial_mission_start(str(mid), req, base, spec)
     run = pl.get('fh_run') or {}
@@ -3684,7 +3729,7 @@ def sp_permits(pl):
             if (k, v) not in have_ids:
                 out.append(dict(r))
                 have_ids.add((k, v))
-        out += [r for r in vortex_editor().permit_rows() if tuple(sorted(r.items())) not in have]
+        out += [r for r in vortex_editor().permit_rows(pl) if tuple(sorted(r.items())) not in have]
     except Exception:
         log.exception('could not add the custom Vortex banners')
     try:
