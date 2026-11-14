@@ -51,6 +51,7 @@ class VortexEditor:
         self.dnames = json.load(open(p, encoding='utf-8')) if os.path.exists(p) else {}
         self.state = self.load()
         self.built_rev = None
+        self.sync_fixed()
         # banners the game actually lists: the Vortex list of the recorded account
         self.listed = set()
         for a in srv.T['action']:
@@ -91,6 +92,16 @@ class VortexEditor:
                 c['area'] = e['area']
             out[did] = c
         return out
+
+    def sync_fixed(self):
+        """A change to data/custom_dungeons.json (git pull) counts as an edit: a new revision, so the
+        game downloads the tables again instead of keeping the copy it has for this version."""
+        import hashlib
+        sig = hashlib.md5(json.dumps(self.fixed_custom(), sort_keys=True).encode()).hexdigest()
+        if self.state.get('fixed_sig') != sig:
+            self.state['fixed_sig'] = sig
+            self.state['rev'] = self.state.get('rev', 0) + 1
+            self.save()
 
     def all_custom(self):
         out = self.fixed_custom()
