@@ -69,6 +69,7 @@ BOSSES = {}
 # 3,000,000 HP / 3,500 ATK / 1,600 DEF, Fire, 3 actions a turn.
 #  - under 50%: a turn of 6 actions (each an attack on a random unit) every 2 turns, starting the turn it drops under 50%
 #  - under 30%: 250,000 HP Earth shield (one of his actions), then every 4 turns
+#  - turn 63: Mint Finale wipes the team (the quest's turn limit)
 #  - his attacks (Mint Slash) can Paralyze; 3,000 ATK, 1,600 DEF
 #  - at 5% or lower (first time): 9,999 fixed damage to 4 random units (4 actions that turn)
 # How the game's boss AI works (from its own scripts, e.g. the Frontier Hunter bosses):
@@ -80,7 +81,7 @@ BOSSES = {}
 # while it is below 3, and when nothing else may run the last row ends the turn.
 #   flag 13 (this turn only) = a 6-action turn (under 50%, every 2 turns)
 #   flag 14 (this turn only) = the 5% turn: 4 x 9,999 then the turn ends
-SHIELD, FIXED, SLASH = '830131253', '6000594', '650460'   # moves re-numbered in data/skill_level_fix.json
+SHIELD, FIXED, SLASH, WIPE = '830131253', '6000594', '650460', '4005565'   # moves re-numbered in data/skill_level_fix.json
 C = (31, 1)                                # count this action
 BOSSES['vv'] = dict(
     name='Vargas of Mint', unit='990011', look='10011', monster='9900111', ai_id='99001101',
@@ -89,8 +90,10 @@ BOSSES['vv'] = dict(
             (FIXED, 'Mint Requiem', None),
             # his attack: Fencer Vargas's own swing (frames of unit 10011), normal-attack strength + Paralysis
             (SLASH, 'Mint Slash', None, {'eyUo6a8c': '20:121:1,38:121:1,56:121:1', 'AR7y0sY4': '1',
-                                         '6Aou5M9r': '26:50:2:2,44:30:2:2,62:20:2:2@0:100:2:1'})],
+                                         '6Aou5M9r': '26:50:2:2,44:30:2:2,62:20:2:2@0:100:2:1'}),
+            (WIPE, 'Mint Finale', None)],
     ai=[
+        ('skill', ['skill:4', 'act:63', 'limited_act:1'], 100, C),                         # turn 63: wipes the team
         ('skill', ['skill:2', 'hp_pr_under:6', 'limited_act:1'], 100, (14, 1) + C),       # 5%: hit 1
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 2
         ('skill', ['skill:2', 'flg_on:14', 'limited_act:1'], 100, C),                      # hit 3

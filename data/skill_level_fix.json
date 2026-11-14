@@ -19,5 +19,10 @@
   "name": "Mint Slash (custom boss Vargas of Mint): his attack, normal strength, 25% Paralysis",
   "params": "1:1500:0,0,0,0,0,0@6,25,0,0,0,0,0,0,60",
   "was": "1:1500:80,0,0,0,0,0@4,80,0,0,0,0,0,0,60"
+ },
+ "4005565": {
+  "name": "Mint Finale (custom boss Vargas of Mint, turn 63): 100% of max HP + 9,999,999 fixed damage to every unit, can KO",
+  "params": "1:2500:100,100,0,0,9999999,100,1",
+  "was": "1:2500:0,0,0,0,9999999,100,0"
  }
 }
