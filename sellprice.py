@@ -133,8 +133,8 @@ class SellPrice:
             key = sorted(changes.items())
             if bonus:                           # (signature unchanged for tables without bonuses)
                 key = [key, sorted((u, sorted(b.items())) for u, b in bonus.items())]
-            if extra:
-                key = [key, sorted((u, sorted(r.items())) for u, r in extra.items())]
+            if extra:                           # (+ 'rows': the row count is sent since; new version)
+                key = [key, sorted((u, sorted(r.items())) for u, r in extra.items()), 'rows']
             sig = hashlib.md5(json.dumps(key).encode()).hexdigest()
             if sig != self.state.get('sig'):
                 self.state = {'rev': int(self.state.get('rev', 0)) + 1, 'sig': sig}
@@ -201,6 +201,10 @@ class SellPrice:
         for r in rows:
             if r.get('moWQ30GH') == TABLE:
                 r = dict(r, d2RFtP8T=str(self.version()))
+                n = sum(len(p) for p in (self.base_parts() or []))
+                extra = [u for u in self.extra_units() if u not in {x.get(F_ID) for p in self.base_parts() for x in p}]
+                if n and r.get('5kbnkTp0'):
+                    r['5kbnkTp0'] = str(n + len(extra))    # the game reads that many rows: our units too
             out.append(r)
         return out
 
