@@ -8,6 +8,7 @@ that the quest's generated chests never hold.
   3. plays each of those quests RUNS times through the battle generator (without this file's additions)
      and keeps the (quest, material) pairs that never turned up in a chest
   4. writes them as [item, chance per run, 1]: a quest named on the page gets NAMED, a whole dungeon WIDE,
+     (a line naming only a region - "Amdahl" - is every quest of that region, also WIDE),
      at most MAX_PER_RUN extra materials per run on average for any one quest
 
 Run on a copy with config.json (it imports server.py):  python3 tools/build_wiki_item_drops.py
@@ -26,6 +27,7 @@ sys.path.insert(0, HERE)
 API = 'https://bravefrontierglobal.fandom.com/api.php'
 RUNS = 300
 NAMED, WIDE, MAX_PER_RUN = 0.25, 0.10, 1.0
+DUNGEON_ALIAS = {'20460': 'Armor Hall'}       # dungeons our data has no English name for
 SKIP = re.compile(r'raid battle|colosseum|bazaar|guild|harvest|exchange|arena|login|reward|summon|frontier gate|'
                   r'grand quest|trial|tournament|shop|chest|stage \d|giveaway|slots', re.I)
 
@@ -62,7 +64,7 @@ def norm(s):
     return ' ' + re.sub(r'\s+', ' ', s).strip() + ' '
 
 
-def match(pages, M, DN):
+def match(pages, M, DN, GEO):
     byname = collections.defaultdict(list)
     for mid, m in M.items():
         n = norm(m.get('name') or '')
@@ -73,13 +75,18 @@ def match(pages, M, DN):
     by_dun = collections.defaultdict(list)
     for mid, m in M.items():
         by_dun[str(m.get('dungeon'))].append(mid)
+    region_duns = collections.defaultdict(list)       # region name -> its dungeons
+    for d, (area, _) in GEO['dungeon'].items():
+        nm = (GEO['area'].get(area) or {}).get('name')
+        if nm:
+            region_duns[norm(nm)].append(d)
     named, wide_lines = collections.defaultdict(set), []
     for item, txt in pages.items():
         stack = []
-        for line in (txt or '').split('\n'):
-            m = re.match(r'^(\*+)(.*)', line.strip())
-            if not m:
-                continue
+        lines = [x.strip() for x in (txt or '').split('\n') if x.strip().startswith('*')]
+        for li, line in enumerate(lines):
+            m = re.match(r'^(\*+)(.*)', line)
+            leaf = li + 1 == len(lines) or len(re.match(r'^\*+', lines[li + 1]).group(0)) <= len(m.group(1))
             stack = stack[:len(m.group(1)) - 1] + [m.group(2)]
             ctx = ' '.join(stack)
             if SKIP.search(ctx):
@@ -97,7 +104,10 @@ def match(pages, M, DN):
                     mids = f or mids
                 named[item].update(mids)
             if not found:
-                wide_lines.append((item, [d for d, dn in dnorm.items() if len(dn) > 6 and dn in nl]))
+                duns = [d for d, dn in dnorm.items() if len(dn) > 6 and dn in nl]
+                if not duns and leaf:          # only a region named: every quest of it
+                    duns = [d for rn, ds in region_duns.items() if rn in nl for d in ds]
+                wide_lines.append((item, duns))
     wide = collections.defaultdict(set)
     for item, duns in wide_lines:
         for d in duns:
@@ -111,8 +121,8 @@ def main():
     item_id = {v[0]: k for k, v in names.items() if v[1] == 'material'}
     pages = fetch(sorted(item_id))
     print(len(pages), 'material pages read')
-    M, DN = data('mission_mst.json'), data('dungeon_names.json')
-    named, wide = match({k: v for k, v in pages.items() if k in item_id}, M, DN)
+    M, DN = data('mission_mst.json'), dict(data('dungeon_names.json'), **DUNGEON_ALIAS)
+    named, wide = match({k: v for k, v in pages.items() if k in item_id}, M, DN, data('dungeon_area.json'))
     os.chdir(HERE)
     import battlegen
     battlegen.WIKI_ITEM_DROPS.clear()          # what the quests drop without this file
