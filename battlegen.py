@@ -322,6 +322,13 @@ try:
                                    encoding='utf-8'))
 except (OSError, ValueError):
     EVENT_BOSSES = {}
+# materials the wiki's item pages say a quest drops that its chests never held (tools/build_wiki_item_drops.py):
+# {quest id: [[item, chance per run, most per run], ...]} - added like extra_drops
+try:
+    WIKI_ITEM_DROPS = {k: v for k, v in _json.load(open(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'data',
+                       'wiki_item_drops.json'), encoding='utf-8')).items() if not k.startswith('_')}
+except (OSError, ValueError):
+    WIKI_ITEM_DROPS = {}
 for _m in WIKI_LINEUPS.values():
     _m.setdefault('zone', _HN_ZONE)
     _m.setdefault('items', _HN_ITEMS)
@@ -1386,7 +1393,7 @@ class Battlegen:
             out_b.append({'mons': mons, 'unit_drops': unit_drops, 'chests': chests})
         # rare materials the wiki lists for this quest that no recorded chest table holds (Empty Sphere in
         # Bariura, Phantom Feather in Menon): [item, chance per run, most per run], in a random battle
-        for item, pct, most in wiki.get('extra_drops') or []:
+        for item, pct, most in list(wiki.get('extra_drops') or []) + list(WIKI_ITEM_DROPS.get(str(mid)) or []):
             for _ in range(max(1, int(most))):
                 if out_b and rng.random() < _chance(float(pct), 'item'):
                     bi = rng.randrange(len(out_b))
