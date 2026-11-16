@@ -935,6 +935,19 @@ def highlights():
             _HL = False
     return _HL
 
+_LB = None
+
+def leaderboard_board():
+    """The Discord leaderboards (leaderboards.py): started once; never lets them break the game."""
+    global _LB
+    if _LB is None:
+        try:
+            _LB = leaderboards.Leaderboards(sys.modules[__name__])
+        except Exception:
+            log.exception('leaderboards: could not start')
+            _LB = False
+    return _LB
+
 def highlight(event, *args):
     try:
         h = highlights()
@@ -1312,6 +1325,7 @@ def do_summon(pl, req, resp):
         if best is None or rare > best[0]:
             best = (rare, o)
         highlight('summon', pl, unit_id)
+        leaderboards.note_summon(pl)
         log.info('summon on %s (%s): %s* %s', gid, (POOLS.get(gid) or {}).get('name', 'default pool'), rare,
                  unit_mst().get(unit_id, {}).get('utP1c0CD', unit_id))
     resp[G_UNITS_ADD] = add
@@ -2519,6 +2533,7 @@ def end_mission(pl, resp):
         return True
     t = team_row(pl['state'])
     before, after = 1, 1
+    leaderboards.note_clear(pl)              # "quests cleared in the last 24 hours" board
     first = mid not in {r.get('j28VNcUW') for r in _rows(pl['state'].get('UT1SVg59')) if isinstance(r, dict)}
     exp_gain = 0 if (is_trial(mid) and not first) else int((_num(m['exp']) or 0) * mult('exp') * boost_mult(mid, 'exp'))
     if t is not None:
@@ -3217,6 +3232,7 @@ def arena_engine():
 
 # every quest start is generated fresh from references (recordings, datamine, wiki) - see battlegen.py
 import battlegen
+import leaderboards
 SKILL_ROWS = {}
 _RECORDED = {}
 for _a in sorted(T['action'], key=lambda a: a['n']):
@@ -5494,6 +5510,7 @@ def main():
         vortex_editor().build()
     except Exception:
         log.exception('could not prepare the edited Vortex tables')
+    leaderboard_board()                       # Discord leaderboards (if their webhook is set)
     try:
         highlight('custom_backfill')          # custom quests cleared before their clears were posted
     except Exception:
