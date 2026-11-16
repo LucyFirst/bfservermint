@@ -1,0 +1,157 @@
+{
+ "_how": "built by tools/build_tower_xenon.py (Sir Sancus Xenon in the Unholy Tower)",
+ "845000210": [
+  {
+   "4eEVw5hL": "845000210",
+   "yu18xScw": "1",
+   "L8PCsu0K": "Sir Sancus Xenon Lv8-9 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@hp_pr_under:10@limited_act:1@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "100"
+  },
+  {
+   "4eEVw5hL": "845000210",
+   "yu18xScw": "2",
+   "L8PCsu0K": "Sir Sancus Xenon Lv8-9 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:2@hp_pr_under:30@limited_act:1@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "100"
+  },
+  {
+   "4eEVw5hL": "845000210",
+   "yu18xScw": "3",
+   "L8PCsu0K": "Sir Sancus Xenon Lv8-9 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:2@hp_pr_under:50@limited_act:1@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "100"
+  },
+  {
+   "4eEVw5hL": "845000210",
+   "yu18xScw": "4",
+   "L8PCsu0K": "Sir Sancus Xenon Lv8-9 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:1@hp_pr_under:70@non:0@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "45"
+  },
+  {
+   "4eEVw5hL": "845000210",
+   "yu18xScw": "5",
+   "L8PCsu0K": "Sir Sancus Xenon Lv8-9 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:1@non:0@non:0@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "15"
+  },
+  {
+   "4eEVw5hL": "845000210",
+   "yu18xScw": "6",
+   "L8PCsu0K": "Sir Sancus Xenon Lv8-9 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#non:0@non:0@non:0@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "weakness",
+   "Hhgi79M1": "attack@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "50"
+  },
+  {
+   "4eEVw5hL": "845000210",
+   "yu18xScw": "7",
+   "L8PCsu0K": "Sir Sancus Xenon Lv8-9 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#non:0@non:0@non:0@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "attack@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "100"
+  }
+ ],
+ "845000220": [
+  {
+   "4eEVw5hL": "845000220",
+   "yu18xScw": "1",
+   "L8PCsu0K": "Sir Sancus Xenon Lv10 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@hp_pr_under:50@limited_act:1@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@1,1,16,1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "100"
+  },
+  {
+   "4eEVw5hL": "845000220",
+   "yu18xScw": "2",
+   "L8PCsu0K": "Sir Sancus Xenon Lv10 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:3@hp_pr_under:20@limited_act:1@flg_off:16@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@1,1,16,1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "100"
+  },
+  {
+   "4eEVw5hL": "845000220",
+   "yu18xScw": "3",
+   "L8PCsu0K": "Sir Sancus Xenon Lv10 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:2@flg_on:1@flg_off:16@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@1,0,17,1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "100"
+  },
+  {
+   "4eEVw5hL": "845000220",
+   "yu18xScw": "4",
+   "L8PCsu0K": "Sir Sancus Xenon Lv10 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:2@flg_on:17@non:0@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "100"
+  },
+  {
+   "4eEVw5hL": "845000220",
+   "yu18xScw": "5",
+   "L8PCsu0K": "Sir Sancus Xenon Lv10 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:1@hp_pr_under:50@non:0@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "35"
+  },
+  {
+   "4eEVw5hL": "845000220",
+   "yu18xScw": "6",
+   "L8PCsu0K": "Sir Sancus Xenon Lv10 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#skill:1@non:0@non:0@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "skill@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "20"
+  },
+  {
+   "4eEVw5hL": "845000220",
+   "yu18xScw": "7",
+   "L8PCsu0K": "Sir Sancus Xenon Lv10 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#non:0@non:0@non:0@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "weakness",
+   "Hhgi79M1": "attack@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "50"
+  },
+  {
+   "4eEVw5hL": "845000220",
+   "yu18xScw": "8",
+   "L8PCsu0K": "Sir Sancus Xenon Lv10 (wiki)",
+   "q7Nit8JW": "0:non:non:non@0:non:non:non@0:non:non:non@0:non:non:non@#non:0@non:0@non:0@non:0@non:0@",
+   "4xctV8gF": "2",
+   "VBj9u0ot": "random",
+   "Hhgi79M1": "attack@-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,@1@0@0",
+   "ug9xV4Fz": "100"
+  }
+ ]
+}

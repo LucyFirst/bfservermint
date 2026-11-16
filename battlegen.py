@@ -1047,7 +1047,7 @@ class Battlegen:
         # times a run - Xenon in the Unholy Tower; "last_wave": "random" = the last wave is any of the
         # quest's line-ups instead of its own boss wave
         roam = wiki.get('roamer') or {}
-        roam_u = {m['u'] for m in roam.get('mobs') or []}
+        roam_u = {m['u'] for m in roam.get('mobs') or []} | set(roam.get('also') or [])
         for _, run in runs:
             if len(run['battles']) != n:
                 continue
@@ -1091,6 +1091,8 @@ class Battlegen:
                 battles[-1] = [dict(m, filler=False, boss=True, hp=int(m['hp'] * rng.uniform(.95, 1.05)),
                                     atk=int(m['atk'] * rng.uniform(.95, 1.05))) for m in roam['mobs']]
                 n_roam, waves = 1, range(len(battles) - 1)
+            elif roam.get('no_last'):            # "no_last": never the last wave (Floors 21-30)
+                waves = range(len(battles) - 1)
             for bi in waves:                     # wave by wave, the last one too, until "max" have come
                 if n_roam >= int(roam.get('max', 2)):
                     break
