@@ -1043,7 +1043,7 @@ class Battlegen:
         nb = Counter(len(run['battles']) for _, run in runs)
         n = nb.most_common(1)[0][0]
         idx = defaultdict(list)          # battle index -> [lineup]
-        # battles.json "roamer": an enemy that turns up in random waves (never the last), at most "max"
+        # battles.json "roamer": an enemy that turns up in random waves (the last one too), at most "max"
         # times a run - Xenon in the Unholy Tower; "last_wave": "random" = the last wave is any of the
         # quest's line-ups instead of its own boss wave
         roam = wiki.get('roamer') or {}
@@ -1084,14 +1084,16 @@ class Battlegen:
         if wiki.get('last_wave') == 'random' and idx:
             lineup = rng.choice([lu for bs in idx.values() for lu in bs])
             battles[-1] = [dict(per_run[(m['u'], m.get('name'))], boss=True) for m in lineup]
-        if roam_u and len(battles) > 1:
+        if roam_u:
             n_roam = 0
-            for bi in rng.sample(range(len(battles) - 1), len(battles) - 1):
+            for bi in range(len(battles)):       # wave by wave, the last one too, until "max" have come
                 if n_roam >= int(roam.get('max', 2)):
                     break
                 if rng.random() < float(roam.get('chance', 0.15)):
                     battles[bi] = [dict(m, filler=False, hp=int(m['hp'] * rng.uniform(.95, 1.05)),
-                                        atk=int(m['atk'] * rng.uniform(.95, 1.05))) for m in roam['mobs']]
+                                        atk=int(m['atk'] * rng.uniform(.95, 1.05)),
+                                        **({'boss': True} if bi == len(battles) - 1 else {}))
+                                   for m in roam['mobs']]
                     n_roam += 1
         chance = METAL_MIMIC_QUESTS.get(mid, 0)
         if chance and len(battles) > 1 and rng.random() < chance:
