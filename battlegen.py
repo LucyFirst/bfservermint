@@ -1043,11 +1043,16 @@ class Battlegen:
         nb = Counter(len(run['battles']) for _, run in runs)
         n = nb.most_common(1)[0][0]
         idx = defaultdict(list)          # battle index -> [lineup]
+        # battles.json "roamer": an enemy that turns up in random waves (never the last), at most "max"
+        # times a run - Xenon in the Unholy Tower; "last_wave": "random" = the last wave is any of the
+        # quest's line-ups instead of its own boss wave
+        roam = wiki.get('roamer') or {}
+        roam_u = {m['u'] for m in roam.get('mobs') or []}
         for _, run in runs:
             if len(run['battles']) != n:
                 continue
             for bi, b in enumerate(run['battles']):
-                if b and not any(m['filler'] for m in b):
+                if b and not any(m['filler'] for m in b) and not any(m['u'] in roam_u for m in b):
                     idx[bi].append(b)
         stats = defaultdict(lambda: defaultdict(list))
         proto = {}
@@ -1076,13 +1081,18 @@ class Battlegen:
             battles.append(b)
         if mid in RUINS_TOTEMS:
             battles = self._ruins(mid, battles, per_run, rng)
-        # waves that are always the same (battles.json "fixed_waves": {wave number: [enemies]}), e.g.
-        # Xenon Lv3 / Lv6 / Lv8 on Unholy Tower floors 25, 55 and 75 - added; the recordings had none
-        for w, lineup in (wiki.get('fixed_waves') or {}).items():
-            bi = int(w) - 1
-            if 0 <= bi < len(battles):
-                battles[bi] = [dict(per_run.get((m['u'], m.get('name'))) or dict(m, filler=False),
-                                    **({'boss': True} if bi == len(battles) - 1 else {})) for m in lineup]
+        if wiki.get('last_wave') == 'random' and idx:
+            lineup = rng.choice([lu for bs in idx.values() for lu in bs])
+            battles[-1] = [dict(per_run[(m['u'], m.get('name'))], boss=True) for m in lineup]
+        if roam_u and len(battles) > 1:
+            n_roam = 0
+            for bi in rng.sample(range(len(battles) - 1), len(battles) - 1):
+                if n_roam >= int(roam.get('max', 2)):
+                    break
+                if rng.random() < float(roam.get('chance', 0.15)):
+                    battles[bi] = [dict(m, filler=False, hp=int(m['hp'] * rng.uniform(.95, 1.05)),
+                                        atk=int(m['atk'] * rng.uniform(.95, 1.05))) for m in roam['mobs']]
+                    n_roam += 1
         chance = METAL_MIMIC_QUESTS.get(mid, 0)
         if chance and len(battles) > 1 and rng.random() < chance:
             # it turns up in one of the normal waves (never the boss) and is caught when beaten
