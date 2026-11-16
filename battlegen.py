@@ -1076,6 +1076,13 @@ class Battlegen:
             battles.append(b)
         if mid in RUINS_TOTEMS:
             battles = self._ruins(mid, battles, per_run, rng)
+        # waves that are always the same (battles.json "fixed_waves": {wave number: [enemies]}), e.g.
+        # Xenon Lv3 / Lv6 / Lv8 on Unholy Tower floors 25, 55 and 75 - added; the recordings had none
+        for w, lineup in (wiki.get('fixed_waves') or {}).items():
+            bi = int(w) - 1
+            if 0 <= bi < len(battles):
+                battles[bi] = [dict(per_run.get((m['u'], m.get('name'))) or dict(m, filler=False),
+                                    **({'boss': True} if bi == len(battles) - 1 else {})) for m in lineup]
         chance = METAL_MIMIC_QUESTS.get(mid, 0)
         if chance and len(battles) > 1 and rng.random() < chance:
             # it turns up in one of the normal waves (never the boss) and is caught when beaten
