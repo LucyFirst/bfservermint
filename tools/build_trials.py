@@ -419,6 +419,9 @@ def recorded_answer(mid):
 # paralysis - 100 = immune). Trial No. 002: Grahdens only takes weak and injury.
 RESIST_FIX = {'2000001': {'Grahdens': {0: '100', 1: '0', 2: '100', 3: '0', 4: '100', 5: '100'}}}
 
+# stats changed from the recording (field -> value): Trial X1 phases 2 and 3 hit harder (owner's choice)
+STAT_FIX = {'8360021': {'Princess Estia': {'67CApcti': '2500'}, 'Xenon & Estia': {'67CApcti': '2700'}}}
+
 
 def from_recording(mid):
     r = recorded_answer(mid)
@@ -437,6 +440,7 @@ def from_recording(mid):
             f = (m.get('CEeqs63b') or '0:0:0:0:0:0').split(':')
             f[i] = v
             m['CEeqs63b'] = ':'.join(f)
+        m.update(STAT_FIX.get(mid, {}).get(m.get('3evIn0zZ')) or {})
     return {'battles': nb, 'monsters': r['U0v5IeJo'], 'groups': r['75t0sx9z'], 'ai': r.get('89ausgc4') or [],
             'skills': skills, 'cgs': r.get('8hoyIF9Q') or [], 'names': names, 'src': 'bfrevive'}
 
