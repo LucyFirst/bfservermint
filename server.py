@@ -3283,6 +3283,12 @@ def trial_mission_start(mid, req, base, spec):
             v = _num(r.get(f)) or 0
             if v > 1000 and not spec.get('exact'):
                 r[f] = str(int(v * random.uniform(.97, 1.03)))
+        if r.get('2EF0d6ue') and not r.get('3BpHN6VD'):
+            # a boss drawn with a monster sprite needs the place of its status icons (3BpHN6VD, like
+            # Juggernaut's 0,-60): without it the game crashed when Poison landed (Cursed Estia, Trial X1)
+            r['3BpHN6VD'] = '0,-60'
+            if r.get('Lkh6gYkT') in (None, '', '0,0'):
+                r['Lkh6gYkT'] = '0,-40'
         resp[G_MON].append(r)
     if spec.get('cgs'):
         resp['8hoyIF9Q'] = [dict(r) for r in spec['cgs']]       # monster-only sprites (Juggernaut...)
