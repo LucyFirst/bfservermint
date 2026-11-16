@@ -29,7 +29,7 @@ STATS = {9: (2000000, 2500, 1200), 10: (3200000, 3000, 1500)}      # level: HP, 
 # skill's): process 53 = damage resistances; these numbers are the game's own "negates critical hits"
 # leader skill (id 1200: 100,100 crit, 100,100 crit damage)
 NO_CRIT = ('53', '100,100,0,0,100,100,0,0,0,0')
-USE_NO_CRIT = False
+USE_NO_CRIT = True
 
 
 def quest(i):
@@ -87,8 +87,7 @@ def main():
         else:                                   # Lv3 / Lv6: the level below, resistances in between
             row = dict(rec[i - 1], CEeqs63b=res(rec[i - 1]['CEeqs63b'], rec[i + 1]['CEeqs63b']))
         row['3evIn0zZ'] = mob['name']
-        # immune to critical hits (wiki) - OFF: the game crashed at start-up right after this went in
-        # (a resumed battle with the passive); kept here to try again once that's understood
+        # immune to critical hits (wiki); USE_NO_CRIT = False takes it off again
         if USE_NO_CRIT:
             row.update(hjAy9St3=NO_CRIT[0], **{'2Smu5Mtq': NO_CRIT[1]})
         else:
