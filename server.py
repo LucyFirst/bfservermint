@@ -3234,9 +3234,9 @@ for _rs in _RECORDED.values():
         for _row in _r.get('8aiBoHg5', []) or []:
             SKILL_ROWS.setdefault(_row.get('nj9Lw7mV'), _row)
 try:                                              # AI we wrote ourselves (tools/build_tower_xenon.py)
-    for _aid, _rows in json.load(open(os.path.join(HERE, 'data', 'custom_ai.json'), encoding='utf-8')).items():
+    for _aid, _ai_rows in json.load(open(os.path.join(HERE, "data", "custom_ai.json"), encoding="utf-8")).items():
         if not _aid.startswith('_'):
-            AI_ROWS[_aid] = list(_rows)
+            AI_ROWS[_aid] = list(_ai_rows)
 except (OSError, ValueError):
     pass
 for _ev in battlegen.EVENT_BOSSES.values():       # event bosses' real moves (tools/build_event_bosses.py)
