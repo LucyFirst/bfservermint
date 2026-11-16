@@ -1113,6 +1113,12 @@ class Battlegen:
             else:
                 b[rng.randrange(len(b))] = mm
         plan = self._finish(mid, wiki, battles, runs, rng, story=False)
+        for b in plan['battles']:                # the roamer's own chest drops (Gold Coin, Prized Jewel...)
+            for pos, m in enumerate(b['mons']):
+                if m['u'] in roam_u and m.get('items'):
+                    for it in m['items']:
+                        if rng.random() < _chance(float(it.get('pct', 0)) / 100, 'item'):
+                            b['chests'].append(f'{pos}/1/4:1000:{it["i"]}:1')
         return plan
 
     def _ruins(self, mid, battles, per_run, rng):

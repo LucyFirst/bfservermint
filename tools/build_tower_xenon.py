@@ -25,6 +25,7 @@ ARDENT, DESECRATION, SMITE = '8550021', '8550023', '8550024'
 SANCUS_SKILLS = f'{ARDENT}:1@{DESECRATION}:1@{SMITE}:1'
 AI_LV8, AI_LV10 = '845000210', '845000220'
 STATS = {9: (2000000, 2300, 1000), 10: (3200000, 2500, 1200)}      # level: HP, ATK, DEF
+EXTRA_ITEMS = [(6, '800000', 10.0), (8, '800001', 10.0)]   # level, item, % (Gold Ingot Lv6, Prized Jewel Lv8)
 ROAMING_LV10 = (1500000, 2200, 1200)      # Floors 91-100: Xenon Lv10 met before the last wave
 # a monster's passive (hjAy9St3 = process id, 2Smu5Mtq = its numbers, read by MonsterMst like a leader
 # skill's): process 53 = damage resistances; these numbers are the game's own "negates critical hits"
@@ -100,6 +101,9 @@ def main():
             row.update(e7DK0FQT=str(STATS[i][0]), **{'67CApcti': str(STATS[i][1]), 'q08xLEsy': str(STATS[i][2])})
         q['roamer']['no_last'] = (i == 3)
         q['roamer']['max'] = 2
+        for lv, item, pct in EXTRA_ITEMS:       # chest drops the wiki adds (Gold Ingot, Prized Jewel)
+            if lv == i and not any(x['i'] == item for x in mob['items']):
+                mob['items'].append({'i': item, 'pct': pct})
         if i == 10:          # Floors 91-100: the last wave is the full boss; the one roaming before it is weaker
             boss = json.loads(json.dumps(mob))
             q['roamer']['last_mobs'] = [boss]
