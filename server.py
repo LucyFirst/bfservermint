@@ -5239,7 +5239,7 @@ class Handler(BaseHTTPRequestHandler):
                 log.info('discovery from %s', self.client_address[0])
                 return self._send(200, {'SREE': enc_dls({
                     'game': PUBLIC, 'resource': PUBLIC, 'mstv': CFG.get('mstv', '21900'),
-                    'gumilive': PUBLIC + '/', 'bgimage': '/wallpaper/' + CFG.get('title_wallpaper', 'title3_logo.jpg')})})
+                    'gumilive': PUBLIC + '/', 'bgimage': '/wallpaper/' + CFG.get('title_wallpaper', 'title4_1_logo.jpg')})})
             if p == '/app/check':
                 have = (q.get('v') or [''])[0]
                 return self._send(200, app_update().check(have, HOST), 'text/plain; charset=utf-8')
