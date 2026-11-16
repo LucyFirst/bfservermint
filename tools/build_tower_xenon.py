@@ -98,6 +98,7 @@ def main():
             mob.update(hp=STATS[i][0], atk=STATS[i][1], **{'def': STATS[i][2]})
             row.update(e7DK0FQT=str(STATS[i][0]), **{'67CApcti': str(STATS[i][1]), 'q08xLEsy': str(STATS[i][2])})
         q['roamer']['no_last'] = (i == 3)
+        q['roamer']['max'] = 1 if i == 10 else 2       # Floors 91-100: only his guaranteed last wave
         q['roamer']['also'] = ['860013', '860014', '860015']   # no other Xenon from the recorded line-ups
         print(quest(i), mob['name'], row['pn16CNah'], row['F4bQ7r8C'], row['i74vGUFa'])
     json.dump(B, open(p, 'w', encoding='utf-8'), ensure_ascii=False)
