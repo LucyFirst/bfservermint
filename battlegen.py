@@ -1086,7 +1086,12 @@ class Battlegen:
             battles[-1] = [dict(per_run[(m['u'], m.get('name'))], boss=True) for m in lineup]
         if roam_u:
             n_roam = 0
-            for bi in range(len(battles)):       # wave by wave, the last one too, until "max" have come
+            waves = range(len(battles))
+            if roam.get('last'):                 # "last": always the last wave (Floors 91-100: Lv10)
+                battles[-1] = [dict(m, filler=False, boss=True, hp=int(m['hp'] * rng.uniform(.95, 1.05)),
+                                    atk=int(m['atk'] * rng.uniform(.95, 1.05))) for m in roam['mobs']]
+                n_roam, waves = 1, range(len(battles) - 1)
+            for bi in waves:                     # wave by wave, the last one too, until "max" have come
                 if n_roam >= int(roam.get('max', 2)):
                     break
                 if rng.random() < float(roam.get('chance', 0.15)):
