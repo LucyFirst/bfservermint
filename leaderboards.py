@@ -6,7 +6,7 @@ Which channel: "discord_leaderboard_webhook" in config.json (make a webhook on i
 #leaderboards). Without it the boards are off.
     python3 tools/set_config.py discord_leaderboard_webhook <link>
 
-Boards (top 10 each):
+Boards (top 5 each):
     Player Level            level, then exp
     Zel                     zel in the wallet
     Quests (last 24 h)      quests cleared in the last 24 hours (counted from when this went in)
@@ -17,7 +17,7 @@ Boards (top 10 each):
 config.json, all optional:
     "leaderboard_every_min": 15     how often the boards are worked out (they are only edited when
                                     something changed)
-    "leaderboard_top": 10           places shown per board
+    "leaderboard_top": 5            places shown per board
     "leaderboard_skip": ["userid"]  accounts never shown; "highlight_skip" accounts and the account
                                     named ADMIN are never shown either
 
@@ -72,7 +72,7 @@ class Leaderboards:
         cfg = srv.CFG
         self.url = str(cfg.get('discord_leaderboard_webhook') or '').strip()
         self.every = max(1, int(cfg.get('leaderboard_every_min', 15))) * 60
-        self.top = max(1, min(25, int(cfg.get('leaderboard_top', 10))))
+        self.top = max(1, min(25, int(cfg.get('leaderboard_top', 5))))
         self.skip = {str(x) for x in (cfg.get('leaderboard_skip') or []) + (cfg.get('highlight_skip') or [])}
         self.state_file = os.path.join(srv.SAVE_DIR, 'leaderboard_state.json')
         try:
