@@ -1087,9 +1087,9 @@ class Battlegen:
         if roam_u:
             n_roam = 0
             waves = range(len(battles))
-            if roam.get('last'):                 # "last": always the last wave (Floors 91-100: Lv10)
-                battles[-1] = [dict(m, filler=False, boss=True, hp=int(m['hp'] * rng.uniform(.95, 1.05)),
-                                    atk=int(m['atk'] * rng.uniform(.95, 1.05))) for m in roam['mobs']]
+            if roam.get('last'):                 # "last": always the last wave (Floors 91-100: Lv10), as
+                battles[-1] = [dict(m, filler=False, boss=True, hp=int(m['hp'] * rng.uniform(.95, 1.05)),   # "last_mobs"
+                                    atk=int(m['atk'] * rng.uniform(.95, 1.05))) for m in roam.get('last_mobs') or roam['mobs']]
                 n_roam, waves = 1, range(len(battles) - 1)
             elif roam.get('no_last'):            # "no_last": never the last wave (Floors 21-30)
                 waves = range(len(battles) - 1)

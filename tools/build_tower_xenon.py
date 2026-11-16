@@ -25,6 +25,7 @@ ARDENT, DESECRATION, SMITE = '8550021', '8550023', '8550024'
 SANCUS_SKILLS = f'{ARDENT}:1@{DESECRATION}:1@{SMITE}:1'
 AI_LV8, AI_LV10 = '845000210', '845000220'
 STATS = {9: (2000000, 2500, 1200), 10: (3200000, 3000, 1500)}      # level: HP, ATK, DEF
+ROAMING_LV10 = (160000, 1600, 1000)       # Floors 91-100: Xenon Lv10 met before the last wave (original numbers)
 # a monster's passive (hjAy9St3 = process id, 2Smu5Mtq = its numbers, read by MonsterMst like a leader
 # skill's): process 53 = damage resistances; these numbers are the game's own "negates critical hits"
 # leader skill (id 1200: 100,100 crit, 100,100 crit damage)
@@ -98,7 +99,13 @@ def main():
             mob.update(hp=STATS[i][0], atk=STATS[i][1], **{'def': STATS[i][2]})
             row.update(e7DK0FQT=str(STATS[i][0]), **{'67CApcti': str(STATS[i][1]), 'q08xLEsy': str(STATS[i][2])})
         q['roamer']['no_last'] = (i == 3)
-        q['roamer']['max'] = 1 if i == 10 else 2       # Floors 91-100: only his guaranteed last wave
+        q['roamer']['max'] = 2
+        if i == 10:          # Floors 91-100: the last wave is the full boss; the one roaming before it is weaker
+            boss = json.loads(json.dumps(mob))
+            q['roamer']['last_mobs'] = [boss]
+            w = ROAMING_LV10
+            mob.update(hp=w[0], atk=w[1], **{'def': w[2]})
+            mob['row'] = dict(mob['row'], e7DK0FQT=str(w[0]), **{'67CApcti': str(w[1]), 'q08xLEsy': str(w[2])})
         q['roamer']['also'] = ['860013', '860014', '860015']   # no other Xenon from the recorded line-ups
         print(quest(i), mob['name'], row['pn16CNah'], row['F4bQ7r8C'], row['i74vGUFa'])
     json.dump(B, open(p, 'w', encoding='utf-8'), ensure_ascii=False)
