@@ -3,5 +3,10 @@
   "10233": {"name": "Swordswoman Seria", "hp": 400, "atk": 400},
   "10234": {"name": "Blade God Seria", "hp": 400, "atk": 400},
   "10235": {"name": "Flare Goddess Seria", "hp": 400, "atk": 400},
-  "10236": {"name": "Solar Fervor Seria", "hp": 400, "atk": 400}
+  "10236": {"name": "Solar Fervor Seria", "hp": 400, "atk": 400},
+  "860013": {"name": "Xenon", "hp": 500, "atk": 500, "def": 500, "rec": 500},
+  "860014": {"name": "Royal Guard Xenon", "hp": 500, "atk": 500, "def": 500, "rec": 500},
+  "860015": {"name": "Sir Sancus Xenon", "hp": 500, "atk": 500, "def": 500, "rec": 500},
+  "860017": {"name": "Black Knight Xenon", "hp": 500, "atk": 500, "def": 500, "rec": 500},
+  "860018": {"name": "Xenon, Son of Elysia", "hp": 500, "atk": 500, "def": 500, "rec": 500}
 }
