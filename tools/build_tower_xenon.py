@@ -24,6 +24,7 @@ from build_custom_bosses import ai_row      # noqa: E402
 ARDENT, DESECRATION, SMITE = '8550021', '8550023', '8550024'
 SANCUS_SKILLS = f'{ARDENT}:1@{DESECRATION}:1@{SMITE}:1'
 AI_LV8, AI_LV10 = '845000210', '845000220'
+STATS = {9: (2000000, 2500, 1200), 10: (3200000, 3000, 1500)}      # level: HP, ATK, DEF
 # a monster's passive (hjAy9St3 = process id, 2Smu5Mtq = its numbers, read by MonsterMst like a leader
 # skill's): process 53 = damage resistances; these numbers are the game's own "negates critical hits"
 # leader skill (id 1200: 100,100 crit, 100,100 crit damage)
@@ -87,6 +88,9 @@ def main():
         row['3evIn0zZ'] = mob['name']
         row.update(hjAy9St3=NO_CRIT[0], **{'2Smu5Mtq': NO_CRIT[1]})      # immune to critical hits (wiki)
         mob['row'], mob['ai'] = row, row['i74vGUFa']
+        if i in STATS:                          # owner's numbers (Lv9 / Lv10 are much tougher than the original)
+            mob.update(hp=STATS[i][0], atk=STATS[i][1], **{'def': STATS[i][2]})
+            row.update(e7DK0FQT=str(STATS[i][0]), **{'67CApcti': str(STATS[i][1]), 'q08xLEsy': str(STATS[i][2])})
         q['roamer']['no_last'] = (i == 3)
         q['roamer']['also'] = ['860013', '860014', '860015']   # no other Xenon from the recorded line-ups
         print(quest(i), mob['name'], row['pn16CNah'], row['F4bQ7r8C'], row['i74vGUFa'])
