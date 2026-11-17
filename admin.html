@@ -270,6 +270,12 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
 
     <div id="pt-units" class="hide">
       <div class="toolbar"><input id="puSearch" placeholder="Search units"><span class="hint" id="puCount" style="margin:0"></span></div>
+      <h3 class="pe-h">Add a unit (straight into the unit box, no gift)</h3>
+      <div class="row"><div><input id="puPick" placeholder="Type at least 2 letters"><div class="results" id="puResults"></div><div class="chosen" id="puChosen"></div></div>
+        <div style="flex:0 0 90px"><input id="puCount" type="number" min="1" max="50" value="1" title="How many"></div>
+        <div style="flex:0 0 140px"><select id="puType"><option value="random">Random type</option><option value="1">Lord</option><option value="2">Anima</option><option value="3">Breaker</option><option value="4">Guardian</option><option value="5">Oracle</option></select></div></div>
+      <label class="chk-line"><input type="checkbox" id="puMax" checked> Maxed (level, BB / SBB, SP and imps)</label>
+      <div style="margin:8px 0 14px"><button class="btn" id="puAdd">Add to unit box</button> <span class="hint">Best done while the player is offline - they see it after fully restarting the game.</span></div>
       <div class="tablewrap"><table id="puTable"><thead><tr><th></th><th>Unit</th><th class="num">Level</th><th class="num">BB / SBB lv</th><th class="num">SP</th><th></th></tr></thead><tbody></tbody></table></div>
     </div>
 
@@ -874,6 +880,10 @@ function drawPeUnits(){
     <td style="white-space:nowrap"><button class="btn ghost sm" data-set="${u.uuid}">Set</button> <button class="btn ghost sm" data-max="${u.uuid}">Max</button> <button class="btn danger sm" data-rm="${u.uuid}"${u.squad?' disabled title="In a squad"':''}>Remove</button></td></tr>`).join('');
 }
 $('#puSearch').oninput=drawPeUnits;
+const puPick=picker('#puPick','#puResults','#puChosen',()=>'unit');
+$('#puAdd').onclick=async()=>{const s=puPick.get();if(!s)return say('#pmsg','Search and pick the unit first.');
+  const b=$('#puAdd');try{b.disabled=true;const r=await api('pe_unit_add',{player:cur,unit:s.id,count:+$('#puCount').value,utype:$('#puType').value,max:$('#puMax').checked});
+    peSet(r.view);say('#pmsg',r.ok,true);puPick.clear();loadPlayers()}catch(e){say('#pmsg',e.message)}finally{b.disabled=false}};
 $('#puTable').onclick=async e=>{
   const b=e.target.closest('button');if(!b)return;
   let d={player:cur};

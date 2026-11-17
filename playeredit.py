@@ -457,6 +457,34 @@ class PlayerEditor:
             raise ValueError('Nothing changed.')
         return f'unit {name} ({uuid}): ' + ', '.join(out)
 
+    def add_units(self, pl, unit_id, count=1, utype='random', maxed=False):
+        """Put units straight into the unit box (no gift), optionally maxed (level, BB/SBB, SP, imps)."""
+        S = self.S
+        unit_id = str(unit_id or '')
+        m = S.unit_mst().get(unit_id)
+        if not m:
+            raise ValueError('Pick a unit first.')
+        n = int(count or 1)
+        if not 1 <= n <= 50:
+            raise ValueError('Add 1 to 50 at a time.')
+        utype = str(utype or 'random')
+        if utype not in ('random', '1', '2', '3', '4', '5'):
+            raise ValueError('Unknown unit type.')
+        out = {}
+        S.grant(pl, 6, unit_id, n, out, unit_type=S.RANDOM_TYPE if utype == 'random' else utype)
+        rows = out.get('units') or []
+        for r in rows:
+            if maxed:
+                try:
+                    self.set_unit(pl, r['edy7fq3L'], level='max',
+                                  bb='max' if str(r.get('nj9Lw7mV') or '') not in ('', '0') else None,
+                                  sbb='max' if str(r.get('iEFZ6H19') or '') not in ('', '0') else None,
+                                  sp='max' if S._num(r.get('GIO9DTif')) else None, imps='max')
+                except ValueError:
+                    pass            # e.g. a level-1-max material: nothing to raise
+        name = m.get('utP1c0CD') or unit_id
+        return f"added {len(rows)}x {name}" + (' (maxed)' if maxed else '')
+
     def set_item(self, pl, iid, count):
         S = self.S
         iid, count = str(iid), int(count)
@@ -555,6 +583,9 @@ class PlayerEditor:
             if action == 'pe_unit':
                 what = self.set_unit(pl, data.get('uuid'), data.get('level'), bool(data.get('remove')),
                                      data.get('bb'), data.get('sbb'), data.get('sp'), data.get('imps'))
+            elif action == 'pe_unit_add':
+                what = self.add_units(pl, data.get('unit'), data.get('count', 1), data.get('utype', 'random'),
+                                      bool(data.get('max')))
             elif action == 'pe_item':
                 what = self.set_item(pl, data.get('item'), data.get('count', 0))
             elif action == 'pe_flag':
