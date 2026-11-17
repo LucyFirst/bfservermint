@@ -1,0 +1,37 @@
+{
+  "_how": "Summoner Journal (journal.py). Tasks: id, name, note (the line under the name), goal: what is counted (level | quests | summons | units | rec:<records key> | count:<counter> | quest:<quest id>), target, points (journal points for claiming), screen (Go button: 1 Units, 2 Town, 3 Quests, 4 Vortex, 5 Arena, 6 Randall, 7 Raid, 8 Friends, 9 Gift box, 0 none), unlock: {level: N} or {task: id} (shown locked until then), reward: [present type, id, count] (8 gems, 3 zel, 2 karma, 6 unit, 4 item). Milestones: points reached -> reward, sent to the gift box automatically. Rewards always go to the gift box.",
+  "tasks": [
+    {"id": "1", "name": "Rookie Summoner", "note": "Reach Player Level 10", "goal": "level", "target": 10, "points": 10, "screen": 3, "reward": [8, "", 5]},
+    {"id": "2", "name": "Seasoned Summoner", "note": "Reach Player Level 30", "goal": "level", "target": 30, "points": 20, "screen": 3, "unlock": {"task": "1"}, "reward": [8, "", 10]},
+    {"id": "3", "name": "Veteran Summoner", "note": "Reach Player Level 60", "goal": "level", "target": 60, "points": 30, "screen": 3, "unlock": {"task": "2"}, "reward": [8, "", 15]},
+    {"id": "4", "name": "Elite Summoner", "note": "Reach Player Level 100", "goal": "level", "target": 100, "points": 50, "screen": 3, "unlock": {"task": "3"}, "reward": [8, "", 25]},
+
+    {"id": "11", "name": "First Steps", "note": "Clear 10 different quests", "goal": "quests", "target": 10, "points": 10, "screen": 3, "reward": [3, "", 20000]},
+    {"id": "12", "name": "Adventurer", "note": "Clear 50 different quests", "goal": "quests", "target": 50, "points": 20, "screen": 3, "unlock": {"task": "11"}, "reward": [3, "", 50000]},
+    {"id": "13", "name": "Pathfinder", "note": "Clear 150 different quests", "goal": "quests", "target": 150, "points": 30, "screen": 3, "unlock": {"task": "12"}, "reward": [8, "", 10]},
+    {"id": "14", "name": "Grand Explorer", "note": "Clear 300 different quests", "goal": "quests", "target": 300, "points": 50, "screen": 3, "unlock": {"task": "13"}, "reward": [8, "", 20]},
+
+    {"id": "21", "name": "Power Up", "note": "Fuse units 10 times", "goal": "rec:WMC6rNF1", "target": 10, "points": 10, "screen": 1, "unlock": {"level": 5}, "reward": [6, "10312", 1]},
+    {"id": "22", "name": "Fusion Master", "note": "Fuse units 50 times", "goal": "rec:WMC6rNF1", "target": 50, "points": 20, "screen": 1, "unlock": {"task": "21"}, "reward": [6, "10313", 1]},
+    {"id": "31", "name": "Evolution", "note": "Evolve a unit", "goal": "rec:Rc6St9h1", "target": 1, "points": 10, "screen": 1, "unlock": {"level": 10}, "reward": [2, "", 5000]},
+    {"id": "32", "name": "Evolution Expert", "note": "Evolve units 10 times", "goal": "rec:Rc6St9h1", "target": 10, "points": 20, "screen": 1, "unlock": {"task": "31"}, "reward": [8, "", 10]},
+
+    {"id": "41", "name": "Summoner's Call", "note": "Summon 10 units", "goal": "summons", "target": 10, "points": 10, "screen": 0, "reward": [3, "", 30000]},
+    {"id": "42", "name": "Gathering Allies", "note": "Collect 50 different units", "goal": "units", "target": 50, "points": 20, "screen": 1, "reward": [8, "", 10]},
+    {"id": "43", "name": "Unit Collector", "note": "Collect 150 different units", "goal": "units", "target": 150, "points": 30, "screen": 1, "unlock": {"task": "42"}, "reward": [8, "", 20]},
+
+    {"id": "51", "name": "Arena Debut", "note": "Win 5 Arena battles", "goal": "rec:8CEu9Kcm", "target": 5, "points": 10, "screen": 5, "unlock": {"level": 10}, "reward": [3, "", 30000]},
+    {"id": "52", "name": "Arena Champion", "note": "Win 30 Arena battles", "goal": "rec:8CEu9Kcm", "target": 30, "points": 30, "screen": 5, "unlock": {"task": "51"}, "reward": [8, "", 15]},
+
+    {"id": "61", "name": "Craftsman", "note": "Craft 10 items", "goal": "rec:c3Bo97kI", "target": 10, "points": 10, "screen": 2, "reward": [2, "", 3000]},
+    {"id": "62", "name": "Sphere Smith", "note": "Craft 3 spheres", "goal": "rec:07HgoLtC", "target": 3, "points": 20, "screen": 2, "unlock": {"task": "61"}, "reward": [8, "", 10]},
+
+    {"id": "71", "name": "Making Friends", "note": "Accept 5 friend requests", "goal": "count:friend", "target": 5, "points": 10, "screen": 8, "reward": [3, "", 20000]}
+  ],
+  "milestones": [
+    {"id": "1", "points": 50, "message": "Summoner Journal: 50 points", "reward": [8, "", 10]},
+    {"id": "2", "points": 150, "message": "Summoner Journal: 150 points", "reward": [6, "20302", 1]},
+    {"id": "3", "points": 300, "message": "Summoner Journal: 300 points", "reward": [8, "", 25]},
+    {"id": "4", "points": 420, "message": "Summoner Journal complete!", "reward": [6, "50612", 1]}
+  ]
+}

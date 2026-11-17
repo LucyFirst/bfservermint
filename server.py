@@ -2686,6 +2686,16 @@ FH_REQUESTS = {'ChallengeBaseRequest', 'ChallengeUserInfoRequest', 'ChallengeSta
                'ChallengeRankingRequest', 'ChallengeRankRewardRequest'}
 
 _REC = None
+_JOURNAL = None
+
+def journal_engine():
+    """Summoner Journal (journal.py)."""
+    global _JOURNAL
+    if _JOURNAL is None:
+        import journal as _journal
+        _JOURNAL = _journal.Journal(sys.modules[__name__])
+    return _JOURNAL
+
 def records_engine():
     global _REC
     if _REC is None:
@@ -2747,7 +2757,8 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
                                'super': {'on': 0, 'chance': 3.0, 'mult': 2.0}, 'label': 'none'},
                     'features': {'frontierhunter': 0, 'guild': 0, 'raid': 0, 'colosseum_enable': 0,
-                                 'frontier_gate': 1, 'frontier_rift': 1, 'frontier_spire': 1, 'sandbag_enable': 1},
+                                 'frontier_gate': 1, 'frontier_rift': 1, 'frontier_spire': 1, 'sandbag_enable': 1,
+                                 'mystery_chest': 0, 'summoner_journal': 1},
                     'raid_max_class': 3,    # Raid Battle: highest Raid Class open (quests and class-ups)
                     'unitbox': 300,
                     'sphere_on': [],        # event / raid Sphere House recipes switched on         # base unit box size every player has (the game starts at 300)
@@ -2769,6 +2780,9 @@ GAME_FEATURES = [
     ('frontier_rift', 'Frontier Rift', 'Survey Office list', 'Banner not drawn.'),
     ('frontier_spire', 'Frontier Spire', 'Survey Office list', 'Banner not drawn.'),
     ('sandbag_enable', "Summoners' Training Ground", 'Survey Office list', 'Banner not drawn.'),
+    ('mystery_chest', 'Mystery Chest', 'Rewards menu',
+     'Button not drawn. (Not built on this server yet - switched on, it only gives a connection error.)'),
+    ('summoner_journal', 'Summoner Journal', 'Rewards menu', 'Button not drawn.'),
 ]
 
 def admin_page():
@@ -4679,6 +4693,11 @@ def handle_action(rid, req):
             close_frontier_gate(resp)
         pl, snap = _CUR.pl, _CUR.snap
         _CUR.pl = _CUR.snap = None
+        if pl is not None and isinstance(resp, dict) and isinstance(resp.get('M3dw18eB'), dict):
+            try:
+                resp['M3dw18eB'] = journal_engine().user_row(pl, resp['M3dw18eB'])
+            except Exception:
+                log.exception('could not set the Summoner Journal points')
         if pl is not None and isinstance(resp, dict) and ENTERED in resp:
             resp[ENTERED] = [dict(r) for r in entered_rows(pl)]      # never a recording's list
         if pl is not None and snap is not None:
@@ -4943,6 +4962,20 @@ def _handle_action(rid, req):
             if err:
                 save_player(pl)
                 return error_response(err)
+            save_player(pl)
+            return resp
+        if cls in ('SummonerJournalInfoRequest', 'SummonerJournalTaskRewardsRequest',
+                   'SummonerJournalMilestoneRewardsRequest'):
+            J = journal_engine()
+            if cls == 'SummonerJournalTaskRewardsRequest':
+                resp, err = J.claim(pl, req)
+            else:
+                resp, err = J.info(pl), None
+            if err:
+                save_player(pl)
+                log.info('Summoner Journal claim refused: %s', err)
+                return error_response(err)
+            apply_wallet(pl, resp)
             save_player(pl)
             return resp
         if cls in ('DailyTaskUserInfoRequest', 'DailyTaskClaimRewardRequest'):
