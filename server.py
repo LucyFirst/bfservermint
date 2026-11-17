@@ -2261,6 +2261,11 @@ def daily_spin(pl):
 G_MEDALS, G_SLOT_RESULT = '6C0kzwM5', 's8r5M6wI'
 SLOT_COST = 3
 SLOT_TABLE = []
+# The recorded slots also paid out Raid items (70000 Beacon, 70300 God Crystal, 70600 Detector...).
+# The slot result screen leaves their tile empty (a 10-spin showed 9 prizes), so they are swapped
+# for ordinary battle items.
+SLOT_SWAP = {'70000@10': '20000@5', '70100@3': '20001@3', '70200@1': '20002@1', '70300@3': '20100@2',
+             '70400@2': '20400@2', '70500@2': '20600@2', '70600@5': '20200@5'}
 
 def slot_table():
     if not SLOT_TABLE:
@@ -2270,7 +2275,10 @@ def slot_table():
                 for x in BLOBS[a['resp']].get(G_SLOT_RESULT) or []:
                     k = (x['yT3NBME0'], x['CW1bko4F'], x['3WZ7KTp8'], x['D20kuSLy'])
                     seen[k] = seen.get(k, 0) + 1
-        SLOT_TABLE.extend((k, n) for k, n in seen.items())
+        for (kind, prize, rank, reels), n in seen.items():
+            if kind == '2' and prize in SLOT_SWAP:       # Raid items: the slot screen can't draw them
+                prize = SLOT_SWAP[prize]
+            SLOT_TABLE.append(((kind, prize, rank, reels), n))
     return SLOT_TABLE
 
 def slot_prizes_page():
