@@ -2753,6 +2753,8 @@ DEFAULT_SETTINGS = {'mult': {'exp': 1.0, 'zel': 1.0, 'karma': 1.0, 'drop': 1.0, 
                     'area_drops': {},       # Vortex banner: {dungeon: {drop, item, caps: {unit: percent}, items: {item: x}}}
                     'item_rates': {},       # every quest: {item id: multiplier} (Rates tab > Item drop rates)
                     'gold_names': [],
+                    'name_colors': {'zoa1Upn6': '#98FBCB'},     # user id -> name colour other players see
+                    'testers': ['zoa1Upn6'],    # tester accounts: see test banners, kept off Discord
                     'sell': {},
                     'fusion': {'great': {'on': 0, 'chance': 12.0, 'mult': 1.5},
                                'super': {'on': 0, 'chance': 3.0, 'mult': 2.0}, 'label': 'none'},
@@ -2818,6 +2820,10 @@ def admin_settings():
                         if a:
                             d['area_drops'][str(did)] = a
                 d['gold_names'] = [str(x) for x in (f.get('gold_names') or [])]
+                if isinstance(f.get('name_colors'), dict):
+                    d['name_colors'] = {str(k): str(v) for k, v in f['name_colors'].items() if v}
+                if isinstance(f.get('testers'), list):
+                    d['testers'] = [str(x) for x in f['testers']]
                 d['item_rates'] = {str(i): float(x) for i, x in (f.get('item_rates') or {}).items()}
                 if (f.get('fusion') or {}).get('label') in ('none', 'great', 'super'):
                     d['fusion']['label'] = f['fusion']['label']
@@ -3188,7 +3194,18 @@ def shown_name(p):
     name = p.get('handle', 'Summoner') or 'Summoner'
     if str(p.get('user_id')) in (admin_settings().get('gold_names') or []):
         return f'<color={GOLD}>{name}</color>'
-    return name
+    c = hex_color((admin_settings().get('name_colors') or {}).get(str(p.get('user_id'))))
+    return f'<color={c}>{name}</color>' if c else name
+
+def hex_color(h):
+    """'#98FBCB' -> '152:251:203' (the game's colour markup), None when it isn't a colour."""
+    h = str(h or '').strip().lstrip('#')
+    if len(h) != 6 or any(ch not in '0123456789abcdefABCDEF' for ch in h):
+        return None
+    return ':'.join(str(int(h[i:i + 2], 16)) for i in (0, 2, 4))
+
+def is_tester(pl):
+    return str((pl or {}).get('user_id')) in (admin_settings().get('testers') or [])
 
 # --------------------------------------------------------------------------- Vortex reward boosts
 # The game's own quest bonus ("XP Received x2" on a Vortex banner): a dungeon row in the Vortex

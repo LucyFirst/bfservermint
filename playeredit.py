@@ -215,6 +215,8 @@ class PlayerEditor:
             'id': pl['user_id'], 'name': pl.get('handle'), 'account': pl.get('account', ''),
             'friend_id': pl.get('friend_id'),
             'gold': pl['user_id'] in (S.admin_settings().get('gold_names') or []),
+            'color': (S.admin_settings().get('name_colors') or {}).get(pl['user_id'], ''),
+            'tester': S.is_tester(pl),
             'created': pl.get('created'), 'saved': int(os.path.getmtime(path)) if os.path.exists(path) else None,
             'team': [{'key': k, 'label': lab, 'value': S._num(t.get(code)) if S._num(t.get(code)) is not None else t.get(code)}
                      for k, code, lab in TEAM_FIELDS],
@@ -301,6 +303,31 @@ class PlayerEditor:
                 st['gold_names'] = sorted(gold)
                 S.save_admin_settings(st)
                 changed.append('gold name on' if data.get('gold') else 'gold name off')
+        if 'color' in data:
+            c = str(data.get('color') or '').strip()
+            if c and not c.startswith('#'):
+                c = '#' + c
+            if c and not S.hex_color(c):
+                raise ValueError('Name colour must be a hex colour like #98FBCB (or empty for none).')
+            st = S.admin_settings()
+            cols = dict(st.get('name_colors') or {})
+            if cols.get(pl['user_id'], '') != c.upper():
+                if c:
+                    cols[pl['user_id']] = c.upper()
+                else:
+                    cols.pop(pl['user_id'], None)
+                st['name_colors'] = cols
+                S.save_admin_settings(st)
+                changed.append(f'name colour {c.upper() or "none"}')
+        if 'tester' in data:
+            st = S.admin_settings()
+            ts = set(st.get('testers') or [])
+            was = pl['user_id'] in ts
+            (ts.add if data.get('tester') else ts.discard)(pl['user_id'])
+            if (pl['user_id'] in ts) != was:
+                st['testers'] = sorted(ts)
+                S.save_admin_settings(st)
+                changed.append('tester on' if data.get('tester') else 'tester off')
         vals = data.get('team') or {}
         if t is not None:
             before = {code: S._num(t.get(code)) for _k, code, _l in TEAM_FIELDS}

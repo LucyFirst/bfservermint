@@ -90,7 +90,8 @@ class Leaderboards:
             except Exception:
                 continue
             handle = str(pl.get('handle') or '').strip()
-            if not handle or handle.upper() == 'ADMIN' or str(pl.get('user_id')) in self.skip:
+            if not handle or handle.upper() == 'ADMIN' or str(pl.get('user_id')) in self.skip \
+                    or self.S.is_tester(pl):
                 continue
             yield pl
 

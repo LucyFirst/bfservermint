@@ -246,6 +246,9 @@ details.qa>summary span.cnt{color:var(--muted);font-weight:500;font-size:13px;ma
       <div class="kv" id="peInfo"></div>
       <label>Player name</label><input id="peName" maxlength="12">
       <label class="chk-line"><input type="checkbox" id="peGold"> Gold name (admin account) - other players see this name in gold in friend lists, helpers and the arena</label>
+      <label>Name colour (hex, e.g. #98FBCB; empty = none; gold name wins)</label>
+      <div style="display:flex;gap:8px;align-items:center"><input id="peColor" maxlength="7" placeholder="#98FBCB" style="max-width:140px"><span id="peColorSw" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--line)"></span></div>
+      <label class="chk-line"><input type="checkbox" id="peTester"> Tester - sees banners that are being tested, and is never posted in the Discord highlights or leaderboards</label>
       <h3 class="pe-h">Account</h3>
       <div class="mults" id="peTeam"></div>
       <label class="chk-line"><input type="checkbox" id="peLvStats" checked> When the level changes, also set that level's max energy, squad cost and friend slots</label>
@@ -795,18 +798,21 @@ function peDraw(){
   const sm=v.summary||{};
   $('#peNote').innerHTML=(sm.online?'<b style="color:var(--gold)">This player is online right now (game activity in the last 5 minutes).</b> Saving is safe, and anything they do meanwhile still counts. ':`Last active ${esc(ago(sm.seen))}. `)+'The game reads the account at login, so the player sees changes after fully restarting the game.';
   $('#peInfo').innerHTML=[['User id',v.id],['Friend id',v.friend_id],['Sign-in account',v.account||'-'],['Made',dayStr(v.created)],['Quests cleared',fmt(v.cleared)],['Units',fmt(v.units.length)]].map(([k,x])=>`<span>${k}</span><b>${esc(x)}</b>`).join('');
-  $('#peName').value=v.name||''; $('#peGold').checked=!!v.gold;
+  $('#peName').value=v.name||''; $('#peGold').checked=!!v.gold; $('#peTester').checked=!!v.tester;
+  $('#peColor').value=v.color||''; peSwatch();
   $('#peTeam').innerHTML=v.team.map(f=>`<div><label>${esc(f.label)}${f.key==='level'&&v.max_level?` (1-${v.max_level})`:''}</label><input type="number" min="0" data-team="${f.key}" value="${esc(f.value)}"></div>`).join('');
   $('#peWallet').innerHTML=v.wallet.map(f=>`<div><label>${esc(f.label)}</label><input type="number" min="0" data-wallet="${f.key}" value="${esc(f.value)}"></div>`).join('');
   const ov=Object.entries(v.overrides||{});
   $('#peOverrides').innerHTML=ov.length?`<p class="hint" style="margin-top:10px;color:var(--gold)">Fixed by ADMIN.bat "set" (these win over the values above): ${ov.map(([k,x])=>esc(k+' = '+x)).join(', ')}. Remove the "overrides" flag on the Flags tab to undo.</p>`:'';
   drawPeUnits(); drawPeItems(); drawPeFlags(); drawPeBackups();
 }
+function peSwatch(){const c=$('#peColor').value.trim();$('#peColorSw').style.background=/^#?[0-9a-fA-F]{6}$/.test(c)?(c[0]==='#'?c:'#'+c):'transparent'}
+$('#peColor').oninput=peSwatch;
 $('#peSaveProfile').onclick=async()=>{
   const team={},wallet={};
   $$('#peTeam input').forEach(i=>team[i.dataset.team]=i.value);
   $$('#peWallet input').forEach(i=>wallet[i.dataset.wallet]=i.value);
-  try{$('#peSaveProfile').disabled=true;const r=await api('pe_profile',{player:cur,name:$('#peName').value,gold:$('#peGold').checked,team,wallet,level_stats:$('#peLvStats').checked});peSet(r.view);say('#pmsg',r.ok,true);loadPlayers()}
+  try{$('#peSaveProfile').disabled=true;const r=await api('pe_profile',{player:cur,name:$('#peName').value,gold:$('#peGold').checked,color:$('#peColor').value,tester:$('#peTester').checked,team,wallet,level_stats:$('#peLvStats').checked});peSet(r.view);say('#pmsg',r.ok,true);loadPlayers()}
   catch(e){say('#pmsg',e.message)}finally{$('#peSaveProfile').disabled=false}
 };
 // quests

@@ -78,7 +78,8 @@ class Highlights:
         return f"**{_esc(pl.get('handle'))}**"
 
     def _ok(self, pl):
-        return bool(self.url) and pl is not None and str(pl.get('user_id')) not in self.skip
+        return bool(self.url) and pl is not None and str(pl.get('user_id')) not in self.skip \
+            and not self.S.is_tester(pl)
 
     def _add(self, line):
         with self.lock:
@@ -177,7 +178,7 @@ class Highlights:
                 pl = json.load(open(f, encoding='utf-8'))
             except Exception:
                 continue
-            if str(pl.get('user_id')) in self.skip or not self._can_first(pl):
+            if str(pl.get('user_id')) in self.skip or self.S.is_tester(pl) or not self._can_first(pl):
                 continue
             for r in (pl.get('state') or {}).get('UT1SVg59') or []:
                 if isinstance(r, dict) and str(r.get('j28VNcUW')) in todo:

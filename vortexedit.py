@@ -112,7 +112,7 @@ class VortexEditor:
         if c.get('hidden'):
             return False
         testers = [str(t).strip().lower() for t in c.get('testers') or []]
-        if not testers:
+        if not testers or self.S.is_tester(pl):
             return True
         who = {str((pl or {}).get(k) or '').strip().lower() for k in ('account', 'handle')} - {''}
         return bool(who & set(testers))
