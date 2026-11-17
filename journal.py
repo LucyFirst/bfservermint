@@ -125,6 +125,12 @@ class Journal:
             opened = self.unlocked(pl, t)
             utasks.append({'h7eY3sAK': uid, '23DaiBpe': t['id'], 'pG2n1A28': str(min(done, target)),
                            '2g6adYig': '0' if opened and done >= target else '1', 'b638DwP8': '1' if opened else '0'})
+        if not utasks:
+            # The game only clears its task list when a row arrives - an empty list leaves the last
+            # claimed task on screen with its Receive button. With everything claimed, show the
+            # finished tasks (full progress, Go button) instead.
+            utasks = [{'h7eY3sAK': uid, '23DaiBpe': t['id'], 'pG2n1A28': str(_i(t.get('target'), 1)),
+                       '2g6adYig': '1', 'b638DwP8': '1'} for t in self.tasks]
         miles = []
         for m in self.miles:
             ptype, pid, cnt = (list(m.get('reward') or [8, '', 0]) + ['', 0])[:3]
@@ -175,7 +181,9 @@ class Journal:
                 self.S.add_present(pl, ptype, pid, cnt, f"Summoner Journal: {t.get('name', '')}")
             got.append(t.get('name', tid))
         if not got:
-            return None, 'There is no task to claim.'
+            # already claimed (the game's list was out of date): send the journal as it is, no error
+            self.S.log.info('Summoner Journal: nothing to claim in %s', want)
+            return self.reply(pl, self._milestones(pl)), None
         self.S.log.info('Summoner Journal: claimed %s (%s points)', ', '.join(got), self.points(pl))
         resp = self.reply(pl, self._milestones(pl))
         resp[self.S.G_PRESENTS] = self.S.present_rows(pl)
