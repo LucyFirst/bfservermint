@@ -263,7 +263,8 @@ class FrontierHunter:
 
     def ranked(self, n, kind='1', mission=None):
         users = self.run(n)['users']
-        rows = [(uid, self.value(u, kind, mission)) for uid, u in users.items()]
+        rows = [(uid, self.value(u, kind, mission)) for uid, u in users.items()
+                if not self.S.is_tester({'user_id': uid})]      # testers are never ranked
         rows = [r for r in rows if r[1] > 0]
         rows.sort(key=lambda r: -r[1])
         return rows
