@@ -3692,6 +3692,23 @@ def key_opens(pl):
         r['H6k1LIxC'] = str(max(1, int(a['until'] - now))) if a else '0'
     return op
 
+def key_missions():
+    """Every quest a key can open."""
+    return {m for kid in KEY_MST for p in key_patterns(kid) for m in p['missions']} | \
+        {str(m.get('MHx05sXt')) for m in KEY_MST.values() if m.get('MHx05sXt') in MISSIONS}
+
+def key_expired(pl, mid):
+    """A quest only a key opens, whose key time has run out (the game may still list it until it
+    gets a fresh Vortex list)."""
+    mid = str(mid)
+    if mid not in key_missions() or mid in key_opens(pl):
+        return False
+    dun = str((MISSIONS.get(mid) or {}).get('dungeon'))
+    for r in sp_permits(pl):
+        if str(r.get('j28VNcUW')) == mid or (str(r.get('MHx05sXt')) == dun and len(r) == 1):
+            return False             # also open without a key (its own listing)
+    return True
+
 def key_rows_raw(pl):
     return [r for r in _rows(pl['state'].get(G_KEYS)) if isinstance(r, dict)]
 
@@ -4710,6 +4727,11 @@ def handle_action(rid, req):
             close_frontier_gate(resp)
         pl, snap = _CUR.pl, _CUR.snap
         _CUR.pl = _CUR.snap = None
+        if pl is not None and isinstance(resp, dict) and cls in ('MissionEndRequest', 'MissionContinueRequest'):
+            try:                # a fresh Vortex list: key quests whose time ran out mid-quest close
+                resp['Y73tHKS8'] = sp_permits(pl)
+            except Exception:
+                log.exception('could not refresh the Vortex list')
         if pl is not None and isinstance(resp, dict) and isinstance(resp.get('M3dw18eB'), dict):
             try:
                 resp['M3dw18eB'] = journal_engine().user_row(pl, resp['M3dw18eB'])
@@ -4910,6 +4932,10 @@ def _handle_action(rid, req):
                 pl['fh_helper'] = str(((req.get('9Q1Lq5FS') or [{}])[0]).get(F_USERID) or '')
             else:
                 pl.pop('fh_run', None)          # an ordinary quest
+            if key_expired(pl, mid_req):
+                save_player(pl)
+                log.info('key quest %s refused: its key time is over', mid_req)
+                return error_response('The time available for this Quest has expired.')
             err = start_mission(pl, req)
             if err:
                 save_player(pl)
