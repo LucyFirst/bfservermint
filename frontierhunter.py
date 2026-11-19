@@ -308,7 +308,9 @@ class FrontierHunter:
         place = self.place(n, pl['user_id'])
         f = self.me(pl)
         return {'TPR79fyI': str(u['search']), 'QG5kcBz6': '1' if f.get('news') else '0', 'c5yZnpB4': season,
-                'j0Uszek2': '1', 's2gM3deu': self.term_text(st, en), '2Cn0bWt9': '0',
+                # j0Uszek2 3 = a finished season's results are waiting: the lobby then asks for them
+                # (ChallengeRankReward) and shows the results screen; 1 = the season is running
+                'j0Uszek2': '3' if f.get('news') else '1', 's2gM3deu': self.term_text(st, en), '2Cn0bWt9': '0',
                 'vV4P53m7': str(place), 'WDUyI85C': self.comment(season, place, u['search'])}
 
     def mission_rows(self, pl):
