@@ -4727,6 +4727,7 @@ def handle_action(rid, req):
             close_frontier_gate(resp)
         pl, snap = _CUR.pl, _CUR.snap
         _CUR.pl = _CUR.snap = None
+        cls = (REQS.get(rid) or {}).get('cls')
         if pl is not None and isinstance(resp, dict) and cls in ('MissionEndRequest', 'MissionContinueRequest'):
             try:                # a fresh Vortex list: key quests whose time ran out mid-quest close
                 resp['Y73tHKS8'] = sp_permits(pl)
