@@ -42,6 +42,7 @@ HR_TIERS = [(1, 1, 7, "You're in first place! Hold on to it and your Hunter Rank
             (2, 4, 3, "You're in the top 4! Keep this up and your Hunter Rank goes up by 3. First place gets 7!"),
             (5, 8, 2, "You're in the top 8! Keep this up and your Hunter Rank goes up by 2. Can you reach the top 4?"),
             (9, 0, 1, "Every Summoner who scores gets a Hunter Rank! Climb into the top 8 for more!")]
+HR_ZEL = 5000                    # zel per Hunter Rank gained, on the season results screen (it needs a prize to show)
 INTRO = 'You\'re here! The area to be surveyed this time is full of tough enemies, but I\'m sure you can take care of them!'
 
 
@@ -353,7 +354,7 @@ class FrontierHunter:
             return {'Hmiwj75u': self.ranking_rows(pl)}
         if cls == 'ChallengeRankRewardRequest':
             f = self.me(pl)
-            rows = f.pop('news', None) or []
+            rows = self.results_rows(pl, f.pop('news', None) or [])
             out = self.lobby(pl)
             out['p73SJiWv'] = rows
             return out
@@ -472,6 +473,32 @@ class FrontierHunter:
             self.S.log.info('Frontier Hunter: %s scored %s on %s (best %s, +%s points, rank %s -> %s)',
                             pl.get('handle'), f'{score:,}', mid, f'{max(old, score):,}', gained, before,
                             resp['21BqKn8b']['vV4P53m7'])
+
+    def results_rows(self, pl, news):
+        """The season results screen (ChallengeReceiptScene), one page per row. Every page shows a
+        reward the game draws by type (2 friend points, 3 zel, 4/5/7 item, 6 unit, 8 brave coins,
+        9 key, 11 karma - anything else is looked up as an item and crashes), so Hunter Rank (type
+        10) can't be a page of its own: it is shown on the first page (NH65Wj0f 1 = the Hunter Rank
+        promotion picture, Sv80kL5r the new rank) together with HR_ZEL zel per rank gained.
+        Ranking prizes are NH65Wj0f 2: their ranking's title picture is looked up by 9w5e3ZJB +
+        j28VNcUW in the game's MVP table, so the mission must be the table's."""
+        f = self.me(pl)
+        hr = str(f['hr'])
+        gained = sum(_i(r.get('wJsB35iH')) for r in news if str(r.get('30Kw4WBa')) == '10')
+        out = []
+        if gained:
+            zel = HR_ZEL * gained
+            season = next((r.get('c5yZnpB4') for r in news), '')
+            self.give(pl, '3', '', zel, f'Frontier Hunter season {season}: Hunter Rank +{gained}')
+            out.append({'c5yZnpB4': season, 'NH65Wj0f': '1', '9w5e3ZJB': '1', 'j28VNcUW': '0', 'Sv80kL5r': hr,
+                        '30Kw4WBa': '3', 'TdDHf59J': '0', 'wJsB35iH': str(zel), '37moriMq': '0'})
+        for r in news:
+            if str(r.get('30Kw4WBa')) == '10':
+                continue
+            kind = str(r.get('9w5e3ZJB'))
+            m = next((x for x in self.mvp.get(str(r.get('c5yZnpB4')), []) if str(x.get('9w5e3ZJB')) == kind), {})
+            out.append(dict(r, NH65Wj0f='2', Sv80kL5r=hr, j28VNcUW=str(m.get('j28VNcUW') or '0')))
+        return out
 
     def give(self, pl, ptype, target, count, note):
         ptype = str(ptype)
