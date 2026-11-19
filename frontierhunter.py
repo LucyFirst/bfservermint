@@ -234,13 +234,33 @@ class FrontierHunter:
         u = self.run(n)['users'].setdefault(pl['user_id'], {'search': 0, 'best': {}, 'mvp': {}, 'paid': {}})
         t = self.S.team_row(pl['state']) or {}
         try:
-            lead = next((x for x, ld in self.S.arena_engine().squad_units(pl) if ld), {})
+            lead = self.S.friend_engine().leader(pl) or {}      # the quest squad leader (as a helper)
         except Exception:
             lead = {}
         u.update({'name': self.S.shown_name(pl), 'lv': str(t.get('D9wXQI2V', '1')),
                   'unit': str(lead.get('pn16CNah', '10011')), 'unit_lv': str(lead.get('D9wXQI2V', '1')),
                   'hr': self.me(pl)['hr']})
         return u
+
+    def refresh_leads(self, users, me):
+        """Other players' leader unit / level / name as they are now (an entry is otherwise only
+        updated when that player opens Frontier Hunter) - at most every 10 minutes per player."""
+        now = time.time()
+        for uid, u in users.items():
+            if uid == me or now - _i(u.get('looked')) < 600:
+                continue
+            u['looked'] = int(now)
+            try:
+                p = self.S.load_player(uid)
+                if not p:
+                    continue
+                lead = self.S.friend_engine().leader(p) or {}
+                t = self.S.team_row(p['state']) or {}
+                u.update({'name': self.S.shown_name(p), 'lv': str(t.get('D9wXQI2V', u.get('lv', '1'))),
+                          'unit': str(lead.get('pn16CNah', u.get('unit', '10011'))),
+                          'unit_lv': str(lead.get('D9wXQI2V', u.get('unit_lv', '1')))})
+            except Exception:
+                pass
 
     def header(self, pl):
         f = self.me(pl)
@@ -466,6 +486,7 @@ class FrontierHunter:
         me = pl['user_id']
         users = self.run(n)['users']
         self.entry(pl, n)
+        self.refresh_leads(users, me)
         try:
             friends = {u for u, st in (self.S.friend_engine().links.get(me) or {}).items() if str(st) in ('friend', '1')}
         except Exception:

@@ -22,6 +22,7 @@ run = F.run(n)
 st = F.start() + n * F.period()
 plain = lambda s: re.sub(r'<[^>]+>', '', str(s or ''))
 users = run['users']
+F.refresh_leads(users, None)
 out = {'run': n + 1, 'season_id': run['season'], 'from': time.strftime('%Y-%m-%d', time.gmtime(st)),
        'to': time.strftime('%Y-%m-%d', time.gmtime(st + F.period())), 'ended': n < now_n}
 row = lambda uid, v: {'name': plain(users[uid].get('name')), 'value': v, 'lv': users[uid].get('lv'),
