@@ -1,0 +1,139 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Cinzel;font-weight:700;src:url(cinzel-latin-700-normal.woff2)}
+@font-face{font-family:Cinzel;font-weight:900;src:url(cinzel-latin-900-normal.woff2)}
+@font-face{font-family:CinzelDeco;font-weight:900;src:url(cinzel-decorative-latin-900-normal.woff2)}
+:root{--gold:#f3cf6b;--gold2:#b8862b;--ink:#f4ead2;--dim:#b9a98a;--bg:#120c1c;--card:rgba(32,22,46,.82);--line:rgba(243,207,107,.35)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1080px;background:var(--bg);color:var(--ink);font-family:Inter,sans-serif}
+.wrap{position:relative;overflow:hidden;padding:46px 48px 40px;
+ background:radial-gradient(900px 520px at 78% 14%,rgba(132,70,200,.42),transparent 65%),
+            radial-gradient(700px 500px at 10% 0%,rgba(230,140,40,.22),transparent 60%),
+            radial-gradient(900px 700px at 50% 110%,rgba(60,40,120,.55),transparent 70%),
+            linear-gradient(180deg,#1a1027,#0d0915)}
+.wrap:before{content:"";position:absolute;inset:14px;border:2px solid var(--line);border-radius:18px;pointer-events:none}
+.wrap:after{content:"";position:absolute;inset:22px;border:1px solid rgba(243,207,107,.15);border-radius:14px;pointer-events:none}
+.gold{background:linear-gradient(180deg,#fff3c4 0%,#f3cf6b 45%,#b8862b 100%);-webkit-background-clip:text;color:transparent}
+header{text-align:center;position:relative;z-index:2}
+.kicker{font-family:Cinzel;font-weight:700;letter-spacing:.42em;font-size:17px;color:var(--dim)}
+h1{font-family:CinzelDeco;font-weight:900;font-size:64px;line-height:1.05;margin-top:6px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.6))}
+.sub{font-family:Cinzel;font-weight:900;font-size:30px;letter-spacing:.12em;margin-top:4px}
+.meta{margin-top:12px;font-size:15px;color:var(--dim);letter-spacing:.08em}
+.meta b{color:var(--ink);font-weight:600}
+.rule{height:2px;margin:22px auto 0;width:520px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+
+.champ{position:relative;margin-top:26px;height:430px;border-radius:16px;overflow:hidden;
+ background:linear-gradient(100deg,rgba(40,24,60,.95) 0%,rgba(40,24,60,.75) 42%,rgba(40,24,60,0) 70%),
+            radial-gradient(500px 380px at 74% 50%,rgba(255,170,60,.35),transparent 70%),#1d1230;
+ border:2px solid var(--line);box-shadow:0 0 40px rgba(243,170,60,.18) inset}
+.champ img{position:absolute;right:-30px;top:-10px;height:470px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.6))}
+.champ .txt{position:absolute;left:40px;top:44px;width:470px}
+.badge{display:inline-block;font-family:Cinzel;font-weight:900;font-size:15px;letter-spacing:.3em;color:#2a1600;
+ background:linear-gradient(180deg,#fff0b8,#f3cf6b 50%,#c8922e);padding:7px 16px 6px;border-radius:6px}
+.champ .name{font-family:Cinzel;font-weight:900;font-size:76px;line-height:1;margin-top:18px}
+.champ .pts{font-family:Cinzel;font-weight:900;font-size:46px;margin-top:16px;color:#fff}
+.champ .pts small{display:block;font-family:Inter;font-weight:600;font-size:14px;letter-spacing:.24em;color:var(--dim);margin-top:2px}
+.champ .tags{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
+.tag{font-size:14px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--ink)}
+
+.pod{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.p{display:flex;align-items:center;gap:18px;padding:18px 20px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.p .rk{font-family:Cinzel;font-weight:900;font-size:44px;width:58px;text-align:center}
+.r2{color:#dfe6ee;text-shadow:0 0 14px rgba(200,220,255,.35)} .r3{color:#e3a36a;text-shadow:0 0 14px rgba(230,150,80,.35)}
+.thumb{width:76px;height:76px;border-radius:10px;border:2px solid var(--line);background:#0d0915}
+.p .nm{font-family:Cinzel;font-weight:900;font-size:30px;line-height:1.1}
+.p .v{font-size:20px;font-weight:700;margin-top:4px}
+.p .v span{font-size:13px;font-weight:600;color:var(--dim);letter-spacing:.14em;margin-left:6px}
+.p .ld{font-size:13px;color:var(--dim);margin-top:4px}
+
+h2{font-family:Cinzel;font-weight:900;font-size:22px;letter-spacing:.18em;margin:30px 0 12px;display:flex;align-items:center;gap:14px}
+h2:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.rest{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.rc{padding:12px;border-radius:12px;background:var(--card);border:1px solid rgba(243,207,107,.18);text-align:center}
+.rc .n{font-family:Cinzel;font-weight:900;font-size:15px;color:var(--gold)}
+.rc img{width:58px;height:58px;border-radius:8px;margin:8px auto 6px;display:block;border:1px solid var(--line)}
+.rc .nm{font-weight:700;font-size:16px}
+.rc .v{font-size:14px;color:var(--dim);margin-top:2px}
+
+.surveys{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.sv{padding:18px 20px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.sv h3{font-family:Cinzel;font-weight:900;font-size:18px;color:var(--gold);letter-spacing:.06em}
+.sv h3 small{display:block;font-family:Inter;font-weight:600;font-size:12px;letter-spacing:.2em;color:var(--dim);margin-top:2px}
+.line{display:flex;align-items:center;gap:12px;margin-top:10px;font-size:17px}
+.line .k{font-family:Cinzel;font-weight:900;width:26px;color:var(--dim)}
+.line:nth-of-type(1) .k{color:var(--gold)}
+.line .who{flex:1;font-weight:700}
+.line .sc{font-variant-numeric:tabular-nums;font-weight:600}
+
+.mvp{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.m{padding:14px 14px 12px;border-radius:12px;background:var(--card);border:1px solid rgba(243,207,107,.22)}
+.m .t{font-size:11.5px;font-weight:700;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+.m .w{font-family:Cinzel;font-weight:900;font-size:22px;margin-top:6px}
+.m .wv{font-size:24px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.m .o{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.5}
+.m.thanks{display:flex;flex-direction:column;justify-content:center;text-align:center;background:linear-gradient(180deg,rgba(243,207,107,.18),rgba(243,207,107,.05))}
+.m.thanks .w{font-size:19px}
+footer{margin-top:26px;text-align:center;font-size:13px;color:var(--dim);letter-spacing:.14em}
+footer b{font-family:Cinzel;color:var(--gold);letter-spacing:.2em}
+</style></head><body><div class="wrap">
+<header>
+ <div class="kicker">BRAVE FRONTIER · MINT</div>
+ <h1 class="gold">Frontier Hunter</h1>
+ <div class="sub">SEASON 2 · FINAL RANKINGS</div>
+ <div class="meta">12 – 19 November 2026 &nbsp;·&nbsp; <b>9</b> hunters ranked &nbsp;·&nbsp; Uncharted Frontier</div>
+ <div class="rule"></div>
+</header>
+
+<section class="champ">
+ <img src="unit_ills_full_860105.png" alt="">
+ <div class="txt">
+  <span class="badge">★ SEASON CHAMPION ★</span>
+  <div class="name gold">Lucy</div>
+  <div class="pts">675,763<small>SURVEY POINTS</small></div>
+  <div class="tags"><span class="tag">Hunter Rank 8</span><span class="tag">Lv 381</span><span class="tag">Lead: Pumqueen Semira</span><span class="tag">Swept all 7 MVP boards</span></div>
+ </div>
+</section>
+
+<div class="pod">
+ <div class="p"><div class="rk r2">2</div><img class="thumb" src="unit_ills_thum_860105.png" alt="">
+  <div><div class="nm">GarLICK</div><div class="v">335,840<span>PTS</span></div><div class="ld">HR 4 · Lv 305 · Pumqueen Semira</div></div></div>
+ <div class="p"><div class="rk r3">3</div><img class="thumb" src="unit_ills_thum_60324.png" alt="">
+  <div><div class="nm">Komik</div><div class="v">319,429<span>PTS</span></div><div class="ld">HR 4 · Lv 321 · Grahdens</div></div></div>
+</div>
+
+<h2 class="gold">HONOURABLE HUNTERS</h2>
+<div class="rest">
+ <div class="rc"><div class="n">4TH</div><img src="unit_ills_thum_50314.png" alt=""><div class="nm">Cactus</div><div class="v">27,971 pts</div></div>
+ <div class="rc"><div class="n">5TH</div><img src="unit_ills_thum_40284.png" alt=""><div class="nm">BOMBA</div><div class="v">19,168 pts</div></div>
+ <div class="rc"><div class="n">6TH</div><img src="unit_ills_thum_60324.png" alt=""><div class="nm">PikuPiku</div><div class="v">15,692 pts</div></div>
+ <div class="rc"><div class="n">7TH</div><img src="unit_ills_thum_10254.png" alt=""><div class="nm">Kurumi</div><div class="v">14,451 pts</div></div>
+ <div class="rc"><div class="n">8TH</div><img src="unit_ills_thum_40024.png" alt=""><div class="nm">whiskers</div><div class="v">2,016 pts</div></div>
+</div>
+
+<h2 class="gold">SURVEY HIGH SCORES</h2>
+<div class="surveys">
+ <div class="sv"><h3>Uncharted Frontier – Middle 2<small>BEST SINGLE-RUN SCORE</small></h3>
+  <div class="line"><span class="k">1</span><span class="who">Lucy</span><span class="sc">3,874,671</span></div>
+  <div class="line"><span class="k">2</span><span class="who">Komik</span><span class="sc">3,295,121</span></div>
+  <div class="line"><span class="k">3</span><span class="who">GarLICK</span><span class="sc">2,764,227</span></div></div>
+ <div class="sv"><h3>Uncharted Frontier – End 2<small>BEST SINGLE-RUN SCORE</small></h3>
+  <div class="line"><span class="k">1</span><span class="who">Lucy</span><span class="sc">1,454,891</span></div>
+  <div class="line"><span class="k">2</span><span class="who">Komik</span><span class="sc">1,105,767</span></div>
+  <div class="line"><span class="k">3</span><span class="who">Cactus</span><span class="sc">775,124</span></div></div>
+</div>
+
+<h2 class="gold">MVP AWARDS</h2>
+<div class="mvp">
+ <div class="m"><div class="t">Total Sparks</div><div class="w gold">Lucy</div><div class="wv">11,594</div><div class="o">2 GarLICK 6,565<br>3 Komik 6,238</div></div>
+ <div class="m"><div class="t">Total Overkills</div><div class="w gold">Lucy</div><div class="wv">50,655</div><div class="o">2 Komik 30,809<br>3 GarLICK 28,674</div></div>
+ <div class="m"><div class="t">Multi-Kills</div><div class="w gold">Lucy</div><div class="wv">499</div><div class="o">2 Komik 306<br>3 GarLICK 292</div></div>
+ <div class="m"><div class="t">BB Kills</div><div class="w gold">Lucy</div><div class="wv">492</div><div class="o">2 GarLICK 286<br>3 Komik 281</div></div>
+ <div class="m"><div class="t">One Turn Kills</div><div class="w gold">Lucy</div><div class="wv">148</div><div class="o">2 GarLICK 92<br>3 Komik 88</div></div>
+ <div class="m"><div class="t">Times Participated</div><div class="w gold">Lucy</div><div class="wv">31</div><div class="o">2 GarLICK 19<br>3 Komik 18</div></div>
+ <div class="m"><div class="t">Times Helped</div><div class="w gold">Lucy</div><div class="wv">52</div><div class="o">2 Komik 9</div></div>
+ <div class="m thanks"><div class="t">Season 3</div><div class="w gold">The hunt goes on</div><div class="o">Thanks for hunting, Summoners!</div></div>
+</div>
+
+<footer><b>BRAVE FRONTIER MINT</b> &nbsp;·&nbsp; Frontier Hunter Season 2</footer>
+</div></body></html>
