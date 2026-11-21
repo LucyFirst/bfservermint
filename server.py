@@ -5089,6 +5089,20 @@ def _handle_action(rid, req):
                 resp[G_BADGE] = {'dUujjBBK': achievement_engine().badges(pl)}   # like the real reply
             save_player(pl)
             return resp
+        if cls in ('ArenaRetireRequest', 'VortexArenaRetireRequest'):
+            # The game was closed during an Arena battle: at the next start it reports the battle as given
+            # up (and keeps asking until the server answers). An unfinished Arena battle counts as a loss.
+            A = arena_engine()
+            if cls == 'ArenaRetireRequest' and pl.get('arena_opp'):
+                try:
+                    A.end(pl, {'yTEvm85f': [{'3pAQY5KW': '0'}]}, pl['state'].get(G_BADGE))
+                    log.info('arena battle given up (game closed mid-battle): counted as a loss')
+                except Exception:
+                    pl.pop('arena_opp', None)
+                    log.exception('could not count the given-up arena battle')
+            resp = {'8jBJ7uKR': [A.info(pl)]} if cls == 'ArenaRetireRequest' else {}
+            save_player(pl)
+            return resp
         if cls in ('ArenaInfoRequest', 'ArenaMatchingRequest', 'ArenaBattleStartRequest', 'ArenaBattleEndRequest',
                    'ArenaFriendListRequest'):
             A = arena_engine()
